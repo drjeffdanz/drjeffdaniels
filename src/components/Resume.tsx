@@ -2,7 +2,7 @@ import { Download, Briefcase, GraduationCap, Users } from "lucide-react";
 
 const experience = [
   {
-    company: "Digital Operations and Service Management",
+    company: "AI, Automation, and Digital Infrastructure Lead",
     location: "Fort Worth, TX",
     period: "2019 – Present",
     title: "Program Director",
