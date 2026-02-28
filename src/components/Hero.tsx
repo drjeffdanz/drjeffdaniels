@@ -20,16 +20,15 @@ export default function Hero() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-32 grid md:grid-cols-2 gap-12 items-center">
         <div className="animate-fade-in-up">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-            <span className="text-gold">Digital Transformation</span>
+            <span className="text-gold">Technology Executive</span>
             <br />
-            <span className="text-white">Leader &</span>
-            <br />
-            <span className="text-white">Professor</span>
+            <span className="text-white">Strategic Leader</span>
           </h1>
           <p className="text-lg text-light-text max-w-lg mb-8 leading-relaxed">
-            Program Director at Lockheed Martin. Professor of Cybersecurity at
-            UMGC. Thought leader in AI, cloud computing, blockchain, and
-            industrial innovation.
+            Senior Executive Program Director at Lockheed Martin. Professor of
+            Cybersecurity at UMGC. Driving enterprise digital transformation,
+            AI innovation, and operational excellence across aerospace and
+            defense.
           </p>
           <div className="flex flex-wrap gap-4">
             <a

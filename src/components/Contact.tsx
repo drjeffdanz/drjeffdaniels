@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { Send, Linkedin, Mail } from "lucide-react";
+import { Send, Linkedin, Mail, Twitter } from "lucide-react";
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -116,7 +116,7 @@ export default function Contact() {
               Let&apos;s Connect
             </h3>
             <a
-              href="https://www.linkedin.com/in/drjeffdaniels"
+              href="https://www.linkedin.com/in/jeffdaniels/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-4 bg-dark-card border border-dark-border rounded-xl p-5 hover:border-gold/30 transition-colors duration-300"
@@ -125,6 +125,18 @@ export default function Contact() {
               <div>
                 <p className="text-white font-medium">LinkedIn</p>
                 <p className="text-light-text text-sm">Connect professionally</p>
+              </div>
+            </a>
+            <a
+              href="https://x.com/jeffdaniels"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 bg-dark-card border border-dark-border rounded-xl p-5 hover:border-gold/30 transition-colors duration-300"
+            >
+              <Twitter className="text-gold" size={24} />
+              <div>
+                <p className="text-white font-medium">X (Twitter)</p>
+                <p className="text-light-text text-sm">@jeffdaniels</p>
               </div>
             </a>
             <a
