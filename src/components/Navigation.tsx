@@ -4,13 +4,14 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Expertise", href: "#expertise" },
-  { label: "Publications", href: "#publications" },
-  { label: "Advisory Board", href: "#advisory-board" },
-  { label: "Awards", href: "#awards" },
-  { label: "Resume", href: "#resume" },
-  { label: "Contact", href: "#contact" },
+  { label: "About", href: "/#about" },
+  { label: "Expertise", href: "/#expertise" },
+  { label: "Publications", href: "/#publications" },
+  { label: "Advisory Board", href: "/#advisory-board" },
+  { label: "Awards", href: "/#awards" },
+  { label: "Resume", href: "/#resume" },
+  { label: "Attention Matrix", href: "/attention-matrix" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Navigation() {
