@@ -11,6 +11,7 @@ const navLinks = [
   { label: "Awards", href: "/#awards" },
   { label: "Resume", href: "/#resume" },
   { label: "Attention Matrix", href: "/attention-matrix" },
+  { label: "Tech Radar", href: "/tech-radar" },
   { label: "Contact", href: "/#contact" },
 ];
 
