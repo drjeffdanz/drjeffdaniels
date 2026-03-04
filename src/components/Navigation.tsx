@@ -10,7 +10,6 @@ const navLinks = [
   { label: "Advisory Board", href: "/#advisory-board" },
   { label: "Awards", href: "/#awards" },
   { label: "Resume", href: "/#resume" },
-  { label: "Attention Matrix", href: "/attention-matrix" },
   { label: "Contact", href: "/#contact" },
 ];
 
