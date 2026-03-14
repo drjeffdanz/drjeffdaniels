@@ -281,7 +281,7 @@ class QueensChamberScene extends BaseScene {
       },
       {
         id: 'tea', name: 'Teacup',
-        x: W/2+148, y: WH-242, w: 50, h: 36,
+        x: W/2+138, y: WH-142, w: 50, h: 36,
         look: () => this._play(DIALOGUE_TEA),
         talk: () => this._narrate("The teacup has nothing useful to say."),
         take: () => this._cantTake('the teacup'),
@@ -293,7 +293,7 @@ class QueensChamberScene extends BaseScene {
       },
       {
         id: 'letter', name: "The Queen's Letter",
-        x: W/2+152, y: WH-208, w: 54, h: 40,
+        x: W/2+151, y: WH-102, w: 54, h: 40,
         look: () => this._play(DIALOGUE_LETTER_LOOK),
         talk: () => this._narrate("The sealed letter waits in silence."),
         take: () => this._letterTake(),
@@ -301,7 +301,7 @@ class QueensChamberScene extends BaseScene {
       },
       {
         id: 'book', name: 'Book of Ballads',
-        x: W/2+140, y: WH-172, w: 44, h: 20,
+        x: W/2+138, y: WH-76, w: 44, h: 20,
         look: () => this._play(DIALOGUE_BOOK_LOOK),
         talk: () => this._narrate("It's a book. It does not answer."),
         take: () => this._bookTake(),

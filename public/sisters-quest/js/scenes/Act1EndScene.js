@@ -125,10 +125,10 @@ class Act1EndScene extends Phaser.Scene {
       align: 'center',
     }).setOrigin(0.5);
 
-    // ── "To be continued" ─────────────────────────────────────
-    const tbcText = this.add.text(W / 2, H - 90, '— To Be Continued —', {
+    // ── "Continue" prompt ─────────────────────────────────────
+    const tbcText = this.add.text(W / 2, H - 96, '— Continue to Act Two? —', {
       fontFamily: 'Georgia, serif',
-      fontSize: '18px',
+      fontSize: '15px',
       color: '#c8956c',
       fontStyle: 'italic',
     }).setOrigin(0.5).setAlpha(0);
@@ -142,18 +142,22 @@ class Act1EndScene extends Phaser.Scene {
     });
 
     // ── Buttons ───────────────────────────────────────────────
-    this._makeButton(W / 2 - 100, H - 42, 'Main Menu', () => {
+    // Primary: Continue into Act 2
+    this._makeButton(W / 2, H - 60, '▶  Continue the Journey', () => {
+      this.cameras.main.fadeOut(500, 0, 0, 0);
+      this.time.delayedCall(500, () => this.scene.start('CresthollowScene'));
+    }, true);
+
+    // Secondary: Main Menu / Play Again
+    this._makeButton(W / 2 - 110, H - 22, 'Main Menu', () => {
       this.cameras.main.fadeOut(400, 0, 0, 0);
       this.time.delayedCall(400, () => this.scene.start('MenuScene'));
     });
 
-    this._makeButton(W / 2 + 100, H - 42, 'Play Again', () => {
+    this._makeButton(W / 2 + 110, H - 22, 'Play Again', () => {
       GameState.reset();
       this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.time.delayedCall(400, () => {
-        this.scene.start('QueensChamberScene');
-        this.scene.launch('UIScene');
-      });
+      this.time.delayedCall(400, () => this.scene.start('QueensChamberScene'));
     });
 
     // Fade in
@@ -185,40 +189,46 @@ class Act1EndScene extends Phaser.Scene {
     g.setAngle(-3);
   }
 
-  _makeButton(x, y, label, callback) {
-    const W = 160;
-    const H = 36;
+  _makeButton(x, y, label, callback, primary = false) {
+    const BW = primary ? 240 : 160;
+    const BH = primary ? 42 : 34;
+
+    const fillNorm   = primary ? 0x2a1408 : 0x1a1008;
+    const fillHover  = primary ? 0x3a2010 : 0x2a1a10;
+    const borderNorm = primary ? 0xc8956c : 0xc8956c;
+    const borderHov  = primary ? 0xf0b870 : 0xd4a97e;
+    const fontSize   = primary ? '15px' : '13px';
 
     const bg = this.add.graphics();
-    bg.fillStyle(0x1a1008, 1);
-    bg.fillRoundedRect(x - W / 2, y - H / 2, W, H, 5);
-    bg.lineStyle(1, 0xc8956c, 0.7);
-    bg.strokeRoundedRect(x - W / 2, y - H / 2, W, H, 5);
+    bg.fillStyle(fillNorm, 1);
+    bg.fillRoundedRect(x - BW / 2, y - BH / 2, BW, BH, 5);
+    bg.lineStyle(primary ? 1.5 : 1, borderNorm, primary ? 1 : 0.7);
+    bg.strokeRoundedRect(x - BW / 2, y - BH / 2, BW, BH, 5);
 
     const text = this.add.text(x, y, label, {
       fontFamily: 'Georgia, serif',
-      fontSize: '14px',
-      color: '#e8d5b0',
+      fontSize,
+      color: primary ? '#f5e8c8' : '#e8d5b0',
     }).setOrigin(0.5);
 
-    const zone = this.add.zone(x, y, W, H).setInteractive({ useHandCursor: true });
+    const zone = this.add.zone(x, y, BW, BH).setInteractive({ useHandCursor: true });
 
     zone.on('pointerover', () => {
       bg.clear();
-      bg.fillStyle(0x2a1a10, 1);
-      bg.fillRoundedRect(x - W / 2, y - H / 2, W, H, 5);
-      bg.lineStyle(1.5, 0xd4a97e, 1);
-      bg.strokeRoundedRect(x - W / 2, y - H / 2, W, H, 5);
+      bg.fillStyle(fillHover, 1);
+      bg.fillRoundedRect(x - BW / 2, y - BH / 2, BW, BH, 5);
+      bg.lineStyle(1.5, borderHov, 1);
+      bg.strokeRoundedRect(x - BW / 2, y - BH / 2, BW, BH, 5);
       text.setColor('#ffffff');
     });
 
     zone.on('pointerout', () => {
       bg.clear();
-      bg.fillStyle(0x1a1008, 1);
-      bg.fillRoundedRect(x - W / 2, y - H / 2, W, H, 5);
-      bg.lineStyle(1, 0xc8956c, 0.7);
-      bg.strokeRoundedRect(x - W / 2, y - H / 2, W, H, 5);
-      text.setColor('#e8d5b0');
+      bg.fillStyle(fillNorm, 1);
+      bg.fillRoundedRect(x - BW / 2, y - BH / 2, BW, BH, 5);
+      bg.lineStyle(primary ? 1.5 : 1, borderNorm, primary ? 1 : 0.7);
+      bg.strokeRoundedRect(x - BW / 2, y - BH / 2, BW, BH, 5);
+      text.setColor(primary ? '#f5e8c8' : '#e8d5b0');
     });
 
     zone.on('pointerdown', callback);
