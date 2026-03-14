@@ -7,6 +7,8 @@
 class TideKingScene extends BaseScene {
   constructor() { super({ key: 'TideKingScene' }); }
 
+  preload() { this.load.image('bg_tideshrine', 'assets/backgrounds/tide-king-shrine.jpg'); }
+
   create() {
     const W  = this.scale.width;
     const H  = this.scale.height;
@@ -23,14 +25,17 @@ class TideKingScene extends BaseScene {
       color: '#2a3840', fontStyle: 'italic',
     }).setOrigin(0.5).setDepth(10);
 
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, WH / 2, 'bg_tideshrine').setDisplaySize(W, WH).setDepth(0);
+
+    // ── Alcove coords (used by shrine_offerings hotspot) ──────
+    this._alcoveX = W * 0.30;
+    this._alcoveY = WH * 0.30;
+    this._alcoveW = W * 0.40;
+    this._alcoveH = WH * 0.38;
+
     // ── World (drawn back to front) ───────────────────────────
-    this._drawSky(W, WH);
-    this._drawSea(W, WH);
-    this._drawCliffFace(W, WH);
-    this._drawShrineLedge(W, WH);
     this._drawTidePools(W, WH);
-    this._drawShrineDecoration(W, WH);
-    this._drawKelpGarlands(W, WH);
     this._drawTideKing(W, WH);
     this._drawReturnArrow(W, WH);
 
@@ -74,161 +79,6 @@ class TideKingScene extends BaseScene {
         ]);
       });
     }
-  }
-
-  // ── Sky (golden-blue, late afternoon) ────────────────────
-
-  _drawSky(W, WH) {
-    const g = this.add.graphics();
-
-    // Deep blue-gold late afternoon
-    g.fillGradientStyle(0x0e1828, 0x0e1828, 0x3a5870, 0x3a5870, 1);
-    g.fillRect(0, 0, W, WH * 0.36);
-
-    // Warm band near horizon
-    g.fillGradientStyle(0x3a5870, 0x3a5870, 0x8a7040, 0x8a7040, 1);
-    g.fillRect(0, WH * 0.26, W, WH * 0.12);
-
-    // High cirrus clouds catching gold light
-    g.fillStyle(0x8a9aaa, 0.25);
-    g.fillEllipse(W * 0.12, WH * 0.06, 240, 22);
-    g.fillEllipse(W * 0.45, WH * 0.04, 180, 18);
-    g.fillStyle(0xc8a060, 0.18);
-    g.fillEllipse(W * 0.72, WH * 0.08, 200, 24);
-    g.fillEllipse(W * 0.88, WH * 0.05, 140, 16);
-
-    // Gold light source (sun, low, out of frame but casting)
-    g.fillStyle(0xd0a040, 0.12);
-    g.fillRect(0, WH * 0.24, W, WH * 0.14);
-  }
-
-  // ── Sea (visible at edges and horizon) ────────────────────
-
-  _drawSea(W, WH) {
-    const g = this.add.graphics().setDepth(1);
-
-    // Horizon sea band
-    g.fillGradientStyle(0x1c3850, 0x1c3850, 0x2a4e68, 0x2a4e68, 1);
-    g.fillRect(0, WH * 0.35, W, WH * 0.06);
-
-    // Left-side sea visible past cliff edge
-    g.fillStyle(0x1e3a50, 1);
-    g.fillRect(0, WH * 0.35, W * 0.08, WH * 0.50);
-    // Right-side sea
-    g.fillStyle(0x1e3a50, 1);
-    g.fillRect(W * 0.92, WH * 0.35, W * 0.08, WH * 0.50);
-
-    // Wave suggestions on visible sea
-    g.lineStyle(1, 0x4888a0, 0.35);
-    [WH * 0.37, WH * 0.40, WH * 0.43].forEach(wy => {
-      g.lineBetween(0, wy, W * 0.07, wy + 2);
-      g.lineBetween(W * 0.93, wy, W, wy + 2);
-    });
-  }
-
-  // ── Cliff Face ────────────────────────────────────────────
-
-  _drawCliffFace(W, WH) {
-    const g = this.add.graphics().setDepth(2);
-
-    // Main cliff mass (dark volcanic rock)
-    g.fillGradientStyle(0x181c20, 0x181c20, 0x222830, 0x222830, 1);
-    g.fillRect(0, WH * 0.28, W, WH * 0.55);
-
-    // Rock texture: irregular facets
-    g.fillStyle(0x1c2028, 1);
-    const rockFacets = [
-      { x: W * 0.05, y: WH * 0.30, w: W * 0.18, h: WH * 0.12 },
-      { x: W * 0.28, y: WH * 0.28, w: W * 0.22, h: WH * 0.10 },
-      { x: W * 0.56, y: WH * 0.31, w: W * 0.20, h: WH * 0.09 },
-      { x: W * 0.78, y: WH * 0.30, w: W * 0.20, h: WH * 0.14 },
-      { x: W * 0.12, y: WH * 0.42, w: W * 0.16, h: WH * 0.18 },
-      { x: W * 0.62, y: WH * 0.44, w: W * 0.22, h: WH * 0.15 },
-    ];
-    rockFacets.forEach(f => {
-      g.fillRect(f.x, f.y, f.w, f.h);
-      g.lineStyle(0.5, 0x141820, 0.7);
-      g.strokeRect(f.x, f.y, f.w, f.h);
-    });
-
-    // Rock highlight (catching the low sun from one side)
-    g.fillStyle(0x8a7040, 0.06);
-    g.fillRect(W * 0.55, WH * 0.28, W * 0.45, WH * 0.55);
-
-    // Crack lines in rock face
-    g.lineStyle(1, 0x10141a, 0.8);
-    const cracks = [
-      [[W * 0.12, WH * 0.30], [W * 0.08, WH * 0.48]],
-      [[W * 0.35, WH * 0.29], [W * 0.30, WH * 0.55], [W * 0.33, WH * 0.65]],
-      [[W * 0.66, WH * 0.31], [W * 0.70, WH * 0.52]],
-      [[W * 0.84, WH * 0.33], [W * 0.86, WH * 0.50], [W * 0.82, WH * 0.62]],
-    ];
-    cracks.forEach(pts => {
-      for (let i = 0; i < pts.length - 1; i++) {
-        g.lineBetween(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1]);
-      }
-    });
-
-    // Shrine carved alcove (center of cliff face — large)
-    const alcX = W * 0.30, alcY = WH * 0.30, alcW = W * 0.40, alcH = WH * 0.38;
-    // Alcove shadow
-    g.fillStyle(0x0c1014, 0.8);
-    g.fillRect(alcX, alcY, alcW, alcH);
-    // Alcove arch
-    g.fillStyle(0x0e1216, 0.95);
-    g.fillEllipse(alcX + alcW / 2, alcY, alcW, alcH * 0.4);
-    // Carved wave patterns around alcove frame
-    g.lineStyle(1.5, 0x3a5060, 0.55);
-    for (let wi = 0; wi < 4; wi++) {
-      const wy = alcY + 8 + wi * 10;
-      for (let wx = alcX + 6; wx < alcX + alcW - 6; wx += 20) {
-        g.arc(wx + 10, wy, 10, Math.PI, 0, false);
-        g.strokePath();
-      }
-    }
-    // Carved frame border
-    g.lineStyle(2, 0x3a5060, 0.5);
-    g.strokeRect(alcX, alcY, alcW, alcH);
-    g.strokeEllipse(alcX + alcW / 2, alcY, alcW, alcH * 0.4);
-
-    this._alcoveX = alcX;
-    this._alcoveY = alcY;
-    this._alcoveW = alcW;
-    this._alcoveH = alcH;
-  }
-
-  // ── Shrine Ledge / Platform ───────────────────────────────
-
-  _drawShrineLedge(W, WH) {
-    const g = this.add.graphics().setDepth(3);
-
-    // Carved stone ledge at the base of the cliff
-    const ledgeY = WH * 0.65;
-    g.fillStyle(0x20242c, 1);
-    g.fillRect(0, ledgeY, W, WH - ledgeY);
-    g.lineStyle(2, 0x2e3440, 1);
-    g.lineBetween(0, ledgeY, W, ledgeY);
-
-    // Ledge texture
-    g.lineStyle(0.5, 0x191d24, 0.6);
-    for (let lx = 0; lx < W; lx += 44) {
-      g.lineBetween(lx, ledgeY, lx, WH);
-    }
-    for (let ly = ledgeY + 16; ly < WH; ly += 22) {
-      g.lineBetween(0, ly, W, ly);
-    }
-
-    // Stone step up to shrine (center)
-    g.fillStyle(0x282c34, 1);
-    g.fillRect(W * 0.35, ledgeY - 14, W * 0.30, 14);
-    g.lineStyle(1, 0x383e48, 1);
-    g.strokeRect(W * 0.35, ledgeY - 14, W * 0.30, 14);
-
-    // Gold-tinged water seep from cliff (luminous crack)
-    g.lineStyle(2, 0x4888a8, 0.35);
-    g.lineBetween(W * 0.48, WH * 0.52, W * 0.50, ledgeY);
-    g.lineStyle(1, 0x6aaac8, 0.2);
-    g.lineBetween(W * 0.46, WH * 0.54, W * 0.49, ledgeY);
   }
 
   // ── Star-polygon helper (Phaser has no fillStar) ──────────
@@ -284,119 +134,6 @@ class TideKingScene extends BaseScene {
     this._mainPoolY = mainY;
     this._mainPoolW = mainW;
     this._mainPoolH = mainH;
-  }
-
-  // ── Shrine Decoration (sea glass, offerings) ──────────────
-
-  _drawShrineDecoration(W, WH) {
-    const g = this.add.graphics().setDepth(6);
-
-    // Sea glass scattered on ledge
-    const seaGlassColors = [0x4ab8c0, 0x68c880, 0xa8d8b0, 0x80b8e0, 0xd8e8a0, 0x60a8d0];
-    const glassPositions = [
-      [W * 0.10, WH * 0.67], [W * 0.18, WH * 0.68], [W * 0.22, WH * 0.66],
-      [W * 0.76, WH * 0.67], [W * 0.82, WH * 0.69], [W * 0.86, WH * 0.66],
-      [W * 0.06, WH * 0.72], [W * 0.91, WH * 0.73], [W * 0.14, WH * 0.75],
-      [W * 0.88, WH * 0.75], [W * 0.03, WH * 0.66], [W * 0.96, WH * 0.68],
-    ];
-    glassPositions.forEach((pos, i) => {
-      const col  = seaGlassColors[i % seaGlassColors.length];
-      const size = Phaser.Math.Between(4, 9);
-      g.fillStyle(col, 0.75);
-      g.fillEllipse(pos[0], pos[1], size, size * 0.7);
-      g.lineStyle(0.5, col, 0.4);
-      g.strokeEllipse(pos[0], pos[1], size, size * 0.7);
-      // Glint
-      g.fillStyle(0xffffff, 0.4);
-      g.fillCircle(pos[0] - size * 0.15, pos[1] - size * 0.15, size * 0.18);
-    });
-
-    // Smooth stone offerings on ledge flanking pool
-    g.fillStyle(0x484c58, 1);
-    [[W * 0.26, WH * 0.64], [W * 0.73, WH * 0.64], [W * 0.24, WH * 0.67], [W * 0.75, WH * 0.67]].forEach(p => {
-      g.fillEllipse(p[0], p[1], Phaser.Math.Between(10, 16), Phaser.Math.Between(6, 10));
-    });
-
-    // Alcove shrine offerings (inside the carved shrine)
-    const alcCX = this._alcoveX + this._alcoveW / 2;
-    const alcBY = this._alcoveY + this._alcoveH - 16;
-    // Central carved wave design (large, dominant)
-    g.lineStyle(2, 0x4888a8, 0.55);
-    for (let wl = 0; wl < 5; wl++) {
-      const wy = alcBY - 12 - wl * 14;
-      for (let wx = this._alcoveX + 12; wx < this._alcoveX + this._alcoveW - 12; wx += 28) {
-        g.arc(wx + 14, wy, 14, Math.PI, 0, false);
-        g.strokePath();
-      }
-    }
-    // Glowing center rune (carved star)
-    g.fillStyle(0x4888a8, 0.3);
-    g.fillPoints(this._starPoints(alcCX, this._alcoveY + this._alcoveH * 0.6, 6, 12, 22, 0), true);
-    g.lineStyle(1.5, 0x6aa8c8, 0.6);
-    g.strokePoints(this._starPoints(alcCX, this._alcoveY + this._alcoveH * 0.6, 6, 12, 22, 0), true);
-
-    // Small candle-like sea glass lights on the shrine ledge
-    const candleX = [alcCX - 48, alcCX - 24, alcCX + 24, alcCX + 48];
-    candleX.forEach(cx => {
-      g.fillStyle(0x80d0e0, 0.55);
-      g.fillCircle(cx, alcBY - 5, 5);
-      g.fillStyle(0xd0f0ff, 0.35);
-      g.fillCircle(cx, alcBY - 8, 6);
-    });
-  }
-
-  // ── Kelp Garlands ─────────────────────────────────────────
-
-  _drawKelpGarlands(W, WH) {
-    const g = this.add.graphics().setDepth(7);
-
-    // Hanging kelp strands from cliff face
-    const kelpAnchors = [
-      W * 0.10, W * 0.22, W * 0.32,
-      W * 0.68, W * 0.78, W * 0.90,
-    ];
-    kelpAnchors.forEach(kX => {
-      const kLen = Phaser.Math.Between(58, 108);
-      const kStartY = WH * 0.30 + Phaser.Math.Between(-10, 10);
-      // Strand body (wavy line approximation)
-      g.lineStyle(3, 0x1a4018, 0.7);
-      g.beginPath();
-      g.moveTo(kX, kStartY);
-      for (let ky = 0; ky < kLen; ky += 10) {
-        const kWave = Math.sin(ky * 0.3) * 5;
-        g.lineTo(kX + kWave, kStartY + ky);
-      }
-      g.strokePath();
-      // Blade highlights (lighter green)
-      g.lineStyle(1, 0x2a6028, 0.5);
-      for (let bl = 0; bl < kLen; bl += 18) {
-        const bx  = kX + Math.sin(bl * 0.3) * 5;
-        const by  = kStartY + bl;
-        const bw  = Phaser.Math.Between(8, 16);
-        g.lineBetween(bx, by, bx + bw, by - 5);
-        g.lineBetween(bx, by, bx - bw, by - 3);
-      }
-    });
-
-    // Draping kelp swag across the top of the alcove
-    g.lineStyle(2, 0x1a4018, 0.6);
-    const swagAnchorL = this._alcoveX, swagAnchorR = this._alcoveX + this._alcoveW;
-    const swagY = this._alcoveY;
-    g.beginPath();
-    g.moveTo(swagAnchorL, swagY);
-    for (let t = 0; t <= 1; t += 0.08) {
-      const sx = swagAnchorL + (swagAnchorR - swagAnchorL) * t;
-      const sy = swagY + Math.sin(t * Math.PI) * 28;
-      g.lineTo(sx, sy);
-    }
-    g.strokePath();
-    // Kelp beads on swag
-    g.fillStyle(0x2a6028, 0.7);
-    for (let t = 0.1; t < 1; t += 0.15) {
-      const sx = swagAnchorL + (swagAnchorR - swagAnchorL) * t;
-      const sy = swagY + Math.sin(t * Math.PI) * 28;
-      g.fillCircle(sx, sy, 4);
-    }
   }
 
   // ── The Tide King ─────────────────────────────────────────
@@ -499,12 +236,24 @@ class TideKingScene extends BaseScene {
     g.arc(tkX + 8, tkY - 72, 8, Math.PI * 0.5, -Math.PI * 0.5, false);
     g.strokePath();
 
+    // Sunset rim-light from the right — warm gold catching his left side
+    g.fillStyle(0xd08028, 0.12);
+    g.fillEllipse(tkX + 40, tkY - 60, 140, 200);
+    // Right-side crown and arm rim-light
+    g.fillStyle(0xf0a030, 0.08);
+    g.fillEllipse(tkX + 60, tkY - 100, 80, 120);
+
     // Ambient water light glow around the King (his presence illuminates the pool)
     const glowG = this.add.graphics().setDepth(11);
-    glowG.fillStyle(0x3090b0, 0.07);
+    // Wide deep outer halo
+    glowG.fillStyle(0x1878a0, 0.18);
+    glowG.fillEllipse(tkX, tkY - 20, 320, 240);
+    // Mid glow
+    glowG.fillStyle(0x3090b0, 0.20);
     glowG.fillEllipse(tkX, tkY - 20, 220, 160);
-    glowG.fillStyle(0x50b0c8, 0.04);
-    glowG.fillEllipse(tkX, tkY - 40, 300, 240);
+    // Bright inner pool glow
+    glowG.fillStyle(0x50b8d0, 0.15);
+    glowG.fillEllipse(tkX, tkY + 10, 140, 60);
 
     // Breathing tween
     this.tweens.add({
@@ -513,7 +262,7 @@ class TideKingScene extends BaseScene {
     });
     // Glow pulse
     this.tweens.add({
-      targets: glowG, alpha: { from: 0.7, to: 1.0 },
+      targets: glowG, alpha: { from: 0.65, to: 1.0 },
       duration: 3000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     });
 

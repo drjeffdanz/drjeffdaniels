@@ -7,6 +7,8 @@
 class WayneShackScene extends BaseScene {
   constructor() { super({ key: 'WayneShackScene' }); }
 
+  preload() { this.load.image('bg_wayne', 'assets/backgrounds/wayne-shack.jpg'); }
+
   create() {
     const W  = this.scale.width;
     const H  = this.scale.height;
@@ -23,14 +25,12 @@ class WayneShackScene extends BaseScene {
       color: '#4a3820', fontStyle: 'italic',
     }).setOrigin(0.5).setDepth(10);
 
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, WH / 2, 'bg_wayne').setDisplaySize(W, WH).setDepth(0);
+
     // ── World ─────────────────────────────────────────────────
-    this._drawSky(W, WH);
-    this._drawOcean(W, WH);
-    this._drawBeach(W, WH);
-    this._drawShack(W, WH);
-    this._drawSurfboards(W, WH);
+    this._initChairCoords(W, WH);
     this._drawFirePit(W, WH);
-    this._drawDockAndBoat(W, WH);
     this._drawWayne(W, WH);
     this._drawJennibelle(W, WH);
     this._drawReturnArrow(W, WH);
@@ -67,119 +67,30 @@ class WayneShackScene extends BaseScene {
     this._refreshJennibelle();
   }
 
-  // ── Sky (sunset / late afternoon) ────────────────────────
+  // ── Coordinate initialiser (replaces static background draws) ──
 
-  _drawSky(W, WH) {
-    const g = this.add.graphics();
-    // Orange-pink-purple sunset gradient
-    g.fillGradientStyle(0x1a1028, 0x1a1028, 0xe07a30, 0xe07a30, 1);
-    g.fillRect(0, 0, W, WH * 0.48);
-    // Lighter band at horizon
-    g.fillGradientStyle(0xe07a30, 0xe07a30, 0xf0a060, 0xf0a060, 1);
-    g.fillRect(0, WH * 0.28, W, WH * 0.20);
+  _initChairCoords(W, WH) {
+    // Chair position (matches where Wayne sits, referenced by _drawWayne and hotspots)
+    const sX = W * 0.04, sW = W * 0.30;
+    this._chairX = sX + sW + 22;
+    this._chairY = WH * 0.65;
 
-    // Silhouetted birds
-    g.lineStyle(1.5, 0x1a1028, 0.55);
-    const birds = [
-      { x: W * 0.15, y: WH * 0.08 },
-      { x: W * 0.22, y: WH * 0.06 },
-      { x: W * 0.55, y: WH * 0.11 },
-      { x: W * 0.62, y: WH * 0.09 },
-      { x: W * 0.80, y: WH * 0.13 },
-    ];
-    birds.forEach(b => {
-      g.lineBetween(b.x - 8, b.y, b.x, b.y - 5);
-      g.lineBetween(b.x, b.y - 5, b.x + 8, b.y);
-    });
+    // Surfboard hotspot bounds
+    this._surfboardsBounds = { x: sX, y: WH * 0.37, w: sX + sW * 0.14 + 30, h: WH * 0.30 };
 
-    // Sun disk low on horizon
-    g.fillStyle(0xffe870, 0.85);
-    g.fillCircle(W * 0.68, WH * 0.38, 34);
-    g.fillStyle(0xffcc40, 0.4);
-    g.fillCircle(W * 0.68, WH * 0.38, 44);
-    g.fillStyle(0xff9020, 0.18);
-    g.fillCircle(W * 0.68, WH * 0.38, 62);
-    // Sun reflection on water (painted later over ocean)
+    // Boat / dock coords (used by hotspots)
+    const dX = W * 0.72, dY = WH * 0.62, dW = W * 0.24, dH = WH * 0.10;
+    const bX = dX + 14;
+    this._boatX = bX + (dW - 28) / 2;
+    this._boatY = dY + dH - 6 + 20;   // approximate mid-hull
+    this._dockX = dX;
+    this._dockY = WH * 0.62;
+    this._dockW = dW;
+    this._dockH = dH + 40;
 
-    // Clouds catching the light
-    g.fillStyle(0xe06030, 0.45);
-    g.fillEllipse(W * 0.12, WH * 0.10, 180, 38);
-    g.fillEllipse(W * 0.38, WH * 0.06, 220, 32);
-    g.fillStyle(0xf08050, 0.35);
-    g.fillEllipse(W * 0.70, WH * 0.04, 160, 28);
-    g.fillStyle(0x8040a0, 0.3);
-    g.fillEllipse(W * 0.86, WH * 0.12, 200, 40);
-  }
-
-  // ── Ocean ─────────────────────────────────────────────────
-
-  _drawOcean(W, WH) {
-    const g = this.add.graphics().setDepth(1);
-    // Horizon to mid-scene: dark blue-green banded water
-    const horizonY = WH * 0.48;
-    const waterH   = WH * 0.22;
-
-    // Base water bands
-    const bands = [
-      { y: 0,             h: waterH * 0.25, c: 0x1a3040 },
-      { y: waterH * 0.25, h: waterH * 0.20, c: 0x1e3848 },
-      { y: waterH * 0.45, h: waterH * 0.20, c: 0x224050 },
-      { y: waterH * 0.65, h: waterH * 0.20, c: 0x254858 },
-      { y: waterH * 0.85, h: waterH * 0.15, c: 0x285060 },
-    ];
-    bands.forEach(b => {
-      g.fillStyle(b.c, 1);
-      g.fillRect(0, horizonY + b.y, W, b.h);
-    });
-
-    // Sun reflection on water
-    g.fillStyle(0xf0a030, 0.22);
-    g.fillRect(W * 0.5, horizonY, W * 0.38, waterH * 0.6);
-
-    // Horizon line shimmer
-    g.lineStyle(1, 0x6090a0, 0.4);
-    g.lineBetween(0, horizonY, W, horizonY);
-  }
-
-  // ── Beach (sandy shore) ───────────────────────────────────
-
-  _drawBeach(W, WH) {
-    const g = this.add.graphics().setDepth(2);
-    const beachY = WH * 0.62;
-
-    // Main sand area
-    g.fillGradientStyle(0xc8a868, 0xc8a868, 0xe8c888, 0xe8c888, 1);
-    g.fillRect(0, beachY, W, WH - beachY);
-
-    // Wet sand near water line (darker, reflective)
-    g.fillStyle(0x9a7a48, 0.7);
-    g.fillRect(0, WH * 0.70, W, WH * 0.03);
-
-    // Sand texture: fine grain dots/lines
-    g.lineStyle(0.5, 0xb89858, 0.3);
-    for (let sy = beachY + 8; sy < WH; sy += 14) {
-      for (let sx = 0; sx < W; sx += 36) {
-        const wx = sx + Phaser.Math.Between(-8, 8);
-        g.lineBetween(wx, sy, wx + Phaser.Math.Between(10, 28), sy);
-      }
-    }
-
-    // Scattered shells / pebbles
-    g.fillStyle(0xf0e8d0, 0.65);
-    const shells = [
-      [W * 0.31, beachY + 18, 4, 2], [W * 0.48, beachY + 32, 3, 2],
-      [W * 0.52, beachY + 14, 4, 3], [W * 0.65, beachY + 28, 5, 2],
-      [W * 0.70, beachY + 8, 3, 3],  [W * 0.44, beachY + 50, 4, 2],
-    ];
-    shells.forEach(s => g.fillEllipse(s[0], s[1], s[2], s[3]));
-
-    // Tide-line seaweed (dark green wisps)
-    g.lineStyle(1, 0x2a5030, 0.5);
-    const seaweed = [[W * 0.35, WH * 0.68], [W * 0.55, WH * 0.69], [W * 0.72, WH * 0.70]];
-    seaweed.forEach(s => {
-      g.lineBetween(s[0] - 14, s[1], s[0] + 14, s[1] + 2);
-      g.lineBetween(s[0] - 8, s[1] - 2, s[0] + 8, s[1]);
-    });
+    // Jennibelle coords
+    this._jennibelleX = W * 0.52;
+    this._jennibelleY = WH * 0.60;
   }
 
   // ── Wave animation layer ──────────────────────────────────
@@ -206,168 +117,6 @@ class WayneShackScene extends BaseScene {
       if (x === 0) g.moveTo(x, wy); else g.lineTo(x, wy);
     }
     g.strokePath();
-  }
-
-  // ── Shack ─────────────────────────────────────────────────
-
-  _drawShack(W, WH) {
-    const g  = this.add.graphics().setDepth(5);
-    const sX = W * 0.04, sY = WH * 0.40, sW = W * 0.30, sH = WH * 0.32;
-
-    // Porch shadow
-    g.fillStyle(0x0c0a06, 0.4);
-    g.fillRect(sX - 8, sY + sH - 2, sW + 16, 12);
-
-    // Shack walls (weathered boards — staggered plank effect)
-    g.fillStyle(0x5a4228, 1);
-    g.fillRect(sX, sY, sW, sH);
-    // Board lines
-    g.lineStyle(1, 0x3e2e18, 0.8);
-    for (let py = sY + 14; py < sY + sH; py += 18) {
-      g.lineBetween(sX, py, sX + sW, py);
-    }
-    // Board vertical seams (staggered — two offset rows)
-    g.lineStyle(0.5, 0x2e2010, 0.5);
-    for (let r = 0; r < 2; r++) {
-      const startSeam = sX + 11 + r * 11;
-      const startY    = sY + (r === 0 ? 0 : 9);
-      for (let s = startSeam; s < sX + sW; s += 22) {
-        g.lineBetween(s, startY, s, sY + sH);
-      }
-    }
-
-    // Wall outline
-    g.lineStyle(2, 0x2e2010, 1);
-    g.strokeRect(sX, sY, sW, sH);
-
-    // Roof (overhanging, angled)
-    g.fillStyle(0x3a2410, 1);
-    g.fillTriangle(sX - 18, sY, sX + sW / 2, sY - 58, sX + sW + 18, sY);
-    g.lineStyle(2, 0x2a1a08, 1);
-    g.strokeTriangle(sX - 18, sY, sX + sW / 2, sY - 58, sX + sW + 18, sY);
-    // Shingles on roof (lines)
-    g.lineStyle(1, 0x2a1a08, 0.6);
-    for (let rl = 1; rl <= 6; rl++) {
-      const t  = rl / 7;
-      const ry = sY - 58 + 58 * t;
-      const rw = (sW + 36) * t;
-      g.lineBetween(sX + sW / 2 - rw / 2, ry, sX + sW / 2 + rw / 2, ry);
-    }
-
-    // Porch posts
-    g.fillStyle(0x4a3220, 1);
-    g.fillRect(sX + 8, sY + sH - 48, 10, 48);
-    g.fillRect(sX + sW - 18, sY + sH - 48, 10, 48);
-    g.fillRect(sX, sY + sH, sW, 6); // porch floor edge
-
-    // Front door (left of center)
-    g.fillStyle(0x2a1a0c, 1);
-    g.fillRect(sX + sW * 0.52, sY + sH - 72, 38, 72);
-    g.lineStyle(1.5, 0x5a4228, 1);
-    g.strokeRect(sX + sW * 0.52, sY + sH - 72, 38, 72);
-    g.fillStyle(0xc8956c, 0.9);
-    g.fillCircle(sX + sW * 0.52 + 32, sY + sH - 34, 3);
-
-    // Shack window (left)
-    g.fillStyle(0x1a2830, 1);
-    g.fillRect(sX + sW * 0.10, sY + sH * 0.14, 54, 44);
-    g.lineStyle(1.5, 0x5a4228, 1);
-    g.strokeRect(sX + sW * 0.10, sY + sH * 0.14, 54, 44);
-    g.lineStyle(1, 0x3a3010, 1);
-    g.lineBetween(sX + sW * 0.10 + 27, sY + sH * 0.14, sX + sW * 0.10 + 27, sY + sH * 0.14 + 44);
-    g.lineBetween(sX + sW * 0.10, sY + sH * 0.14 + 22, sX + sW * 0.10 + 54, sY + sH * 0.14 + 22);
-    // Warm light in window
-    g.fillStyle(0xe07820, 0.18);
-    g.fillRect(sX + sW * 0.10, sY + sH * 0.14, 54, 44);
-
-    // Fishing nets hanging off porch rail / wall
-    const netX = sX + sW * 0.04, netY = sY + 22;
-    g.lineStyle(1, 0x8a6840, 0.55);
-    for (let nw = 0; nw < 3; nw++) {
-      const nx = netX + nw * 24;
-      for (let nh = 0; nh < 5; nh++) {
-        g.lineBetween(nx, netY + nh * 12, nx + 18, netY + (nh + 1) * 12);
-        g.lineBetween(nx + 18, netY + nh * 12, nx, netY + (nh + 1) * 12);
-      }
-      for (let nn = 0; nn <= 4; nn++) {
-        g.lineBetween(nx, netY + nn * 12, nx + 18, netY + nn * 12);
-      }
-    }
-
-    // Chair on porch (where Wayne sits)
-    this._chairX = sX + sW + 22;
-    this._chairY = WH * 0.65;
-    const cX = this._chairX, cY = this._chairY;
-    g.fillStyle(0x3a2a18, 1);
-    // Seat
-    g.fillRect(cX, cY, 42, 8);
-    // Back
-    g.fillRect(cX, cY - 38, 6, 38);
-    g.fillRect(cX + 36, cY - 38, 6, 38);
-    g.fillRect(cX, cY - 38, 42, 6);
-    // Legs
-    g.fillRect(cX + 2, cY + 8, 6, 22);
-    g.fillRect(cX + 34, cY + 8, 6, 22);
-    g.lineStyle(1, 0x5a4228, 0.8);
-    g.strokeRect(cX, cY, 42, 8);
-
-    // Cooler (beside chair)
-    const coX = cX + 52;
-    g.fillStyle(0x3c6080, 1);
-    g.fillRect(coX, cY + 4, 36, 26);
-    g.fillStyle(0x4a78a0, 1);
-    g.fillRect(coX, cY + 4, 36, 6);
-    g.lineStyle(1.5, 0x5090b8, 1);
-    g.strokeRect(coX, cY + 4, 36, 26);
-    this.add.text(coX + 18, cY + 20, 'ICE', {
-      fontFamily: 'Georgia, serif', fontSize: '7px', color: '#a8c8e8',
-    }).setOrigin(0.5).setDepth(7);
-  }
-
-  // ── Surfboards ────────────────────────────────────────────
-
-  _drawSurfboards(W, WH) {
-    const g = this.add.graphics().setDepth(6);
-    const sX = W * 0.04;
-    const sW = W * 0.30;
-
-    // Board 1 (teal, leaning left against shack wall)
-    const b1X = sX + sW * 0.02, b1Y = WH * 0.38;
-    g.fillStyle(0x208080, 1);
-    g.fillEllipse(b1X + 10, b1Y + 6, 20, 12);  // nose
-    g.fillRect(b1X, b1Y + 6, 20, WH * 0.26);
-    g.fillEllipse(b1X + 10, b1Y + WH * 0.26, 20, 10); // tail
-    g.lineStyle(1.5, 0x106060, 1);
-    g.strokeEllipse(b1X + 10, b1Y + 6, 20, 12);
-    g.strokeRect(b1X, b1Y + 6, 20, WH * 0.26);
-    // Fin
-    g.fillStyle(0x106060, 1);
-    g.fillTriangle(b1X + 18, b1Y + WH * 0.22, b1X + 28, b1Y + WH * 0.30, b1X + 18, b1Y + WH * 0.30);
-    // Stripe
-    g.lineStyle(2, 0x60d0c0, 0.6);
-    g.lineBetween(b1X + 10, b1Y + 18, b1X + 10, b1Y + WH * 0.24);
-    // Duct tape repair (crack detail)
-    g.fillStyle(0x888888, 0.8);
-    g.fillRect(b1X + 2, b1Y + WH * 0.14, 16, 5);
-
-    // Board 2 (coral/orange, leaning slightly offset)
-    const b2X = sX + sW * 0.06, b2Y = WH * 0.37;
-    g.fillStyle(0xd05838, 1);
-    g.fillEllipse(b2X + 10, b2Y + 6, 20, 12);
-    g.fillRect(b2X, b2Y + 6, 20, WH * 0.28);
-    g.fillEllipse(b2X + 10, b2Y + WH * 0.28, 20, 10);
-    g.lineStyle(1.5, 0xa04028, 1);
-    g.strokeEllipse(b2X + 10, b2Y + 6, 20, 12);
-    g.strokeRect(b2X, b2Y + 6, 20, WH * 0.28);
-    // Fin
-    g.fillStyle(0xa04028, 1);
-    g.fillTriangle(b2X + 18, b2Y + WH * 0.24, b2X + 28, b2Y + WH * 0.32, b2X + 18, b2Y + WH * 0.32);
-    // Design stripe
-    g.lineStyle(2, 0xf0a070, 0.7);
-    g.lineBetween(b2X + 6, b2Y + 22, b2X + 14, b2Y + WH * 0.25);
-    g.lineBetween(b2X + 14, b2Y + 22, b2X + 6, b2Y + WH * 0.25);
-
-    this._surfboardsBounds = { x: sX, y: WH * 0.37, w: sX + sW * 0.14 + 30, h: WH * 0.30 };
   }
 
   // ── Fire Pit ──────────────────────────────────────────────
@@ -413,9 +162,13 @@ class WayneShackScene extends BaseScene {
     g.fillStyle(0xc08040, 1);
     g.fillTriangle(fX + 10, fY - 16, fX + 22, fY - 12, fX + 10, fY - 8);
 
-    // Warm glow on ground
-    g.fillStyle(0xe06020, 0.12);
-    g.fillEllipse(fX, fY + 6, 72, 24);
+    // Warm glow on ground — fire cast light
+    g.fillStyle(0xe06020, 0.28);
+    g.fillEllipse(fX, fY + 8, 80, 28);
+    g.fillStyle(0xd04810, 0.15);
+    g.fillEllipse(fX, fY + 10, 130, 40);
+    g.fillStyle(0xc03808, 0.07);
+    g.fillCircle(fX, fY, 90);  // wide ambient fire glow
 
     this._firePitX = fX;
     this._firePitY = fY;
@@ -438,61 +191,6 @@ class WayneShackScene extends BaseScene {
     });
   }
 
-  // ── Dock and Boat ─────────────────────────────────────────
-
-  _drawDockAndBoat(W, WH) {
-    const g  = this.add.graphics().setDepth(4);
-    const dX = W * 0.72, dY = WH * 0.62, dW = W * 0.24, dH = WH * 0.10;
-
-    // Dock planks
-    g.fillStyle(0x5a4428, 1);
-    g.fillRect(dX, dY, dW, dH);
-    g.lineStyle(1, 0x3a2c18, 0.8);
-    for (let dp = dX + 18; dp < dX + dW; dp += 18) {
-      g.lineBetween(dp, dY, dp, dY + dH);
-    }
-    g.lineBetween(dX, dY, dX + dW, dY);
-    g.lineStyle(2, 0x3a2810, 1);
-    g.strokeRect(dX, dY, dW, dH);
-
-    // Dock posts
-    g.fillStyle(0x3a2810, 1);
-    [dX + 4, dX + dW * 0.5, dX + dW - 4].forEach(px => {
-      g.fillRect(px - 5, dY - 12, 10, dH + 28);
-      g.lineStyle(1, 0x2a1e08, 1);
-      g.strokeRect(px - 5, dY - 12, 10, dH + 28);
-    });
-
-    // Boat hull
-    const bX = dX + 14, bY = dY + dH - 6;
-    g.fillStyle(0x3a5068, 1);
-    // Hull shape (flat-bottomed)
-    g.fillRect(bX, bY, dW - 28, 38);
-    g.fillTriangle(bX, bY, bX - 18, bY + 38, bX, bY + 38);         // bow
-    g.fillTriangle(bX + dW - 28, bY, bX + dW - 28 + 12, bY + 38, bX + dW - 28, bY + 38); // stern
-    g.lineStyle(2, 0x2a3e50, 1);
-    g.strokeRect(bX, bY, dW - 28, 38);
-    // Boat interior
-    g.fillStyle(0x2e4058, 1);
-    g.fillRect(bX + 4, bY + 8, dW - 36, 22);
-    // Gunwale stripe
-    g.lineStyle(2, 0x6888a0, 0.7);
-    g.lineBetween(bX, bY, bX + dW - 28, bY);
-    // Rope tying boat to dock post
-    g.lineStyle(1.5, 0x9a8060, 0.8);
-    g.lineBetween(bX + 10, bY + 4, dX + 4, dY + 4);
-    // Mast suggestion (small, not a sailing boat)
-    g.fillStyle(0x4a3828, 1);
-    g.fillRect(bX + dW * 0.3, bY - 42, 5, 50);
-
-    this._boatX = bX + (dW - 28) / 2;
-    this._boatY = bY + 20;
-    this._dockX = dX;
-    this._dockY = dY;
-    this._dockW = dW;
-    this._dockH = dH + 40;
-  }
-
   // ── Wayne Havasu ──────────────────────────────────────────
 
   _drawWayne(W, WH) {
@@ -501,17 +199,25 @@ class WayneShackScene extends BaseScene {
     const cY = this._chairY - 10;
 
     // Body — sitting, relaxed posture, slight forward lean
-    // Legs (resting, outstretched)
-    g.fillStyle(0x3a4858, 1);
+    // Legs (resting, outstretched) — tanned skin
+    g.fillStyle(0xb88050, 1);
     g.fillRect(cX - 16, cY + 44, 14, 26);
     g.fillRect(cX + 2, cY + 44, 14, 26);
-    // Shorts (casual)
-    g.fillStyle(0x4a5a70, 1);
-    g.fillRect(cX - 18, cY + 36, 36, 14);
-    // Shoes/feet
-    g.fillStyle(0x2a2018, 1);
-    g.fillEllipse(cX - 12, cY + 72, 18, 8);
-    g.fillEllipse(cX + 12, cY + 72, 18, 8);
+    // Shorts — reddish-orange board shorts
+    g.fillStyle(0xb03820, 1);
+    g.fillRect(cX - 18, cY + 36, 36, 16);
+    // Shorts pattern lines
+    g.lineStyle(1, 0xd05030, 0.5);
+    g.lineBetween(cX - 18, cY + 41, cX + 18, cY + 41);
+    g.lineBetween(cX - 18, cY + 46, cX + 18, cY + 46);
+    // Flip flops — strappy sandals
+    g.fillStyle(0xe0a040, 1);
+    g.fillEllipse(cX - 12, cY + 72, 20, 6);  // left sole
+    g.fillEllipse(cX + 12, cY + 72, 20, 6);  // right sole
+    // Flip flop strap
+    g.lineStyle(1.5, 0xc87020, 1);
+    g.lineBetween(cX - 12, cY + 70, cX - 7, cY + 66);
+    g.lineBetween(cX + 12, cY + 70, cX + 7, cY + 66);
     // Torso (aloha-style shirt, unbuttoned, relaxed)
     g.fillStyle(0x285070, 1);
     g.fillRect(cX - 16, cY + 8, 32, 32);
@@ -531,15 +237,17 @@ class WayneShackScene extends BaseScene {
     // Head
     g.fillStyle(0xb88050, 1);
     g.fillCircle(cX, cY - 8, 17);
-    // Silver-streaked hair (laid back)
-    g.fillStyle(0x3a3028, 1);
+    // Reddish-blond hair (sun-bleached surfer style)
+    g.fillStyle(0xb86028, 1);
     g.fillEllipse(cX, cY - 22, 34, 18);
-    g.fillStyle(0x909088, 0.8);
-    // Silver streaks
-    g.lineStyle(1.5, 0xc0c0b8, 0.65);
+    // Lighter blond highlights
+    g.lineStyle(1.5, 0xe8a850, 0.65);
     g.lineBetween(cX - 8, cY - 24, cX - 6, cY - 16);
     g.lineBetween(cX - 2, cY - 26, cX, cY - 18);
     g.lineBetween(cX + 6, cY - 24, cX + 4, cY - 16);
+    // Reddish tones
+    g.fillStyle(0xd07830, 0.5);
+    g.fillEllipse(cX + 4, cY - 20, 14, 10);
     // Beard stubble (dark gray)
     g.fillStyle(0x5a5050, 0.45);
     g.fillEllipse(cX, cY + 2, 24, 10);

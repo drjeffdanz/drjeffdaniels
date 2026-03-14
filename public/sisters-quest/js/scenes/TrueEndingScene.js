@@ -9,6 +9,11 @@ class TrueEndingScene extends Phaser.Scene {
     super({ key: 'TrueEndingScene' });
   }
 
+  preload() {
+    this.load.image('bg_shore', 'assets/backgrounds/shore-dawn.jpg');
+    this.load.image('bg_greathall', 'assets/backgrounds/great-hall.jpg');
+  }
+
   create() {
     const W = this.scale.width;
     const H = this.scale.height;
@@ -64,57 +69,10 @@ class TrueEndingScene extends Phaser.Scene {
   // ── Act A: Shore Dawn ─────────────────────────────────────────
 
   _drawShoreDawn(W, H) {
-    const g = this.add.graphics();
+    const WH = H;
+    this.add.image(W / 2, WH / 2, 'bg_shore').setDisplaySize(W, WH).setDepth(0);
 
-    // Dawn sky — dark purple top fading to orange-pink at horizon
-    g.fillGradientStyle(0x0e0818, 0x0e0818, 0x1a0c20, 0x1a0c20, 1);
-    g.fillRect(0, 0, W, H * 0.30);
-
-    g.fillGradientStyle(0x1a0c20, 0x1a0c20, 0x5a1830, 0x5a1830, 1);
-    g.fillRect(0, H * 0.30, W, H * 0.20);
-
-    // Orange-pink horizon band
-    g.fillGradientStyle(0x5a1830, 0x5a1830, 0xe84820, 0xe84820, 1);
-    g.fillRect(0, H * 0.50, W, H * 0.10);
-
-    // Warm orange horizon glow
-    g.fillGradientStyle(0xe84820, 0xe84820, 0xf07030, 0xf07030, 1);
-    g.fillRect(0, H * 0.60, W, H * 0.06);
-
-    // Dark sea at base
-    g.fillGradientStyle(0x0a1820, 0x0a1820, 0x060c10, 0x060c10, 1);
-    g.fillRect(0, H * 0.66, W, H * 0.34);
-
-    // Stars (fading at dawn)
-    for (let i = 0; i < 40; i++) {
-      const sx = Phaser.Math.Between(0, W);
-      const sy = Phaser.Math.Between(0, H * 0.35);
-      g.fillStyle(0xffffff, Phaser.Math.FloatBetween(0.05, 0.35));
-      g.fillCircle(sx, sy, 1);
-    }
-
-    // Obsidian isle silhouette (right)
-    g.fillStyle(0x060408, 1);
-    g.fillRect(W * 0.65, H * 0.50, W * 0.35, H * 0.50);
-    g.fillTriangle(W * 0.65, H * 0.50, W * 0.80, H * 0.36, W, H * 0.46);
-    g.fillTriangle(W * 0.80, H * 0.44, W, H * 0.38, W, H * 0.50);
-
-    // Tower on cliff (small, right side)
-    g.fillStyle(0x080610, 1);
-    g.fillRect(W * 0.88, H * 0.28, 12, H * 0.22);
-    // Glowing window
-    g.fillStyle(0xd08020, 0.7);
-    g.fillRect(W * 0.89, H * 0.34, 5, 8);
-
-    // Rocky shoreline (dark)
-    g.fillStyle(0x0e0c0a, 1);
-    g.fillRect(0, H * 0.72, W, H * 0.28);
-    g.fillTriangle(0, H * 0.72, W * 0.20, H * 0.66, W * 0.35, H * 0.72);
-    g.fillTriangle(W * 0.28, H * 0.72, W * 0.50, H * 0.68, W * 0.60, H * 0.72);
-
-    // Sea reflection of dawn on water
-    g.fillStyle(0xe84820, 0.10);
-    g.fillRect(W * 0.30, H * 0.66, W * 0.40, H * 0.06);
+    const g = this.add.graphics().setDepth(2);
 
     // Sisters waiting on shore (two small silhouettes, center-left)
     this._drawSisterSilhouettes(g, W * 0.28, H * 0.80);
@@ -131,14 +89,18 @@ class TrueEndingScene extends Phaser.Scene {
     const crownPulse = this.add.graphics().setDepth(8);
     this.tweens.add({
       targets: crownPulse,
-      alpha: { from: 0.4, to: 1.0 },
+      alpha: { from: 0.5, to: 1.0 },
       duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
       onUpdate: () => {
         crownPulse.clear();
-        crownPulse.fillStyle(0xffd860, 0.15 * crownPulse.alpha);
-        crownPulse.fillCircle(crownX, crownY, 28);
-        crownPulse.fillStyle(0xfff0a0, 0.08 * crownPulse.alpha);
-        crownPulse.fillCircle(crownX, crownY, 44);
+        crownPulse.fillStyle(0xffd860, 0.55 * crownPulse.alpha);
+        crownPulse.fillCircle(crownX, crownY, 22);
+        crownPulse.fillStyle(0xffe090, 0.32 * crownPulse.alpha);
+        crownPulse.fillCircle(crownX, crownY, 36);
+        crownPulse.fillStyle(0xfff0a0, 0.16 * crownPulse.alpha);
+        crownPulse.fillCircle(crownX, crownY, 56);
+        crownPulse.fillStyle(0xffe8a0, 0.07 * crownPulse.alpha);
+        crownPulse.fillCircle(crownX, crownY, 80);
       },
     });
 
@@ -178,11 +140,18 @@ class TrueEndingScene extends Phaser.Scene {
     g.fillStyle(0xf0f0ec, 0.8);
     g.fillEllipse(x, y - 12, 22, 10);
 
-    // Luminous glow around her
-    g.fillStyle(0xffd860, 0.12);
-    g.fillCircle(x, y + 28, 40);
-    g.fillStyle(0xfff0a0, 0.06);
-    g.fillCircle(x, y + 28, 60);
+    // Luminous glow around her — she carries the completed Crown
+    g.fillStyle(0xfff8c0, 0.55);
+    g.fillCircle(x, y + 28, 20);
+    g.fillStyle(0xffd860, 0.38);
+    g.fillCircle(x, y + 28, 36);
+    g.fillStyle(0xffc840, 0.22);
+    g.fillCircle(x, y + 28, 56);
+    g.fillStyle(0xffb030, 0.10);
+    g.fillCircle(x, y + 28, 80);
+    // Side halo ellipses for wide aura
+    g.fillStyle(0xffd060, 0.08);
+    g.fillEllipse(x, y + 20, 120, 90);
   }
 
   _drawCrown(g, x, y, r) {
@@ -207,68 +176,10 @@ class TrueEndingScene extends Phaser.Scene {
   // ── Act B: The Great Hall ─────────────────────────────────────
 
   _drawGreatHall(W, H) {
-    const g = this.add.graphics();
+    const WH = H;
+    this.add.image(W / 2, WH / 2, 'bg_greathall').setDisplaySize(W, WH).setDepth(0);
 
-    // High stone hall — warm dawn light
-    // Background wall
-    g.fillGradientStyle(0x1a1208, 0x1a1208, 0x221810, 0x221810, 1);
-    g.fillRect(0, 0, W, H);
-
-    // Ceiling
-    g.fillStyle(0x100e0a, 1);
-    g.fillRect(0, 0, W, 30);
-
-    // Floor — lighter stone
-    g.fillStyle(0x1e1810, 1);
-    g.fillRect(0, H * 0.75, W, H * 0.25);
-    g.lineStyle(1, 0x2a2014, 0.3);
-    for (let x = 0; x < W; x += 60) g.lineBetween(x, H * 0.75, x, H);
-    for (let y = H * 0.75; y < H; y += 40) g.lineBetween(0, y, W, y);
-    g.lineBetween(0, H * 0.75, W, H * 0.75);
-
-    // Tall columns — left and right
-    const columns = [W * 0.12, W * 0.26, W * 0.74, W * 0.88];
-    columns.forEach(cx => {
-      g.fillStyle(0x2a2018, 1);
-      g.fillRect(cx - 14, 28, 28, H * 0.75);
-      g.lineStyle(1, 0x3a3020, 0.7);
-      g.strokeRect(cx - 14, 28, 28, H * 0.75);
-      // Capital
-      g.fillStyle(0x3a3020, 1);
-      g.fillRect(cx - 20, 28, 40, 14);
-    });
-
-    // Tall windows — morning light streams through
-    const windows = [W * 0.19, W * 0.50, W * 0.81];
-    windows.forEach(wx => {
-      // Window embrasure
-      g.fillStyle(0x282018, 1);
-      g.fillRect(wx - 22, 28, 44, H * 0.55);
-      g.fillEllipse(wx, 28, 44, 22);
-
-      // Glass — dawn gold-white
-      g.fillStyle(0xf0d080, 0.4);
-      g.fillRect(wx - 18, 30, 36, H * 0.54);
-      g.fillEllipse(wx, 30, 36, 18);
-
-      // Light shaft
-      g.fillStyle(0xffe090, 0.06);
-      g.fillTriangle(
-        wx - 18, 30,
-        wx + 18, 30,
-        wx + 80, H * 0.80
-      );
-      g.fillStyle(0xffe090, 0.04);
-      g.fillTriangle(
-        wx - 18, 30,
-        wx + 18, 30,
-        wx - 60, H * 0.80
-      );
-    });
-
-    // Warm morning ambient glow
-    g.fillStyle(0xd09020, 0.05);
-    g.fillRect(0, 0, W, H);
+    const g = this.add.graphics().setDepth(2);
 
     // ── Queen's bed/throne — center ──────────────────────────
     const bedX = W * 0.50;
@@ -305,7 +216,7 @@ class TrueEndingScene extends Phaser.Scene {
     g.fillEllipse(pilX, pilY, 40, 20);
     this._drawCrownDetailed(g, pilX, pilY - 10);
 
-    // Crown glow
+    // Crown glow — the completed Moonveil Crown radiating power
     const crownGlow = this.add.graphics().setDepth(6);
     this.tweens.add({
       targets: crownGlow,
@@ -313,8 +224,14 @@ class TrueEndingScene extends Phaser.Scene {
       duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
       onUpdate: () => {
         crownGlow.clear();
-        crownGlow.fillStyle(0xffd860, 0.14 * crownGlow.alpha);
-        crownGlow.fillCircle(pilX, pilY - 10, 30);
+        crownGlow.fillStyle(0xfff8c0, 0.50 * crownGlow.alpha);
+        crownGlow.fillCircle(pilX, pilY - 10, 14);
+        crownGlow.fillStyle(0xffd860, 0.35 * crownGlow.alpha);
+        crownGlow.fillCircle(pilX, pilY - 10, 26);
+        crownGlow.fillStyle(0xffb830, 0.18 * crownGlow.alpha);
+        crownGlow.fillCircle(pilX, pilY - 10, 44);
+        crownGlow.fillStyle(0xffa020, 0.08 * crownGlow.alpha);
+        crownGlow.fillCircle(pilX, pilY - 10, 65);
       },
     });
 
@@ -450,9 +367,13 @@ class TrueEndingScene extends Phaser.Scene {
     // Crown symbol at center (decorative, subtle)
     this._drawCrownDetailed(g, W / 2, H * 0.25);
 
-    // Subtle golden radiance behind crown
-    g.fillStyle(0xc89030, 0.04);
-    g.fillCircle(W / 2, H * 0.26, 60);
+    // Crown radiance on epilogue screen
+    g.fillStyle(0xfff0a0, 0.28);
+    g.fillCircle(W / 2, H * 0.24, 28);
+    g.fillStyle(0xffd860, 0.18);
+    g.fillCircle(W / 2, H * 0.24, 48);
+    g.fillStyle(0xc89030, 0.10);
+    g.fillCircle(W / 2, H * 0.24, 75);
 
     // Divider line below crown
     g.lineStyle(1, 0xc8956c, 0.3);

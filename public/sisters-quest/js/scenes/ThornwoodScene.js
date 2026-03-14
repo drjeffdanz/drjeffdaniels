@@ -7,6 +7,8 @@
 class ThornwoodScene extends BaseScene {
   constructor() { super({ key: 'ThornwoodScene' }); }
 
+  preload() { this.load.image('bg_thornwood', 'assets/backgrounds/thornwood.jpg'); }
+
   create() {
     const W  = this.scale.width;
     const H  = this.scale.height;
@@ -15,11 +17,10 @@ class ThornwoodScene extends BaseScene {
     GameState.setCurrentScene('ThornwoodScene');
     this.cameras.main.fadeIn(500, 0, 0, 0);
 
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, WH / 2, 'bg_thornwood').setDisplaySize(W, WH).setDepth(0);
+
     // ── Draw world ────────────────────────────────────────────
-    this._drawSky(W, WH);
-    this._drawForestBack(W, WH);
-    this._drawIronGate(W, WH);
-    this._drawGround(W, WH);
     this._drawHollow(W, WH);
     this._drawThorn(W, WH);
 
@@ -60,222 +61,6 @@ class ThornwoodScene extends BaseScene {
     this.setStatus('The Thornwood. Mind the goat.');
   }
 
-  // ── Sky ──────────────────────────────────────────────────────
-
-  _drawSky(W, WH) {
-    const g = this.add.graphics();
-    // Deep blue-black gradient sky
-    g.fillGradientStyle(0x02030a, 0x02030a, 0x04081a, 0x04081a, 1);
-    g.fillRect(0, 0, W, WH * 0.55);
-
-    // Pale stars
-    g.fillStyle(0xd0d8f0, 1);
-    const stars = [
-      [42, 18], [120, 9], [198, 25], [280, 12], [350, 30], [430, 8],
-      [510, 22], [580, 14], [640, 35], [700, 10], [760, 28], [820, 16],
-      [870, 40], [55, 45], [310, 50], [660, 42], [780, 55], [900, 30],
-    ];
-    stars.forEach(([sx, sy]) => {
-      g.fillCircle(sx, sy, Math.random() > 0.6 ? 1.5 : 1);
-    });
-    // A couple brighter stars
-    g.fillStyle(0xeef4ff, 0.9);
-    g.fillCircle(195, 20, 2);
-    g.fillCircle(640, 30, 2);
-  }
-
-  // ── Background forest ────────────────────────────────────────
-
-  _drawForestBack(W, WH) {
-    const g = this.add.graphics();
-
-    // Far treeline silhouette (dark blue-black)
-    g.fillStyle(0x030610, 1);
-    const horizon = WH * 0.55;
-
-    // Draw gnarled tree silhouettes as irregular shapes
-    const trees = [
-      { x: 0,    w: 90,  h: 220, lean: -8  },
-      { x: 70,   w: 70,  h: 260, lean: 5   },
-      { x: 130,  w: 80,  h: 190, lean: -4  },
-      { x: 200,  w: 100, h: 240, lean: 10  },
-      { x: 290,  w: 60,  h: 210, lean: -6  },
-      { x: 480,  w: 75,  h: 230, lean: 8   },
-      { x: 540,  w: 90,  h: 200, lean: -10 },
-      { x: 610,  w: 65,  h: 250, lean: 5   },
-      { x: 660,  w: 85,  h: 215, lean: -5  },
-      { x: 730,  w: 95,  h: 235, lean: 12  },
-      { x: 810,  w: 70,  h: 200, lean: -8  },
-      { x: 870,  w: 100, h: 245, lean: 6   },
-      { x: 950,  w: 80,  h: 220, lean: -3  },
-    ];
-
-    trees.forEach(t => {
-      // Trunk
-      g.fillStyle(0x030610, 1);
-      g.fillRect(t.x + t.w * 0.4, horizon - t.h * 0.4, t.w * 0.12, t.h * 0.4);
-
-      // Canopy — gnarled blob using overlapping triangles/rects
-      const tx = t.x + t.w / 2 + t.lean;
-      const ty = horizon - t.h * 0.6;
-      g.fillTriangle(
-        tx - t.w * 0.5, horizon - t.h * 0.4,
-        tx + t.lean,    ty,
-        tx + t.w * 0.5, horizon - t.h * 0.3
-      );
-      g.fillTriangle(
-        tx - t.w * 0.4, horizon - t.h * 0.52,
-        tx + t.lean * 0.5, ty - t.h * 0.12,
-        tx + t.w * 0.4, horizon - t.h * 0.48
-      );
-      // Gnarled branches
-      g.lineStyle(2, 0x04080f, 1);
-      g.lineBetween(tx, horizon - t.h * 0.5, tx - t.w * 0.4, horizon - t.h * 0.62);
-      g.lineBetween(tx, horizon - t.h * 0.5, tx + t.w * 0.35, horizon - t.h * 0.58);
-    });
-
-    // Fill the ground under treeline
-    g.fillStyle(0x02040a, 1);
-    g.fillRect(0, horizon, W, WH - horizon);
-
-    // Midground tree trunks with visible roots
-    g.fillStyle(0x060a12, 1);
-    const midTrunks = [
-      { x: 40,  y: WH * 0.72, w: 18, h: WH * 0.28 },
-      { x: 160, y: WH * 0.68, w: 22, h: WH * 0.32 },
-      { x: 820, y: WH * 0.70, w: 16, h: WH * 0.30 },
-      { x: 940, y: WH * 0.65, w: 24, h: WH * 0.35 },
-    ];
-    midTrunks.forEach(t => {
-      g.fillRect(t.x, t.y, t.w, t.h);
-      // Root spread
-      g.fillTriangle(t.x - 14, WH, t.x, t.y + t.h * 0.6, t.x + t.w, t.y + t.h * 0.6);
-      g.fillTriangle(t.x + t.w, t.y + t.h * 0.6, t.x + t.w + 14, WH, t.x, t.y + t.h * 0.6);
-    });
-
-    // Cold blue ambient — subtle fog layer at horizon
-    g.fillStyle(0x0a1828, 0.18);
-    g.fillRect(0, horizon - 20, W, 60);
-  }
-
-  // ── Iron Gate ────────────────────────────────────────────────
-
-  _drawIronGate(W, WH) {
-    const g  = this.add.graphics().setDepth(6);
-    const gx = W * 0.68;
-    const gy = WH * 0.3;
-    const gw = 200;
-    const gh = WH * 0.55;
-
-    // Stone pillars either side
-    g.fillStyle(0x181a20, 1);
-    g.fillRect(gx - 14, gy, 18, gh);
-    g.fillRect(gx + gw - 4, gy, 18, gh);
-    g.lineStyle(1, 0x282a34, 1);
-    g.strokeRect(gx - 14, gy, 18, gh);
-    g.strokeRect(gx + gw - 4, gy, 18, gh);
-
-    // Pillar capstones
-    g.fillStyle(0x22242e, 1);
-    g.fillRect(gx - 18, gy - 12, 26, 14);
-    g.fillRect(gx + gw - 8, gy - 12, 26, 14);
-
-    // Left door panel
-    g.fillStyle(0x1a1008, 1);
-    g.fillRect(gx, gy, gw / 2 - 4, gh);
-    g.lineStyle(1.5, 0x3a2808, 1);
-    g.strokeRect(gx, gy, gw / 2 - 4, gh);
-    // Wood grain lines
-    g.lineStyle(1, 0x221408, 0.6);
-    for (let ly = gy + 18; ly < gy + gh - 10; ly += 22) {
-      g.lineBetween(gx + 4, ly, gx + gw / 2 - 8, ly);
-    }
-
-    // Right door panel
-    g.fillStyle(0x1a1008, 1);
-    g.fillRect(gx + gw / 2 + 4, gy, gw / 2 - 4, gh);
-    g.lineStyle(1.5, 0x3a2808, 1);
-    g.strokeRect(gx + gw / 2 + 4, gy, gw / 2 - 4, gh);
-    g.lineStyle(1, 0x221408, 0.6);
-    for (let ly = gy + 18; ly < gy + gh - 10; ly += 22) {
-      g.lineBetween(gx + gw / 2 + 8, ly, gx + gw - 8, ly);
-    }
-
-    // Iron chains draped across
-    g.lineStyle(3, 0x404040, 1);
-    // Chain 1 — diagonal drape
-    g.lineBetween(gx - 10, gy + 40, gx + gw / 2, gy + 90);
-    g.lineBetween(gx + gw / 2, gy + 90, gx + gw + 10, gy + 50);
-    // Chain 2 — lower drape
-    g.lineBetween(gx - 10, gy + 80, gx + gw * 0.45, gy + 130);
-    g.lineBetween(gx + gw * 0.45, gy + 130, gx + gw + 10, gy + 100);
-    // Chain link detail
-    g.lineStyle(2, 0x505050, 0.7);
-    g.lineBetween(gx + gw * 0.3, gy + 65, gx + gw * 0.7, gy + 75);
-
-    // Chain padlock
-    g.fillStyle(0x5a5020, 1);
-    g.fillRoundedRect(gx + gw / 2 - 10, gy + 86, 20, 16, 3);
-    g.lineStyle(2, 0x8a7830, 1);
-    g.strokeRoundedRect(gx + gw / 2 - 10, gy + 86, 20, 16, 3);
-
-    // Beyond gate: pitch black interior
-    g.fillStyle(0x000000, 0.88);
-    g.fillRect(gx + 2, gy + 2, gw - 8, gh - 2);
-
-    // Very faint cold light beyond the gate
-    g.fillStyle(0x0a1428, 0.15);
-    g.fillRect(gx + 2, gy + 2, gw - 8, gh / 2);
-  }
-
-  // ── Ground / clearing ────────────────────────────────────────
-
-  _drawGround(W, WH) {
-    const g = this.add.graphics().setDepth(2);
-
-    // Main ground — dark earth
-    g.fillGradientStyle(0x0a0c08, 0x0a0c08, 0x0e1008, 0x0e1008, 1);
-    g.fillRect(0, WH * 0.72, W, WH * 0.28);
-
-    // Moss patches
-    const mosses = [
-      { x: 60,  y: WH * 0.80, r: 28 },
-      { x: 240, y: WH * 0.84, r: 20 },
-      { x: 420, y: WH * 0.76, r: 34 },
-      { x: 580, y: WH * 0.82, r: 18 },
-      { x: 720, y: WH * 0.78, r: 24 },
-    ];
-    mosses.forEach(m => {
-      g.fillStyle(0x0e1a0a, 1);
-      g.fillEllipse(m.x, m.y, m.r * 2, m.r * 0.7);
-    });
-
-    // Root tangles on ground
-    g.lineStyle(2, 0x141208, 1);
-    g.lineBetween(50, WH * 0.83, 130, WH * 0.88);
-    g.lineBetween(80, WH * 0.88, 160, WH * 0.83);
-    g.lineBetween(800, WH * 0.80, 880, WH * 0.87);
-    g.lineBetween(840, WH * 0.87, 910, WH * 0.82);
-
-    // Small mushrooms
-    const shrooms = [
-      { x: 200, y: WH * 0.84, r: 6, cap: 0x4a1a1a },
-      { x: 215, y: WH * 0.85, r: 4, cap: 0x3a1212 },
-      { x: 600, y: WH * 0.80, r: 5, cap: 0x4a1a08 },
-      { x: 610, y: WH * 0.81, r: 3, cap: 0x5a2008 },
-    ];
-    shrooms.forEach(s => {
-      g.fillStyle(0xe0d8c0, 1);
-      g.fillRect(s.x - 1, s.y - s.r * 0.8, 2, s.r * 0.8);
-      g.fillStyle(s.cap, 1);
-      g.fillEllipse(s.x, s.y - s.r * 0.8, s.r * 2.2, s.r * 1.2);
-    });
-
-    // Path toward gate (worn dirt track)
-    g.fillStyle(0x0c0d08, 0.6);
-    g.fillEllipse(W * 0.62, WH * 0.9, 200, 40);
-  }
-
   // ── Witch's Hollow ───────────────────────────────────────────
 
   _drawHollow(W, WH) {
@@ -301,21 +86,30 @@ class ThornwoodScene extends BaseScene {
     g.fillEllipse(hx, hy + 20, 100, 90);
     g.fillRect(hx - 50, hy + 20, 100, 50);
 
-    // Warm amber glow from inside
+    // Warm amber glow from inside — Witch's fire
     const glowG = this.add.graphics().setDepth(5);
-    glowG.fillStyle(0xd46a10, 0.22);
-    glowG.fillEllipse(hx, hy + 30, 130, 110);
-    glowG.fillStyle(0xe07818, 0.12);
-    glowG.fillEllipse(hx, hy + 40, 180, 130);
+    const _drawHollowGlow = (alpha) => {
+      glowG.clear();
+      glowG.fillStyle(0xff9030, 0.60 * alpha);
+      glowG.fillEllipse(hx, hy + 20, 90, 80);    // hot bright inner
+      glowG.fillStyle(0xe06c18, 0.42 * alpha);
+      glowG.fillEllipse(hx, hy + 30, 140, 115);   // mid glow
+      glowG.fillStyle(0xc05010, 0.22 * alpha);
+      glowG.fillEllipse(hx, hy + 40, 200, 150);   // wide outer bloom
+      glowG.fillStyle(0x903808, 0.10 * alpha);
+      glowG.fillEllipse(hx, hy + 48, 270, 180);   // far ambient
+    };
+    _drawHollowGlow(1.0);
 
-    // Pulsing glow tween
+    // Pulsing fire glow tween — redraws each frame
     this.tweens.add({
       targets: glowG,
-      alpha: { from: 0.8, to: 0.5 },
-      duration: 1800,
+      alpha: { from: 0.75, to: 1.0 },
+      duration: 1400,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut',
+      onUpdate: () => _drawHollowGlow(glowG.alpha),
     });
 
     // Old wooden door — slightly ajar
@@ -361,6 +155,13 @@ class ThornwoodScene extends BaseScene {
   }
 
   _drawTorch(g, x, y) {
+    // Torch glow halos on rock face behind — layered warm light
+    g.fillStyle(0xd06010, 0.22);
+    g.fillCircle(x, y - 4, 42);
+    g.fillStyle(0xe07820, 0.14);
+    g.fillCircle(x, y - 4, 62);
+    g.fillStyle(0xf09030, 0.06);
+    g.fillCircle(x, y - 4, 88);
     // Bracket
     g.fillStyle(0x505040, 1);
     g.fillRect(x - 2, y, 4, 22);
@@ -368,13 +169,18 @@ class ThornwoodScene extends BaseScene {
     // Cup
     g.fillStyle(0x706050, 1);
     g.fillRect(x - 4, y + 8, 8, 12);
-    // Flames
-    g.fillStyle(0xd05810, 0.8);
-    g.fillTriangle(x - 5, y + 8, x, y - 12, x + 5, y + 8);
-    g.fillStyle(0xe08828, 0.65);
-    g.fillTriangle(x - 3, y + 8, x, y - 4, x + 3, y + 8);
-    g.fillStyle(0xf8d060, 0.5);
-    g.fillTriangle(x - 2, y + 8, x, y, x + 2, y + 8);
+    // Flames — outer red-orange
+    g.fillStyle(0xd05810, 0.88);
+    g.fillTriangle(x - 5, y + 8, x, y - 14, x + 5, y + 8);
+    // Mid flame
+    g.fillStyle(0xf08428, 0.72);
+    g.fillTriangle(x - 3, y + 8, x, y - 6, x + 3, y + 8);
+    // Hot yellow-white core
+    g.fillStyle(0xffe060, 0.65);
+    g.fillTriangle(x - 2, y + 8, x, y - 1, x + 2, y + 8);
+    // Bright tip
+    g.fillStyle(0xffffff, 0.30);
+    g.fillCircle(x, y - 2, 2);
   }
 
   // ── Thorn the Goat ───────────────────────────────────────────

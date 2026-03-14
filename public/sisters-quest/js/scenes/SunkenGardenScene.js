@@ -7,6 +7,8 @@
 class SunkenGardenScene extends BaseScene {
   constructor() { super({ key: 'SunkenGardenScene' }); }
 
+  preload() { this.load.image('bg_garden', 'assets/backgrounds/sunken-garden.jpg'); }
+
   create() {
     const W  = this.scale.width;
     const H  = this.scale.height;
@@ -15,10 +17,7 @@ class SunkenGardenScene extends BaseScene {
     GameState.setCurrentScene('SunkenGardenScene');
 
     // ── World ─────────────────────────────────────────────────
-    this._drawBackground(W, H, WH);
-    this._drawWalls(W, H, WH);
-    this._drawFloor(W, H, WH);
-    this._drawFountain(W, H, WH);
+    this.add.image(W / 2, WH / 2, 'bg_garden').setDisplaySize(W, WH).setDepth(0);
     this._drawMoonveilPlants(W, H, WH);
     this._drawTidalPools(W, H, WH);
     this._dorianAwake = GameState.getFlag('dorian_awake');
@@ -64,183 +63,6 @@ class SunkenGardenScene extends BaseScene {
 
   // ── Drawing ──────────────────────────────────────────────────
 
-  _drawBackground(W, H, WH) {
-    const g = this.add.graphics();
-
-    // Gray-blue late-afternoon sky
-    g.fillGradientStyle(0x7a9aaa, 0x7a9aaa, 0x4a6a7a, 0x4a6a7a, 1);
-    g.fillRect(0, 0, W, WH * 0.55);
-
-    // Sea glimpses through gaps — blue-green ocean below sky
-    g.fillGradientStyle(0x2a6a70, 0x2a6a70, 0x1a4a50, 0x1a4a50, 1);
-    g.fillRect(0, WH * 0.55, W, WH * 0.15);
-
-    // Soft cloud wisps
-    g.fillStyle(0x9ab8c8, 0.3);
-    g.fillEllipse(W * 0.15, WH * 0.12, 180, 40);
-    g.fillEllipse(W * 0.55, WH * 0.08, 240, 35);
-    g.fillEllipse(W * 0.82, WH * 0.15, 150, 30);
-  }
-
-  _drawWalls(W, H, WH) {
-    const g = this.add.graphics();
-
-    // Left stone wall
-    g.fillStyle(0x6a6858, 1);
-    g.fillRect(0, WH * 0.18, 82, WH * 0.52);
-    g.lineStyle(1, 0x4a4840, 1);
-    g.strokeRect(0, WH * 0.18, 82, WH * 0.52);
-
-    // Stone brick pattern left
-    g.lineStyle(1, 0x3a3828, 0.6);
-    for (let y = WH * 0.18; y < WH * 0.70; y += 22) {
-      g.lineBetween(0, y, 82, y);
-    }
-    for (let y = WH * 0.18; y < WH * 0.70; y += 44) {
-      g.lineBetween(18, y + 11, 18, y + 33);
-      g.lineBetween(54, y, 54, y + 22);
-    }
-
-    // Right stone wall
-    g.fillStyle(0x6a6858, 1);
-    g.fillRect(W - 82, WH * 0.18, 82, WH * 0.52);
-    g.lineStyle(1, 0x4a4840, 1);
-    g.strokeRect(W - 82, WH * 0.18, 82, WH * 0.52);
-
-    // Stone brick pattern right
-    g.lineStyle(1, 0x3a3828, 0.6);
-    for (let y = WH * 0.18; y < WH * 0.70; y += 22) {
-      g.lineBetween(W - 82, y, W, y);
-    }
-    for (let y = WH * 0.18; y < WH * 0.70; y += 44) {
-      g.lineBetween(W - 54, y + 11, W - 54, y + 33);
-      g.lineBetween(W - 18, y, W - 18, y + 22);
-    }
-
-    // Back wall (top)
-    g.fillStyle(0x5a5848, 1);
-    g.fillRect(0, WH * 0.18, W, 46);
-    g.lineStyle(1, 0x3a3828, 0.5);
-    for (let x = 0; x < W; x += 55) g.lineBetween(x, WH * 0.18, x, WH * 0.18 + 46);
-    g.lineBetween(0, WH * 0.18 + 23, W, WH * 0.18 + 23);
-
-    // Crumbled wall sections — gaps showing sea
-    g.fillStyle(0x2a6a70, 0.7);
-    // Left gap
-    g.fillRect(10, WH * 0.35, 38, 60);
-    // Right gap
-    g.fillRect(W - 58, WH * 0.40, 42, 55);
-
-    // Crumble rubble at gaps
-    g.fillStyle(0x8a8068, 1);
-    g.fillTriangle(10, WH * 0.35 + 60, 48, WH * 0.35 + 60, 10, WH * 0.35 + 80);
-    g.fillTriangle(W - 58, WH * 0.40 + 55, W - 16, WH * 0.40 + 55, W - 16, WH * 0.40 + 75);
-
-    // Sea-plant seaweed draped on walls — silver-green
-    const sg = this.add.graphics().setDepth(2);
-    sg.lineStyle(2, 0x7a9a78, 0.7);
-    // Left wall seaweed
-    for (let i = 0; i < 6; i++) {
-      const sx = 10 + i * 12;
-      const sy = WH * 0.18 + 46;
-      const ey = sy + 50 + i * 8;
-      sg.lineBetween(sx, sy, sx + Phaser.Math.Between(-6, 6), ey);
-    }
-    sg.lineStyle(2, 0x8aaa88, 0.5);
-    for (let i = 0; i < 5; i++) {
-      const sx = W - 78 + i * 14;
-      const sy = WH * 0.18 + 46;
-      const ey = sy + 45 + i * 10;
-      sg.lineBetween(sx, sy, sx + Phaser.Math.Between(-5, 5), ey);
-    }
-    // Back wall seaweed clusters
-    sg.lineStyle(1.5, 0x6a8a68, 0.55);
-    for (let i = 0; i < 12; i++) {
-      const sx = 90 + i * 60;
-      sg.lineBetween(sx, WH * 0.18 + 46, sx + Phaser.Math.Between(-4, 4), WH * 0.18 + 90);
-    }
-  }
-
-  _drawFloor(W, H, WH) {
-    const g = this.add.graphics();
-
-    // Mossy stone floor
-    g.fillGradientStyle(0x484838, 0x484838, 0x383828, 0x383828, 1);
-    g.fillRect(82, WH * 0.65, W - 164, WH * 0.35);
-    g.fillGradientStyle(0x484838, 0x484838, 0x383828, 0x383828, 1);
-    g.fillRect(0, WH * 0.70, 82, WH * 0.30);
-    g.fillRect(W - 82, WH * 0.70, 82, WH * 0.30);
-
-    // Floor stone grid
-    g.lineStyle(1, 0x2a2818, 0.4);
-    for (let x = 0; x < W; x += 48) g.lineBetween(x, WH * 0.65, x, WH);
-    for (let y = WH * 0.65; y < WH; y += 32) g.lineBetween(0, y, W, y);
-
-    // Moss patches (green smudges)
-    g.fillStyle(0x405030, 0.4);
-    g.fillEllipse(120, WH * 0.80, 60, 18);
-    g.fillEllipse(W * 0.4, WH * 0.88, 80, 20);
-    g.fillEllipse(W * 0.7, WH * 0.75, 50, 14);
-    g.fillEllipse(W - 120, WH * 0.82, 70, 18);
-  }
-
-  _drawFountain(W, H, WH) {
-    const g  = this.add.graphics().setDepth(5);
-    const cx = W * 0.38;
-    const cy = WH * 0.58;
-
-    // Outer basin base
-    g.fillStyle(0x7a7060, 1);
-    g.fillEllipse(cx, cy + 18, 130, 38);
-    g.lineStyle(2, 0x5a5048, 1);
-    g.strokeEllipse(cx, cy + 18, 130, 38);
-
-    // Basin walls
-    g.fillStyle(0x848270, 1);
-    g.fillEllipse(cx, cy, 110, 32);
-    g.lineStyle(1.5, 0x6a6858, 1);
-    g.strokeEllipse(cx, cy, 110, 32);
-
-    // Basin inner (dry, dark)
-    g.fillStyle(0x2a2820, 1);
-    g.fillEllipse(cx, cy - 4, 88, 24);
-
-    // Carved relief panels on basin side (abstract underwater shapes)
-    g.lineStyle(1, 0x9a9080, 0.5);
-    // Wave arcs
-    g.beginPath();
-    g.moveTo(cx - 50, cy + 2); g.lineTo(cx - 30, cy - 4); g.lineTo(cx - 10, cy + 2);
-    g.strokePath();
-    g.beginPath();
-    g.moveTo(cx + 10, cy + 2); g.lineTo(cx + 30, cy - 4); g.lineTo(cx + 50, cy + 2);
-    g.strokePath();
-
-    // Central column
-    g.fillStyle(0x706858, 1);
-    g.fillRect(cx - 8, cy - 60, 16, 60);
-    g.lineStyle(1, 0x5a5240, 1);
-    g.strokeRect(cx - 8, cy - 60, 16, 60);
-
-    // Top bowl (upper basin)
-    g.fillStyle(0x7a7060, 1);
-    g.fillEllipse(cx, cy - 60, 72, 22);
-    g.fillStyle(0x2a2820, 1);
-    g.fillEllipse(cx, cy - 64, 55, 16);
-    g.lineStyle(1.5, 0x5a5248, 1);
-    g.strokeEllipse(cx, cy - 60, 72, 22);
-
-    // Crack lines
-    g.lineStyle(1, 0x3a3828, 0.8);
-    g.lineBetween(cx - 48, cy + 10, cx - 30, cy - 2);
-    g.lineBetween(cx + 22, cy + 8, cx + 38, cy - 6);
-
-    // Label
-    this.add.text(cx, cy - 90, 'The Dry Fountain', {
-      fontFamily: 'Georgia, serif', fontSize: '9px', color: '#7a7060',
-      fontStyle: 'italic',
-    }).setOrigin(0.5).setDepth(6).setAlpha(0.6);
-  }
-
   _drawMoonveilPlants(W, H, WH) {
     const g  = this.add.graphics().setDepth(6);
     const px = W * 0.55;
@@ -271,15 +93,43 @@ class SunkenGardenScene extends BaseScene {
       g.lineBetween(mx, my, mx + 10, my - 6);
     });
 
-    // Faint glow dots at tips (bright silver-white)
-    g.fillStyle(0xe8f0ec, 0.55);
-    stems.forEach(s => g.fillCircle(s.tx, s.ty, 3));
-    g.fillStyle(0xffffff, 0.25);
-    stems.forEach(s => g.fillCircle(s.tx, s.ty, 5));
+    // Glow dots at tips — bright silver-white
+    g.fillStyle(0xe8f0ec, 0.80);
+    stems.forEach(s => g.fillCircle(s.tx, s.ty, 4));
+    g.fillStyle(0xffffff, 0.55);
+    stems.forEach(s => g.fillCircle(s.tx, s.ty, 2.5));
 
-    // Animate a subtle pulse
+    // Ambient cluster glow — silver light pooling at base
+    const glowG = this.add.graphics().setDepth(5);
+    const _drawMoonveilGlow = (alpha) => {
+      glowG.clear();
+      // Wide ambient bloom
+      glowG.fillStyle(0xb8d8d0, 0.14 * alpha);
+      glowG.fillEllipse(px, py - 10, 140, 90);
+      // Mid glow
+      glowG.fillStyle(0xcce8e0, 0.24 * alpha);
+      glowG.fillEllipse(px, py - 15, 90, 60);
+      // Bright core around plant tips
+      glowG.fillStyle(0xe8f8f4, 0.38 * alpha);
+      glowG.fillEllipse(px, py - 20, 55, 40);
+      // Individual tip blooms
+      stems.forEach(s => {
+        glowG.fillStyle(0xffffff, 0.30 * alpha);
+        glowG.fillCircle(s.tx, s.ty, 7);
+      });
+    };
+    _drawMoonveilGlow(1.0);
+
+    // Pulsing tween with redraw
     this.tweens.add({
-      targets: g, alpha: { from: 0.85, to: 0.55 },
+      targets: glowG, alpha: { from: 0.65, to: 1.0 },
+      duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      onUpdate: () => _drawMoonveilGlow(glowG.alpha),
+    });
+
+    // Also gently pulse the stem graphics
+    this.tweens.add({
+      targets: g, alpha: { from: 0.80, to: 1.0 },
       duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     });
 
@@ -291,28 +141,25 @@ class SunkenGardenScene extends BaseScene {
   }
 
   _drawTidalPools(W, H, WH) {
-    const g = this.add.graphics().setDepth(3);
-
-    // Bottom-left pool
-    g.fillStyle(0x2a5a68, 0.55);
-    g.fillEllipse(64, WH * 0.84, 80, 26);
-    g.lineStyle(1, 0x3a7080, 0.6);
-    g.strokeEllipse(64, WH * 0.84, 80, 26);
-    // Sea-glass dots
-    const glassColors = [0x6ad0a0, 0x5aa8c8, 0x88d8b0, 0xe8c860];
-    glassColors.forEach((c, i) => {
-      g.fillStyle(c, 0.8);
-      g.fillCircle(40 + i * 14, WH * 0.84 + Phaser.Math.Between(-5, 5), 4);
-    });
-
-    // Bottom-right pool
-    g.fillStyle(0x2a5a68, 0.55);
-    g.fillEllipse(W - 64, WH * 0.80, 90, 28);
-    g.lineStyle(1, 0x3a7080, 0.6);
-    g.strokeEllipse(W - 64, WH * 0.80, 90, 28);
-    glassColors.forEach((c, i) => {
-      g.fillStyle(c, 0.8);
-      g.fillCircle(W - 92 + i * 14, WH * 0.80 + Phaser.Math.Between(-5, 5), 4);
+    // Animated pool shimmer — sunlight on water surface
+    const shimmerG = this.add.graphics().setDepth(4);
+    this.tweens.add({
+      targets: shimmerG, alpha: { from: 0.4, to: 1.0 },
+      duration: 1600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      onUpdate: () => {
+        shimmerG.clear();
+        const t = Date.now() / 2200;
+        // Left pool shimmer streak
+        shimmerG.fillStyle(0x90d8e8, 0.35);
+        shimmerG.fillEllipse(64 + Math.sin(t) * 8, WH * 0.84, 28, 5);
+        shimmerG.fillStyle(0xb0f0f8, 0.22);
+        shimmerG.fillEllipse(50 + Math.cos(t * 1.3) * 6, WH * 0.835, 14, 3);
+        // Right pool shimmer streak
+        shimmerG.fillStyle(0x90d8e8, 0.35);
+        shimmerG.fillEllipse(W - 64 + Math.sin(t + 1) * 10, WH * 0.80, 32, 5);
+        shimmerG.fillStyle(0xb0f0f8, 0.22);
+        shimmerG.fillEllipse(W - 78 + Math.cos(t * 0.9) * 7, WH * 0.795, 16, 3);
+      },
     });
   }
 
@@ -390,9 +237,11 @@ class SunkenGardenScene extends BaseScene {
       g.lineBetween(dx - 4, dy + 40, dx - 8, dy + 70);
       g.lineBetween(dx + 6, dy + 35, dx + 10, dy + 65);
     } else {
-      // If awake: slight warm glow around him
-      g.fillStyle(0xffc870, 0.08);
-      g.fillCircle(dx, dy + 50, 55);
+      // If awake: warm golden glow — breaking of the stone curse
+      g.fillStyle(0xffc870, 0.22);
+      g.fillCircle(dx, dy + 50, 70);
+      g.fillStyle(0xffe090, 0.12);
+      g.fillCircle(dx, dy + 50, 100);
     }
 
     // Label

@@ -6,6 +6,8 @@
 class VessaTowerScene extends BaseScene {
   constructor() { super({ key: 'VessaTowerScene' }); }
 
+  preload() { this.load.image('bg_vessa', 'assets/backgrounds/vesa-tower.jpg'); }
+
   create() {
     const W  = this.scale.width;
     const H  = this.scale.height;
@@ -13,12 +15,11 @@ class VessaTowerScene extends BaseScene {
 
     GameState.setCurrentScene('VessaTowerScene');
 
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, WH / 2, 'bg_vessa').setDisplaySize(W, WH).setDepth(0);
+
     // ── World ─────────────────────────────────────────────────
-    this._drawBackground(W, H, WH);
-    this._drawLooms(W, H, WH);
     this._drawMasterLoom(W, H, WH);
-    this._drawWindows(W, H, WH);
-    this._drawCandles(W, H, WH);
     this._drawVessa(W, H, WH);
 
     this.add.text(W / 2, 18, "Vessa's Tower", {
@@ -58,160 +59,11 @@ class VessaTowerScene extends BaseScene {
 
   // ── Drawing ──────────────────────────────────────────────────
 
-  _drawBackground(W, H, WH) {
-    const g = this.add.graphics();
-
-    // Dark stone interior walls
-    g.fillGradientStyle(0x0e0a08, 0x0e0a08, 0x1a1410, 0x1a1410, 1);
-    g.fillRect(0, 0, W, WH);
-
-    // Stone floor
-    g.fillStyle(0x181410, 1);
-    g.fillRect(0, WH * 0.78, W, WH * 0.22);
-    g.lineStyle(1, 0x2a2018, 0.4);
-    g.lineBetween(0, WH * 0.78, W, WH * 0.78);
-
-    // Floor stone tiles
-    g.lineStyle(1, 0x201a14, 0.3);
-    for (let x = 0; x < W; x += 56) g.lineBetween(x, WH * 0.78, x, WH);
-    for (let y = WH * 0.78; y < WH; y += 30) g.lineBetween(0, y, W, y);
-
-    // Ceiling — high and dark
-    g.fillStyle(0x080608, 1);
-    g.fillRect(0, 0, W, 28);
-
-    // Warm amber ambient light (from candles)
-    g.fillStyle(0xd08020, 0.04);
-    g.fillRect(0, 0, W, WH);
-    g.fillStyle(0xd08020, 0.03);
-    g.fillRect(W * 0.25, WH * 0.20, W * 0.50, WH * 0.60);
-  }
-
-  _drawLooms(W, H, WH) {
-    const g = this.add.graphics().setDepth(4);
-
-    // Left side looms — tall, against the wall
-    this._drawLoom(g, 18, WH * 0.05, 88, WH * 0.70);
-    this._drawLoom(g, 116, WH * 0.05, 88, WH * 0.70);
-
-    // Right side looms
-    this._drawLoom(g, W - 106, WH * 0.05, 88, WH * 0.70);
-    this._drawLoom(g, W - 196, WH * 0.05, 78, WH * 0.65);
-
-    // Store reference for animation
-    this._loomGraphics = g;
-  }
-
-  _drawLoom(g, x, y, w, h) {
-    // Frame
-    g.fillStyle(0x2a1c10, 1);
-    g.fillRect(x, y, w, h);
-    g.lineStyle(1.5, 0x4a3020, 1);
-    g.strokeRect(x, y, w, h);
-
-    // Top beam
-    g.fillStyle(0x3a2a18, 1);
-    g.fillRect(x - 4, y, w + 8, 10);
-
-    // Bottom beam
-    g.fillRect(x - 4, y + h - 10, w + 8, 10);
-
-    // Vertical side posts
-    g.fillRect(x, y, 8, h);
-    g.fillRect(x + w - 8, y, 8, h);
-
-    // Warp threads (vertical, silver-gray)
-    const numThreads = Math.floor(w / 6);
-    for (let i = 1; i < numThreads; i++) {
-      const tx = x + i * 6;
-      // Vary thread color slightly
-      const shade = 0x888070 + (i % 3) * 0x080808;
-      g.lineStyle(1, shade, 0.6);
-      g.lineBetween(tx, y + 10, tx, y + h - 10);
-    }
-
-    // Weft threads (horizontal, colored — the weaving)
-    const weftColors = [0x8a3010, 0x3a5a8a, 0x6a8a30, 0x8a6a10, 0x5a2a6a];
-    const numWeft = Math.floor(h / 14);
-    for (let j = 1; j < numWeft - 1; j++) {
-      const wy = y + 10 + j * 14;
-      g.lineStyle(1.5, weftColors[j % weftColors.length], 0.5);
-      // Interlace: alternating segments
-      for (let k = 0; k < numThreads; k += 2) {
-        if ((j + k) % 2 === 0) {
-          g.lineBetween(x + k * 6, wy, x + (k + 1) * 6, wy);
-        }
-      }
-    }
-  }
-
   _drawMasterLoom(W, H, WH) {
-    const g  = this.add.graphics().setDepth(6);
     const lx = W * 0.35;
     const ly = WH * 0.04;
     const lw = W * 0.30;
     const lh = WH * 0.72;
-
-    // Frame — imposing, ornate
-    g.fillStyle(0x3a2810, 1);
-    g.fillRect(lx, ly, lw, lh);
-    g.lineStyle(2.5, 0xc8956c, 0.8);
-    g.strokeRect(lx, ly, lw, lh);
-
-    // Top cross-beam with carved detail
-    g.fillStyle(0x4a3818, 1);
-    g.fillRect(lx - 10, ly, lw + 20, 16);
-    g.lineStyle(1.5, 0xc8956c, 0.7);
-    g.strokeRect(lx - 10, ly, lw + 20, 16);
-    // Carved triangles on beam
-    g.fillStyle(0xc8956c, 0.3);
-    g.fillTriangle(lx + 10, ly + 4, lx + 20, ly + 4, lx + 15, ly + 12);
-    g.fillTriangle(lx + lw - 20, ly + 4, lx + lw - 10, ly + 4, lx + lw - 15, ly + 12);
-    g.fillTriangle(lx + lw / 2 - 6, ly + 2, lx + lw / 2 + 6, ly + 2, lx + lw / 2, ly + 12);
-
-    // Side posts (thick)
-    g.fillStyle(0x3a2810, 1);
-    g.fillRect(lx, ly, 12, lh);
-    g.fillRect(lx + lw - 12, ly, 12, lh);
-
-    // Bottom beam
-    g.fillStyle(0x4a3818, 1);
-    g.fillRect(lx - 10, ly + lh - 16, lw + 20, 16);
-    g.lineStyle(1, 0xc8956c, 0.5);
-    g.strokeRect(lx - 10, ly + lh - 16, lw + 20, 16);
-
-    // Warp threads — silver and gold, more elaborate
-    const numW = Math.floor(lw / 7);
-    for (let i = 1; i < numW; i++) {
-      const tx  = lx + 12 + i * 7;
-      const col = i % 3 === 0 ? 0xd4a030 : 0xa0a890;
-      g.lineStyle(1, col, 0.65);
-      g.lineBetween(tx, ly + 16, tx, ly + lh - 16);
-    }
-
-    // Weft threads — silver and gold interlaced
-    const weftCols = [0xc8a830, 0x9098a0, 0xe0c060, 0xb0b8a8];
-    const numWf = Math.floor(lh / 10);
-    for (let j = 2; j < numWf - 2; j++) {
-      const wy = ly + 16 + j * 10;
-      g.lineStyle(1.5, weftCols[j % weftCols.length], 0.55);
-      for (let k = 0; k < numW; k += 2) {
-        if ((j + k) % 2 === 0) {
-          const kx = lx + 12 + k * 7;
-          g.lineBetween(kx, wy, kx + 7, wy);
-        }
-      }
-    }
-
-    // Glow effect on master loom threads
-    g.fillStyle(0xd0a030, 0.06);
-    g.fillRect(lx + 12, ly + 16, lw - 24, lh - 32);
-
-    // Label
-    this.add.text(lx + lw / 2, ly + lh + 10, 'The Master Loom', {
-      fontFamily: 'Georgia, serif', fontSize: '9px',
-      color: '#c8956c', fontStyle: 'italic',
-    }).setOrigin(0.5).setDepth(7).setAlpha(0.8);
 
     // Animated thread glow — store for animation
     this._masterLoomGlow = this.add.graphics().setDepth(7);
@@ -226,98 +78,6 @@ class VessaTowerScene extends BaseScene {
         this._masterLoomGlow.lineStyle(1, 0xd4b050, 0.15 * this._masterLoomGlow.alpha);
         this._masterLoomGlow.strokeRect(lx, ly, lw, lh);
       },
-    });
-  }
-
-  _drawWindows(W, H, WH) {
-    const g = this.add.graphics().setDepth(3);
-
-    // Narrow high windows on back wall
-    const windows = [
-      { x: W * 0.20, y: WH * 0.06 },
-      { x: W * 0.80, y: WH * 0.06 },
-    ];
-
-    windows.forEach(win => {
-      const wx = win.x;
-      const wy = win.y;
-
-      // Window embrasure (stone surround)
-      g.fillStyle(0x1a1410, 1);
-      g.fillRect(wx - 14, wy, 28, 70);
-      g.lineStyle(1.5, 0x2a2018, 1);
-      g.strokeRect(wx - 14, wy, 28, 70);
-
-      // Arch top
-      g.fillStyle(0x1a1410, 1);
-      g.fillEllipse(wx, wy, 28, 14);
-
-      // Window glass — sea visible outside (dawn blue)
-      g.fillStyle(0x304860, 0.7);
-      g.fillRect(wx - 11, wy + 4, 22, 60);
-      g.fillEllipse(wx, wy + 4, 22, 11);
-
-      // Morning light shaft
-      g.fillStyle(0x80a0c0, 0.06);
-      g.fillTriangle(
-        wx - 11, wy + 4,
-        wx + 11, wy + 4,
-        wx + 50, WH * 0.70
-      );
-
-      // Window cross bars
-      g.lineStyle(1, 0x201810, 0.8);
-      g.lineBetween(wx - 11, wy + 34, wx + 11, wy + 34);
-      g.lineBetween(wx, wy + 4, wx, wy + 64);
-    });
-  }
-
-  _drawCandles(W, H, WH) {
-    const g = this.add.graphics().setDepth(5);
-
-    // Wall sconces with candles — left and right sides
-    const sconces = [
-      { x: 105,     y: WH * 0.32 },
-      { x: 105,     y: WH * 0.54 },
-      { x: W - 105, y: WH * 0.32 },
-      { x: W - 105, y: WH * 0.54 },
-    ];
-
-    sconces.forEach(sc => {
-      const sx = sc.x;
-      const sy = sc.y;
-
-      // Sconce bracket
-      g.fillStyle(0x5a4020, 1);
-      g.fillRect(sx - 12, sy, 24, 8);
-      g.fillRect(sx - 4, sy + 8, 8, 16);
-      g.lineStyle(1, 0x7a5828, 0.7);
-      g.strokeRect(sx - 12, sy, 24, 8);
-
-      // Candle
-      g.fillStyle(0xf0e8d0, 1);
-      g.fillRect(sx - 3, sy - 18, 6, 18);
-      g.lineStyle(1, 0xd0c0a0, 0.5);
-      g.strokeRect(sx - 3, sy - 18, 6, 18);
-
-      // Flame
-      g.fillStyle(0xffd040, 0.9);
-      g.fillTriangle(sx - 3, sy - 18, sx + 3, sy - 18, sx, sy - 28);
-      g.fillStyle(0xff8020, 0.6);
-      g.fillTriangle(sx - 2, sy - 18, sx + 2, sy - 18, sx, sy - 24);
-      g.fillStyle(0xffffff, 0.3);
-      g.fillCircle(sx, sy - 26, 2);
-
-      // Glow halo
-      g.fillStyle(0xd08020, 0.08);
-      g.fillCircle(sx, sy - 22, 20);
-    });
-
-    // Candle wax drips
-    g.fillStyle(0xe8dfc0, 0.7);
-    sconces.forEach(sc => {
-      g.fillRect(sc.x - 1, sc.y - 2, 2, 8);
-      g.fillRect(sc.x + 2, sc.y - 1, 1, 5);
     });
   }
 

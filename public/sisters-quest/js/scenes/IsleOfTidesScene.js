@@ -7,6 +7,8 @@
 class IsleOfTidesScene extends BaseScene {
   constructor() { super({ key: 'IsleOfTidesScene' }); }
 
+  preload() { this.load.image('bg_tides', 'assets/backgrounds/isle-of-tides.jpg'); }
+
   create() {
     const W  = this.scale.width;
     const H  = this.scale.height;
@@ -14,12 +16,11 @@ class IsleOfTidesScene extends BaseScene {
 
     GameState.setCurrentScene('IsleOfTidesScene');
 
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, WH / 2, 'bg_tides').setDisplaySize(W, WH).setDepth(0);
+
     // ── World ─────────────────────────────────────────────────
-    this._drawBackground(W, H, WH);
-    this._drawRockyShore(W, H, WH);
     this._drawTidePools(W, H, WH);
-    this._drawWreckHorizon(W, H, WH);
-    this._drawTideKingShrine(W, H, WH);
     this._drawMira(W, H, WH);
 
     this.add.text(W / 2, 18, 'The Isle of Tides', {
@@ -62,87 +63,6 @@ class IsleOfTidesScene extends BaseScene {
 
   // ── Drawing ──────────────────────────────────────────────────
 
-  _drawBackground(W, H, WH) {
-    const g = this.add.graphics();
-
-    // Golden evening sky — gradient top to warm horizon
-    g.fillGradientStyle(0x7a6030, 0x7a6030, 0xe89040, 0xe89040, 1);
-    g.fillRect(0, 0, W, WH * 0.50);
-
-    // Warm horizon band
-    g.fillGradientStyle(0xe89040, 0xe89040, 0xd07830, 0xd07830, 1);
-    g.fillRect(0, WH * 0.50, W, WH * 0.12);
-
-    // Deep sea blue-green below horizon
-    g.fillGradientStyle(0x1a5058, 0x1a5058, 0x0e3840, 0x0e3840, 1);
-    g.fillRect(0, WH * 0.62, W, WH * 0.38);
-
-    // Sun near horizon (partially set)
-    g.fillStyle(0xffe090, 0.9);
-    g.fillCircle(W * 0.72, WH * 0.54, 24);
-    g.fillStyle(0xffa030, 0.3);
-    g.fillCircle(W * 0.72, WH * 0.54, 36);
-    g.fillStyle(0xff8020, 0.15);
-    g.fillCircle(W * 0.72, WH * 0.54, 52);
-
-    // Sun reflection on water
-    g.fillStyle(0xe09030, 0.25);
-    g.fillRect(W * 0.66, WH * 0.62, 80, WH * 0.38);
-
-    // Distant rocky outcrop on horizon
-    g.fillStyle(0x1a1810, 1);
-    g.fillEllipse(W * 0.28, WH * 0.60, 120, 22);
-    g.fillEllipse(W * 0.35, WH * 0.59, 80, 16);
-  }
-
-  _drawRockyShore(W, H, WH) {
-    const g = this.add.graphics();
-
-    // Main dark volcanic rock — lower half of scene
-    g.fillStyle(0x252018, 1);
-    g.fillRect(0, WH * 0.62, W, WH * 0.38);
-
-    // Large rock formations — angular volcanic shapes
-    // Left cluster
-    g.fillStyle(0x201c14, 1);
-    g.fillTriangle(0, WH * 0.72, 60, WH * 0.62, 120, WH * 0.78);
-    g.fillTriangle(30, WH * 0.68, 90, WH * 0.62, 90, WH * 0.78);
-    g.fillStyle(0x1a1810, 1);
-    g.fillTriangle(0, WH * 0.68, 40, WH * 0.62, 70, WH * 0.75);
-
-    // Center rocks
-    g.fillStyle(0x282218, 1);
-    g.fillTriangle(W * 0.3, WH * 0.64, W * 0.42, WH * 0.56, W * 0.50, WH * 0.68);
-    g.fillTriangle(W * 0.40, WH * 0.66, W * 0.52, WH * 0.60, W * 0.58, WH * 0.70);
-
-    // Right cliff face (where Mira sits)
-    g.fillStyle(0x1e1a12, 1);
-    g.fillRect(W * 0.68, WH * 0.40, W * 0.32, WH * 0.60);
-    g.fillTriangle(W * 0.68, WH * 0.40, W * 0.78, WH * 0.35, W * 0.90, WH * 0.44);
-
-    // Cliff edge detail — angular facets
-    g.fillStyle(0x282216, 1);
-    g.fillTriangle(W * 0.68, WH * 0.48, W * 0.74, WH * 0.42, W * 0.74, WH * 0.58);
-    g.fillStyle(0x1a1610, 1);
-    g.fillTriangle(W * 0.74, WH * 0.42, W * 0.82, WH * 0.38, W * 0.82, WH * 0.52);
-
-    // Rock surface lines
-    g.lineStyle(1, 0x3a3020, 0.5);
-    g.lineBetween(W * 0.68, WH * 0.50, W * 0.78, WH * 0.48);
-    g.lineBetween(W * 0.72, WH * 0.58, W * 0.84, WH * 0.54);
-    g.lineBetween(W * 0.76, WH * 0.66, W * 0.90, WH * 0.62);
-
-    // Path along cliff (winding line)
-    g.lineStyle(2, 0x3a3020, 0.7);
-    g.beginPath();
-    g.moveTo(W * 0.42, WH - 10);
-    g.lineTo(W * 0.52, WH * 0.82);
-    g.lineTo(W * 0.60, WH * 0.72);
-    g.lineTo(W * 0.65, WH * 0.62);
-    g.lineTo(W * 0.70, WH * 0.55);
-    g.strokePath();
-  }
-
   _drawTidePools(W, H, WH) {
     const g = this.add.graphics().setDepth(4);
 
@@ -181,77 +101,25 @@ class IsleOfTidesScene extends BaseScene {
       g.fillStyle(d.c, 0.85);
       g.fillCircle(d.x, d.y, 4);
     });
-  }
 
-  _drawWreckHorizon(W, H, WH) {
-    const g = this.add.graphics().setDepth(3);
-
-    // Ship's mast tip above water at horizon
-    const mx = W * 0.42;
-    const my = WH * 0.56;
-
-    // Mast
-    g.lineStyle(2, 0x3a2a18, 0.85);
-    g.lineBetween(mx, my, mx, my + 30);
-
-    // Crow's nest suggestion
-    g.fillStyle(0x3a2a18, 0.85);
-    g.fillRect(mx - 5, my - 2, 10, 6);
-
-    // Rigging lines
-    g.lineStyle(1, 0x3a2a18, 0.5);
-    g.lineBetween(mx, my, mx - 14, my + 20);
-    g.lineBetween(mx, my, mx + 14, my + 20);
-
-    // Label
-    this.add.text(mx + 18, my + 10, 'The Sable Dawn', {
-      fontFamily: 'Georgia, serif', fontSize: '8px',
-      color: '#8a7060', fontStyle: 'italic',
-    }).setDepth(4).setAlpha(0.6);
-  }
-
-  _drawTideKingShrine(W, H, WH) {
-    const g  = this.add.graphics().setDepth(5);
-    const sx = W * 0.09;
-    const sy = WH * 0.52;
-
-    // Cliff-carved niche
-    g.fillStyle(0x1a1610, 1);
-    g.fillRect(sx - 22, sy, 44, 60);
-    g.lineStyle(2, 0x3a3020, 1);
-    g.strokeRect(sx - 22, sy, 44, 60);
-
-    // Arch at top
-    g.fillStyle(0x282018, 1);
-    g.fillEllipse(sx, sy, 44, 24);
-
-    // Tide King symbol (wave-and-crown)
-    g.lineStyle(1.5, 0x5a90a0, 0.8);
-    // Wave
-    g.beginPath();
-    g.moveTo(sx - 12, sy + 26);
-    g.lineTo(sx - 6,  sy + 20);
-    g.lineTo(sx,      sy + 26);
-    g.lineTo(sx + 6,  sy + 20);
-    g.lineTo(sx + 12, sy + 26);
-    g.strokePath();
-    // Crown
-    g.fillStyle(0x5a90a0, 0.7);
-    g.fillTriangle(sx - 10, sy + 38, sx - 14, sy + 50, sx - 6, sy + 50);
-    g.fillTriangle(sx,      sy + 34, sx - 4,  sy + 50, sx + 4, sy + 50);
-    g.fillTriangle(sx + 10, sy + 38, sx + 6,  sy + 50, sx + 14, sy + 50);
-    g.fillRect(sx - 14, sy + 48, 28, 4);
-
-    // Candle offering
-    g.fillStyle(0xf0e8d0, 1);
-    g.fillRect(sx - 3, sy + 54, 6, 14);
-    g.fillStyle(0xffcc40, 0.8);
-    g.fillCircle(sx, sy + 52, 3);
-
-    this.add.text(sx, sy + 72, "Tide King\nShrine", {
-      fontFamily: 'Georgia, serif', fontSize: '8px',
-      color: '#5a90a0', fontStyle: 'italic', align: 'center',
-    }).setOrigin(0.5, 0).setDepth(6).setAlpha(0.7);
+    // Animated sunset shimmer on tide pools
+    const shimmerG = this.add.graphics().setDepth(5);
+    this.tweens.add({
+      targets: shimmerG, alpha: { from: 0.3, to: 1.0 },
+      duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      onUpdate: () => {
+        shimmerG.clear();
+        const t = Date.now() / 2000;
+        // Left pool — warm golden shimmer
+        shimmerG.fillStyle(0xf0c060, 0.40);
+        shimmerG.fillEllipse(W * 0.18 + Math.sin(t) * 10, WH * 0.84, 30, 5);
+        shimmerG.fillStyle(0xffd880, 0.25);
+        shimmerG.fillEllipse(W * 0.14 + Math.cos(t * 1.2) * 8, WH * 0.835, 15, 3);
+        // Center pool shimmer
+        shimmerG.fillStyle(0xe8b050, 0.35);
+        shimmerG.fillEllipse(W * 0.48 + Math.sin(t + 1.5) * 8, WH * 0.88, 22, 4);
+      },
+    });
   }
 
   _drawMira(W, H, WH) {

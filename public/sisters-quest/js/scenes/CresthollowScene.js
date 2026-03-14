@@ -7,6 +7,10 @@
 class CresthollowScene extends BaseScene {
   constructor() { super({ key: 'CresthollowScene' }); }
 
+  preload() {
+    this.load.image('bg_cresthollow', 'assets/backgrounds/cresthollow.jpg');
+  }
+
   create() {
     const W  = this.scale.width;
     const H  = this.scale.height;
@@ -17,17 +21,16 @@ class CresthollowScene extends BaseScene {
     // ── Camera ────────────────────────────────────────────────
     this.cameras.main.fadeIn(500, 0, 0, 0);
 
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, WH / 2, 'bg_cresthollow').setDisplaySize(W, WH).setDepth(0);
+
     // ── Scene label ───────────────────────────────────────────
     this.add.text(W / 2, 18, 'Cresthollow  ·  The Village Square', {
       fontFamily: 'Georgia, serif', fontSize: '12px',
       color: '#3a3028', fontStyle: 'italic',
     }).setOrigin(0.5).setDepth(10);
 
-    // ── World graphics ────────────────────────────────────────
-    this._drawSky(W, WH);
-    this._drawBuildings(W, WH);
-    this._drawGround(W, WH);
-    this._drawMarketStalls(W, WH);
+    // ── Thornwood gate, notice board, Bram, path arrows ───────
     this._drawThornwoodGate(W, WH);
     this._drawNoticeBoard(W, WH);
     this._drawBram(W, WH);
@@ -66,242 +69,6 @@ class CresthollowScene extends BaseScene {
         this._play(DIALOGUE_CRESTHOLLOW_ENTER);
       });
     }
-  }
-
-  // ── Sky ───────────────────────────────────────────────────
-
-  _drawSky(W, WH) {
-    const g = this.add.graphics();
-    // Dark blue-gray overcast dawn gradient
-    g.fillGradientStyle(0x1a1e2e, 0x1a1e2e, 0x2e2e3a, 0x2e2e3a, 1);
-    g.fillRect(0, 0, W, WH * 0.55);
-
-    // Cloud layer — heavy overcast bands
-    g.fillStyle(0x252530, 0.7);
-    const clouds = [
-      { x: 0, y: 28, w: 240, h: 38 },
-      { x: 180, y: 18, w: 310, h: 44 },
-      { x: 460, y: 30, w: 280, h: 36 },
-      { x: W - 260, y: 20, w: 270, h: 42 },
-    ];
-    clouds.forEach(c => {
-      g.fillEllipse(c.x + c.w / 2, c.y + c.h / 2, c.w, c.h);
-    });
-
-    // Pale dawn glow at horizon
-    g.fillStyle(0x4a3a28, 0.18);
-    g.fillRect(0, WH * 0.38, W, WH * 0.17);
-
-    // Far tree silhouettes in the distance (Thornwood visible)
-    g.fillStyle(0x0c0e14, 1);
-    for (let tx = W * 0.58; tx < W; tx += 22) {
-      const th = Phaser.Math.Between(48, 88);
-      const tw = Phaser.Math.Between(12, 20);
-      g.fillTriangle(tx, WH * 0.55 - th, tx - tw / 2, WH * 0.55, tx + tw / 2, WH * 0.55);
-    }
-  }
-
-  // ── Buildings ─────────────────────────────────────────────
-
-  _drawBuildings(W, WH) {
-    const g = this.add.graphics();
-
-    // ─ The Rusty Plow (inn, left) ─
-    const innX = 18, innY = WH * 0.18, innW = W * 0.27, innH = WH * 0.52;
-    // Main facade
-    g.fillStyle(0x2a2218, 1);
-    g.fillRect(innX, innY, innW, innH);
-    g.lineStyle(2, 0x4a3c28, 1);
-    g.strokeRect(innX, innY, innW, innH);
-    // Roof
-    g.fillStyle(0x1e1610, 1);
-    g.fillTriangle(innX - 14, innY, innX + innW / 2, innY - 52, innX + innW + 14, innY);
-    g.lineStyle(2, 0x3a2e1e, 1);
-    g.strokeTriangle(innX - 14, innY, innX + innW / 2, innY - 52, innX + innW + 14, innY);
-    // Chimney
-    g.fillStyle(0x1a1410, 1);
-    g.fillRect(innX + innW * 0.68, innY - 76, 18, 46);
-    g.lineStyle(1, 0x2e2418, 1);
-    g.strokeRect(innX + innW * 0.68, innY - 76, 18, 46);
-    // Chimney smoke
-    g.fillStyle(0x3a3430, 0.35);
-    g.fillEllipse(innX + innW * 0.68 + 9, innY - 88, 14, 12);
-    g.fillEllipse(innX + innW * 0.68 + 14, innY - 104, 18, 14);
-    // Doorway (arched)
-    g.fillStyle(0x100c08, 1);
-    g.fillRect(innX + innW * 0.35, innY + innH - 86, 48, 86);
-    g.fillEllipse(innX + innW * 0.35 + 24, innY + innH - 86, 48, 36);
-    g.lineStyle(2, 0x3a2c1c, 1);
-    g.strokeRect(innX + innW * 0.35, innY + innH - 86, 48, 86);
-    // Door frame detail
-    g.lineStyle(1, 0x4a3c28, 0.7);
-    g.strokeEllipse(innX + innW * 0.35 + 24, innY + innH - 86, 48, 36);
-    // Windows
-    this._drawWindow(g, innX + 18, innY + 28, 44, 54);
-    this._drawWindow(g, innX + innW - 62, innY + 28, 44, 54);
-    this._drawWindow(g, innX + 18, innY + innH * 0.45, 38, 46);
-    this._drawWindow(g, innX + innW - 56, innY + innH * 0.45, 38, 46);
-    // Warm light from windows
-    g.fillStyle(0xd08020, 0.12);
-    g.fillRect(innX + 18, innY + 28, 44, 54);
-    g.fillRect(innX + innW - 62, innY + 28, 44, 54);
-
-    // Inn sign — "The Rusty Plow"
-    const sx = innX + innW * 0.5 - 58, sy = innY + innH * 0.12;
-    g.fillStyle(0x3a2a14, 1);
-    g.fillRect(sx, sy, 116, 34);
-    g.lineStyle(1.5, 0xc8956c, 0.85);
-    g.strokeRect(sx, sy, 116, 34);
-    // Hanging chains
-    g.lineStyle(1, 0x6a5a38, 1);
-    g.lineBetween(sx + 20, sy, sx + 20, sy - 14);
-    g.lineBetween(sx + 96, sy, sx + 96, sy - 14);
-    // Mug icon (simple drawn)
-    g.fillStyle(0xc8956c, 0.8);
-    g.fillRect(sx + 6, sy + 8, 16, 18);
-    g.fillRect(sx + 22, sy + 11, 5, 10);  // handle
-    g.lineStyle(1, 0x8a6030, 1);
-    g.strokeRect(sx + 6, sy + 8, 16, 18);
-    this.add.text(sx + 34, sy + 17, 'The Rusty Plow', {
-      fontFamily: 'Georgia, serif', fontSize: '10px', color: '#e8c87a', fontStyle: 'italic',
-    }).setOrigin(0, 0.5).setDepth(6);
-
-    // ─ General Store (right side) ─
-    const stX = W * 0.64, stY = WH * 0.22, stW = W * 0.22, stH = WH * 0.48;
-    g.fillStyle(0x24201a, 1);
-    g.fillRect(stX, stY, stW, stH);
-    g.lineStyle(2, 0x3e3428, 1);
-    g.strokeRect(stX, stY, stW, stH);
-    // Roof (flat with parapet)
-    g.fillStyle(0x1c1810, 1);
-    g.fillRect(stX - 8, stY - 14, stW + 16, 18);
-    g.lineStyle(2, 0x3a3020, 1);
-    g.strokeRect(stX - 8, stY - 14, stW + 16, 18);
-    // Awning
-    g.fillStyle(0x4a2a0e, 1);
-    g.fillRect(stX - 4, stY + stH - 65, stW + 8, 18);
-    g.lineStyle(1, 0x8a5a28, 1);
-    g.strokeRect(stX - 4, stY + stH - 65, stW + 8, 18);
-    // Awning fringe
-    for (let fx = stX; fx < stX + stW; fx += 12) {
-      g.fillStyle(0x7a4a1e, 1);
-      g.fillTriangle(fx, stY + stH - 47, fx + 6, stY + stH - 38, fx + 12, stY + stH - 47);
-    }
-    // Store windows
-    this._drawWindow(g, stX + 12, stY + 22, 52, 62);
-    this._drawWindow(g, stX + stW - 64, stY + 22, 52, 62);
-    // Store door
-    g.fillStyle(0x160e08, 1);
-    g.fillRect(stX + stW / 2 - 18, stY + stH - 64, 36, 64);
-    g.lineStyle(1.5, 0x4a3828, 1);
-    g.strokeRect(stX + stW / 2 - 18, stY + stH - 64, 36, 64);
-    // Store sign
-    const ssx = stX + 14, ssy = stY + 4;
-    g.fillStyle(0x2a1e10, 1);
-    g.fillRect(ssx, ssy, stW - 28, 24);
-    g.lineStyle(1, 0x8a6030, 0.7);
-    g.strokeRect(ssx, ssy, stW - 28, 24);
-    this.add.text(stX + stW / 2, ssy + 12, 'General Store', {
-      fontFamily: 'Georgia, serif', fontSize: '9px', color: '#b89860',
-    }).setOrigin(0.5).setDepth(6);
-
-    // ─ Blacksmith (center-back, smaller, recessed) ─
-    const bsX = W * 0.38, bsY = WH * 0.14, bsW = W * 0.17, bsH = WH * 0.38;
-    g.fillStyle(0x1e1a14, 1);
-    g.fillRect(bsX, bsY, bsW, bsH);
-    g.lineStyle(2, 0x382e20, 1);
-    g.strokeRect(bsX, bsY, bsW, bsH);
-    // Forge glow through opening
-    g.fillStyle(0xe04010, 0.15);
-    g.fillRect(bsX + bsW * 0.2, bsY + bsH * 0.4, bsW * 0.6, bsH * 0.5);
-    // Wide open forge entry
-    g.fillStyle(0x0e0a06, 1);
-    g.fillRect(bsX + bsW * 0.2, bsY + bsH * 0.3, bsW * 0.6, bsH * 0.7);
-    // Hammer on wall silhouette
-    g.fillStyle(0x4a3820, 0.5);
-    g.fillRect(bsX + 8, bsY + 24, 6, 28);
-    g.fillRect(bsX + 4, bsY + 20, 14, 10);
-    // Anvil silhouette in forge opening
-    g.fillStyle(0x2a2010, 0.7);
-    g.fillRect(bsX + bsW * 0.34, bsY + bsH * 0.68, bsW * 0.3, 12);
-    g.fillRect(bsX + bsW * 0.38, bsY + bsH * 0.7, bsW * 0.22, 18);
-    // Blacksmith label
-    this.add.text(bsX + bsW / 2, bsY + 10, 'Smithy', {
-      fontFamily: 'Georgia, serif', fontSize: '9px', color: '#6a5030', fontStyle: 'italic',
-    }).setOrigin(0.5).setDepth(6);
-  }
-
-  _drawWindow(g, x, y, w, h) {
-    // Frame
-    g.fillStyle(0x1a1410, 1);
-    g.fillRect(x, y, w, h);
-    g.lineStyle(1.5, 0x4a3c28, 1);
-    g.strokeRect(x, y, w, h);
-    // Cross-pane
-    g.lineStyle(1, 0x3a2e1e, 1);
-    g.lineBetween(x + w / 2, y, x + w / 2, y + h);
-    g.lineBetween(x, y + h / 2, x + w, y + h / 2);
-  }
-
-  // ── Ground / cobblestones ─────────────────────────────────
-
-  _drawGround(W, WH) {
-    const g = this.add.graphics();
-    // Base ground
-    g.fillStyle(0x1e1c18, 1);
-    g.fillRect(0, WH * 0.65, W, WH * 0.35);
-    g.lineStyle(1, 0x2a2820, 1);
-    g.lineBetween(0, WH * 0.65, W, WH * 0.65);
-
-    // Cobblestone pattern
-    g.lineStyle(0.5, 0x28261e, 0.55);
-    const rows = 7;
-    const rowH = (WH * 0.35) / rows;
-    for (let r = 0; r < rows; r++) {
-      const y    = WH * 0.65 + r * rowH;
-      const cols = Math.round(W / (40 + r * 4));
-      const colW = W / cols;
-      const offset = (r % 2 === 0) ? 0 : colW / 2;
-      for (let c = 0; c < cols + 1; c++) {
-        const cx = c * colW - offset;
-        g.fillStyle(0x1e1c18 + (((r + c) % 3) * 0x020200), 1);
-        g.fillRoundedRect(cx + 1, y + 1, colW - 2, rowH - 2, 1);
-        g.strokeRoundedRect(cx + 1, y + 1, colW - 2, rowH - 2, 1);
-      }
-    }
-  }
-
-  // ── Market Stalls (sparse/closed) ────────────────────────
-
-  _drawMarketStalls(W, WH) {
-    const g = this.add.graphics().setDepth(4);
-    // A couple of closed/empty stalls in the middle of the square
-    const stalls = [
-      { x: W * 0.26, y: WH * 0.62, w: 88, h: 52 },
-      { x: W * 0.42, y: WH * 0.60, w: 104, h: 52 },
-    ];
-    stalls.forEach(s => {
-      // Frame posts
-      g.fillStyle(0x2a2018, 1);
-      g.fillRect(s.x, s.y - 24, 6, 76);
-      g.fillRect(s.x + s.w - 6, s.y - 24, 6, 76);
-      // Faded awning
-      g.fillStyle(0x382a1a, 0.85);
-      g.fillRect(s.x - 4, s.y - 24, s.w + 8, 16);
-      g.lineStyle(1, 0x5a4228, 0.6);
-      g.strokeRect(s.x - 4, s.y - 24, s.w + 8, 16);
-      // Counter
-      g.fillStyle(0x241c14, 1);
-      g.fillRect(s.x, s.y - 2, s.w, 8);
-      // Empty surface
-      g.fillStyle(0x1c1610, 0.9);
-      g.fillRect(s.x, s.y + 6, s.w, s.h - 8);
-      g.lineStyle(1, 0x3a2c1c, 0.5);
-      g.strokeRect(s.x, s.y + 6, s.w, s.h - 8);
-      // "Closed" cloth draped
-      g.fillStyle(0x2e2218, 0.6);
-      g.fillTriangle(s.x + s.w * 0.2, s.y + 6, s.x + s.w * 0.5, s.y + 26, s.x + s.w * 0.8, s.y + 6);
-    });
   }
 
   // ── Thornwood Gate ────────────────────────────────────────

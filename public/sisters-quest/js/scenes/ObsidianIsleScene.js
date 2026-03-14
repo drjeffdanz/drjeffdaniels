@@ -7,6 +7,8 @@
 class ObsidianIsleScene extends BaseScene {
   constructor() { super({ key: 'ObsidianIsleScene' }); }
 
+  preload() { this.load.image('bg_obsidian', 'assets/backgrounds/obsidian-isle.jpg'); }
+
   create() {
     const W  = this.scale.width;
     const H  = this.scale.height;
@@ -15,10 +17,7 @@ class ObsidianIsleScene extends BaseScene {
     GameState.setCurrentScene('ObsidianIsleScene');
 
     // ── World ─────────────────────────────────────────────────
-    this._drawBackground(W, H, WH);
-    this._drawCliffs(W, H, WH);
-    this._drawSea(W, H, WH);
-    this._drawPath(W, H, WH);
+    this.add.image(W / 2, WH / 2, 'bg_obsidian').setDisplaySize(W, WH).setDepth(0);
     this._drawTower(W, H, WH);
 
     this.add.text(W / 2, 18, 'The Obsidian Isle', {
@@ -60,181 +59,6 @@ class ObsidianIsleScene extends BaseScene {
   }
 
   // ── Drawing ──────────────────────────────────────────────────
-
-  _drawBackground(W, H, WH) {
-    const g = this.add.graphics();
-
-    // Pre-dawn sky — dark purple to deep red at horizon
-    g.fillGradientStyle(0x0a0414, 0x0a0414, 0x180820, 0x180820, 1);
-    g.fillRect(0, 0, W, WH * 0.40);
-
-    // Deep red-orange near horizon
-    g.fillGradientStyle(0x180820, 0x180820, 0x500818, 0x500818, 1);
-    g.fillRect(0, WH * 0.40, W, WH * 0.22);
-
-    // Horizon glow — dark orange-red
-    g.fillGradientStyle(0x500818, 0x500818, 0x700c10, 0x700c10, 1);
-    g.fillRect(0, WH * 0.62, W, WH * 0.10);
-
-    // Stars in dark upper sky
-    for (let i = 0; i < 60; i++) {
-      const sx = Phaser.Math.Between(0, W);
-      const sy = Phaser.Math.Between(0, WH * 0.40);
-      const r  = Math.random() > 0.85 ? 1.5 : 1;
-      g.fillStyle(0xffffff, Phaser.Math.FloatBetween(0.15, 0.7));
-      g.fillCircle(sx, sy, r);
-    }
-
-    // Faint moon (crescent suggestion)
-    g.fillStyle(0xe8e0d0, 0.18);
-    g.fillCircle(W * 0.82, WH * 0.14, 22);
-    g.fillStyle(0x100412, 0.9);
-    g.fillCircle(W * 0.78, WH * 0.14, 18);
-  }
-
-  _drawCliffs(W, H, WH) {
-    const g = this.add.graphics();
-
-    // Black volcanic glass cliffs — angular geometric shapes
-    // Left cliff face
-    g.fillStyle(0x0c0a0e, 1);
-    g.fillRect(0, WH * 0.28, 110, WH * 0.72);
-
-    // Left cliff angular facets (very dark with slight variation)
-    g.fillStyle(0x100e14, 1);
-    g.fillTriangle(0, WH * 0.28, 60, WH * 0.28, 0, WH * 0.44);
-    g.fillTriangle(40, WH * 0.36, 110, WH * 0.32, 110, WH * 0.50);
-    g.fillStyle(0x0e0c12, 1);
-    g.fillTriangle(0, WH * 0.50, 70, WH * 0.44, 40, WH * 0.62);
-    g.fillTriangle(60, WH * 0.56, 110, WH * 0.52, 110, WH * 0.68);
-
-    // Glass glints on left cliff — bright specks
-    g.fillStyle(0x6060a0, 0.3);
-    const leftGlints = [
-      { x: 18, y: WH * 0.34 }, { x: 52, y: WH * 0.40 },
-      { x: 28, y: WH * 0.52 }, { x: 78, y: WH * 0.46 },
-      { x: 12, y: WH * 0.64 }, { x: 88, y: WH * 0.60 },
-    ];
-    leftGlints.forEach(p => {
-      g.fillStyle(0x8080c8, 0.25);
-      g.fillRect(p.x, p.y, 14, 2);
-    });
-
-    // Right cliff face (taller, steeper)
-    g.fillStyle(0x0c0a0e, 1);
-    g.fillRect(W - 130, WH * 0.22, 130, WH * 0.78);
-
-    // Right cliff angular facets
-    g.fillStyle(0x100e14, 1);
-    g.fillTriangle(W - 130, WH * 0.22, W - 50, WH * 0.22, W - 130, WH * 0.38);
-    g.fillTriangle(W - 80, WH * 0.30, W, WH * 0.26, W, WH * 0.44);
-    g.fillStyle(0x0e0c12, 1);
-    g.fillTriangle(W - 130, WH * 0.44, W - 60, WH * 0.40, W - 90, WH * 0.58);
-    g.fillTriangle(W - 70, WH * 0.50, W, WH * 0.46, W, WH * 0.64);
-
-    // Glass reflection lines on right cliff
-    g.lineStyle(1, 0x7070b0, 0.2);
-    g.lineBetween(W - 110, WH * 0.30, W - 60, WH * 0.26);
-    g.lineBetween(W - 90, WH * 0.44, W - 40, WH * 0.40);
-    g.lineBetween(W - 120, WH * 0.58, W - 55, WH * 0.54);
-    g.lineBetween(W - 80, WH * 0.66, W - 20, WH * 0.62);
-
-    // Fractured light lines across cliff face (glass reflections)
-    g.lineStyle(1, 0x9090d0, 0.15);
-    for (let i = 0; i < 8; i++) {
-      const lx = W - 128 + i * 16;
-      const ly = WH * (0.24 + i * 0.04);
-      g.lineBetween(lx, ly, lx + 28, ly + 12);
-    }
-
-    // Background cliff mass — summit area where tower sits
-    g.fillStyle(0x080608, 1);
-    g.fillRect(0, WH * 0.60, W, WH * 0.40);
-
-    // Angular summit rocks
-    g.fillStyle(0x0e0c12, 1);
-    g.fillTriangle(0, WH * 0.60, W * 0.28, WH * 0.54, W * 0.40, WH * 0.62);
-    g.fillTriangle(W * 0.60, WH * 0.56, W * 0.76, WH * 0.50, W, WH * 0.60);
-
-    // Cliff base (solid rock)
-    g.fillStyle(0x060408, 1);
-    g.fillRect(0, WH * 0.72, W, WH * 0.28);
-  }
-
-  _drawSea(W, H, WH) {
-    const g = this.add.graphics().setDepth(2);
-
-    // Dark sea at base of cliffs — near-black
-    g.fillGradientStyle(0x0a1828, 0x0a1828, 0x060c14, 0x060c14, 1);
-    g.fillRect(110, WH * 0.68, W - 240, WH * 0.32);
-
-    // Sea surface detail — faint wave lines
-    g.lineStyle(1, 0x1a2a40, 0.4);
-    for (let y = WH * 0.72; y < WH; y += 14) {
-      g.lineBetween(115, y, W - 135, y + 4);
-    }
-
-    // Reflection of horizon glow on water
-    g.fillStyle(0x600810, 0.12);
-    g.fillRect(W * 0.30, WH * 0.68, W * 0.40, WH * 0.32);
-  }
-
-  _drawPath(W, H, WH) {
-    const g = this.add.graphics().setDepth(4);
-
-    // Winding rocky path from bottom center to tower
-    // Path base — slightly lighter than the rock
-    g.fillStyle(0x1a1618, 1);
-
-    // Bottom section (wide, foreground)
-    g.fillTriangle(
-      W / 2 - 28, WH * 0.98,
-      W / 2 + 28, WH * 0.98,
-      W / 2 + 16, WH * 0.84
-    );
-    g.fillTriangle(
-      W / 2 - 28, WH * 0.98,
-      W / 2 + 28, WH * 0.98,
-      W / 2 - 16, WH * 0.84
-    );
-
-    // Middle section (narrows, curves left)
-    g.fillTriangle(
-      W / 2 - 16, WH * 0.84,
-      W / 2 + 16, WH * 0.84,
-      W / 2 - 4,  WH * 0.70
-    );
-    g.fillTriangle(
-      W / 2 - 16, WH * 0.84,
-      W / 2 + 16, WH * 0.84,
-      W / 2 + 10, WH * 0.70
-    );
-
-    // Upper path (switchback toward tower at center)
-    g.fillTriangle(
-      W / 2 - 10, WH * 0.70,
-      W / 2 + 10, WH * 0.70,
-      W / 2 - 2,  WH * 0.55
-    );
-    g.fillTriangle(
-      W / 2 - 10, WH * 0.70,
-      W / 2 + 10, WH * 0.70,
-      W / 2 + 8,  WH * 0.55
-    );
-
-    // Path edge marks (stones)
-    g.lineStyle(1, 0x2a2430, 0.6);
-    g.lineBetween(W / 2 - 18, WH * 0.92, W / 2 - 14, WH * 0.84);
-    g.lineBetween(W / 2 + 18, WH * 0.90, W / 2 + 14, WH * 0.84);
-    g.lineBetween(W / 2 - 12, WH * 0.80, W / 2 - 8,  WH * 0.72);
-    g.lineBetween(W / 2 + 12, WH * 0.78, W / 2 + 8,  WH * 0.72);
-
-    // Path label
-    this.add.text(W / 2, WH * 0.92, '▲ Path to Tower', {
-      fontFamily: 'Georgia, serif', fontSize: '9px',
-      color: '#605860', fontStyle: 'italic',
-    }).setOrigin(0.5).setDepth(5).setAlpha(0.6);
-  }
 
   _drawTower(W, H, WH) {
     const g  = this.add.graphics().setDepth(6);
@@ -278,11 +102,18 @@ class ObsidianIsleScene extends BaseScene {
     g.lineBetween(tx - 7, WH * 0.22 + 10, tx + 7, WH * 0.22 + 10);
     g.lineBetween(tx, WH * 0.22, tx, WH * 0.22 + 20);
 
-    // Window glow halo
-    g.fillStyle(0xd08020, 0.08);
-    g.fillCircle(tx, WH * 0.22 + 10, 30);
-    g.fillStyle(0xe09030, 0.05);
+    // Window glow halo — beacon in the dark
+    g.fillStyle(0xffe080, 0.55);
+    g.fillCircle(tx, WH * 0.22 + 10, 14);  // bright inner bloom
+    g.fillStyle(0xd08020, 0.35);
+    g.fillCircle(tx, WH * 0.22 + 10, 28);
+    g.fillStyle(0xb06010, 0.18);
     g.fillCircle(tx, WH * 0.22 + 10, 50);
+    g.fillStyle(0x904808, 0.08);
+    g.fillCircle(tx, WH * 0.22 + 10, 80);
+    // Light spill down tower face below window
+    g.fillStyle(0xc07018, 0.12);
+    g.fillRect(tx - 10, WH * 0.22 + 20, 20, WH * 0.20);
 
     // Tower door (bottom, visible at path end)
     g.fillStyle(0x0a0810, 1);
@@ -292,16 +123,25 @@ class ObsidianIsleScene extends BaseScene {
     g.lineStyle(1.5, 0x3a2848, 0.8);
     g.strokeRect(tx - 10, WH * 0.54, 20, 30);
 
-    // Animate window flicker
+    // Animate window flicker — warm beacon pulse
     const windowGlow = this.add.graphics().setDepth(7);
     this.tweens.add({
       targets: windowGlow,
-      alpha: { from: 1.0, to: 0.6 },
+      alpha: { from: 0.65, to: 1.0 },
       duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
       onUpdate: () => {
         windowGlow.clear();
-        windowGlow.fillStyle(0xd08020, 0.12 * windowGlow.alpha);
-        windowGlow.fillCircle(tx, WH * 0.22 + 10, 40);
+        const a = windowGlow.alpha;
+        // Animated bloom layers
+        windowGlow.fillStyle(0xffe070, 0.50 * a);
+        windowGlow.fillCircle(tx, WH * 0.22 + 10, 18);
+        windowGlow.fillStyle(0xd08020, 0.28 * a);
+        windowGlow.fillCircle(tx, WH * 0.22 + 10, 45);
+        windowGlow.fillStyle(0xa06010, 0.12 * a);
+        windowGlow.fillCircle(tx, WH * 0.22 + 10, 80);
+        // Faint light cast on adjacent tower stone
+        windowGlow.fillStyle(0xc07818, 0.10 * a);
+        windowGlow.fillRect(tx - 22, WH * 0.22, 44, WH * 0.22);
       },
     });
 

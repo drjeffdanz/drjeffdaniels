@@ -17,19 +17,34 @@ class Act1EndScene extends Phaser.Scene {
     bg.fillGradientStyle(0x0a0810, 0x0a0810, 0x1a1420, 0x1a1420, 1);
     bg.fillRect(0, 0, W, H);
 
-    // Dawn horizon
-    bg.fillGradientStyle(0x200818, 0x200818, 0x3a1828, 0x3a1828, 1);
-    bg.fillRect(0, H * 0.5, W, H * 0.5);
+    // Dawn horizon — warm pre-dawn glow building
+    bg.fillGradientStyle(0x3a1428, 0x3a1428, 0x6a2830, 0x6a2830, 1);
+    bg.fillRect(0, H * 0.5, W, H * 0.22);
+    bg.fillGradientStyle(0x6a2830, 0x6a2830, 0x9a3820, 0x9a3820, 1);
+    bg.fillRect(0, H * 0.72, W, H * 0.28);
+
+    // Horizon light band — the actual first light
+    bg.fillStyle(0xd05828, 0.35);
+    bg.fillRect(0, H * 0.56, W, H * 0.06);
+    bg.fillStyle(0xe87030, 0.20);
+    bg.fillRect(0, H * 0.52, W, H * 0.08);
 
     // Distant hills silhouette
-    bg.fillStyle(0x0a0608, 1);
+    bg.fillStyle(0x0c0808, 1);
     bg.fillEllipse(W * 0.2, H * 0.66, 400, 120);
     bg.fillEllipse(W * 0.7, H * 0.70, 500, 100);
+    // Hill rim light from dawn
+    bg.fillStyle(0xb03820, 0.18);
+    bg.fillEllipse(W * 0.2, H * 0.62, 380, 40);
+    bg.fillEllipse(W * 0.7, H * 0.64, 460, 30);
 
-    // Road stretching away
-    bg.fillStyle(0x1a1008, 1);
+    // Road stretching away — slightly brighter, catches first light
+    bg.fillStyle(0x2a1a0c, 1);
     bg.fillTriangle(W / 2 - 20, H, W / 2 + 20, H, W / 2 + 5, H * 0.58);
     bg.fillTriangle(W / 2 - 20, H, W / 2 + 20, H, W / 2 - 5, H * 0.58);
+    // Road highlight — dawn light on road surface
+    bg.fillStyle(0xb84020, 0.12);
+    bg.fillTriangle(W / 2 - 12, H, W / 2 + 12, H, W / 2 + 2, H * 0.62);
 
     // Stars
     for (let i = 0; i < 80; i++) {
@@ -184,6 +199,11 @@ class Act1EndScene extends Phaser.Scene {
     g.fillEllipse(x + 2, y - 30, 22, 12);
     // Small braid
     g.fillRect(x + 8, y - 22, 3, 20);
+
+    // Dawn rim light on both sisters (warm left edge from horizon)
+    g.fillStyle(0xd04820, 0.18);
+    g.fillCircle(x - 18, y - 10, 12);  // Cambrie rim
+    g.fillCircle(x + 2, y - 22, 14);   // Mackenzie rim
 
     // Walking away — slight lean
     g.setAngle(-3);

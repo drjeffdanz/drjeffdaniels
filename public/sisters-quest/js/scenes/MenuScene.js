@@ -8,52 +8,19 @@ class MenuScene extends Phaser.Scene {
     super({ key: 'MenuScene' });
   }
 
+  preload() {
+    this.load.image('bg_menu', 'assets/backgrounds/menu.jpg');
+  }
+
   create() {
     const W = this.scale.width;
     const H = this.scale.height;
 
-    // ── Background ────────────────────────────────────────────
-    const bg = this.add.graphics();
-    bg.fillGradientStyle(0x050510, 0x050510, 0x0d0820, 0x0d0820, 1);
-    bg.fillRect(0, 0, W, H);
-
-    // Stars
-    for (let i = 0; i < 120; i++) {
-      const x = Phaser.Math.Between(0, W);
-      const y = Phaser.Math.Between(0, H * 0.75);
-      const r = Math.random() < 0.15 ? 2 : 1;
-      const alpha = Phaser.Math.FloatBetween(0.3, 1.0);
-      this.add.circle(x, y, r, 0xffffff, alpha);
-    }
-
-    // Moon — bright, layered glow
-    const moonX = W * 0.78, moonY = H * 0.22;
-    const moon = this.add.graphics();
-    // Outer corona
-    moon.fillStyle(0xc8d8ff, 0.04);
-    moon.fillCircle(moonX, moonY, 160);
-    moon.fillStyle(0xc8d8ff, 0.07);
-    moon.fillCircle(moonX, moonY, 130);
-    // Mid glow ring
-    moon.fillStyle(0xdde8ff, 0.18);
-    moon.fillCircle(moonX, moonY, 108);
-    moon.fillStyle(0xe8f0ff, 0.35);
-    moon.fillCircle(moonX, moonY, 94);
-    // Moon face — bright cool white
-    moon.fillStyle(0xf0f4ff, 0.88);
-    moon.fillCircle(moonX, moonY, 82);
-    // Subtle surface shading (darker patch lower-right)
-    moon.fillStyle(0xd8e4f8, 0.18);
-    moon.fillCircle(moonX + 22, moonY + 18, 38);
-    moon.fillStyle(0xd0ddf5, 0.12);
-    moon.fillCircle(moonX + 30, moonY + 28, 22);
-    // Bright highlight upper-left
-    moon.fillStyle(0xffffff, 0.55);
-    moon.fillCircle(moonX - 24, moonY - 20, 28);
-    moon.fillStyle(0xffffff, 0.25);
-    moon.fillCircle(moonX - 16, moonY - 12, 44);
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, H / 2, 'bg_menu').setDisplaySize(W, H).setDepth(0);
 
     // Animated moonveil shimmer ring
+    const moonX = W * 0.78, moonY = H * 0.22;
     const shimmer = this.add.graphics();
     this.tweens.add({
       targets: shimmer,
@@ -71,15 +38,7 @@ class MenuScene extends Phaser.Scene {
       },
     });
 
-    // Tower silhouette on the right
-    this._drawTower(W * 0.78, H, 60, H * 0.55);
-
-    // Ground/hill silhouette
-    const hill = this.add.graphics();
-    hill.fillStyle(0x08050f, 1);
-    hill.fillEllipse(W * 0.5, H + 60, W * 1.6, 200);
-
-    // ── Ground mist (graphics-based, no texture needed) ───────
+    // ── Ground mist ───────────────────────────────────────────
     const mistG = this.add.graphics();
     this.tweens.add({
       targets: mistG,
@@ -157,44 +116,6 @@ class MenuScene extends Phaser.Scene {
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut',
-    });
-  }
-
-  _drawTower(cx, groundY, width, height) {
-    const g = this.add.graphics();
-    g.fillStyle(0x06040e, 1);
-
-    // Main tower body
-    g.fillRect(cx - width / 2, groundY - height, width, height);
-
-    // Battlements
-    const merlonW = width / 5;
-    for (let i = 0; i < 5; i++) {
-      if (i % 2 === 0) {
-        g.fillRect(cx - width / 2 + i * merlonW, groundY - height - 22, merlonW, 22);
-      }
-    }
-
-    // Windows — warm amber glow (lit from within)
-    const glow = this.add.graphics();
-    const wins = [
-      groundY - height + 30,
-      groundY - height + 80,
-      groundY - height + 130,
-    ];
-    wins.forEach(wy => {
-      // Glow halo
-      glow.fillStyle(0xd08020, 0.12);
-      glow.fillRect(cx - 22, wy - 8, 44, 44);
-      glow.fillStyle(0xffa030, 0.07);
-      glow.fillRect(cx - 30, wy - 14, 60, 56);
-      // Window pane
-      g.fillStyle(0xd08828, 0.9);
-      g.fillRect(cx - 9, wy, 18, 26);
-      // Cross bar
-      g.fillStyle(0x06040e, 1);
-      g.fillRect(cx - 9, wy + 12, 18, 2);
-      g.fillRect(cx, wy, 2, 26);
     });
   }
 

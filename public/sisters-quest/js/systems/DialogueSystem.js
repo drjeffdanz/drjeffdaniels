@@ -57,6 +57,12 @@ class DialogueSystem {
       fontStyle: 'bold', alpha: 0.85,
     }).setOrigin(0.5).setDepth(D + 3);
 
+    // Portrait image (shown when a texture exists for the speaker)
+    this.portraitImg = this.scene.add.image(80, BOX_Y + BOX_H / 2, '__placeholder__')
+      .setDisplaySize(96, 96)
+      .setDepth(D + 2)
+      .setVisible(false);
+
     // Speaker name
     this.speakerTxt = this.scene.add.text(132, BOX_Y + 12, '', {
       fontFamily: 'Georgia, serif', fontSize: '12px',
@@ -107,6 +113,7 @@ class DialogueSystem {
     this.speakerTxt.setVisible(v);
     this.bodyTxt.setVisible(v);
     this.hintTxt.setVisible(v);
+    if (!v) this.portraitImg.setVisible(false);
 
     if (v) {
       this.clickZone.setInteractive();
@@ -119,12 +126,27 @@ class DialogueSystem {
 
   _drawPortrait(speakerKey) {
     const p = PORTRAITS[speakerKey] || PORTRAITS.narrator;
+    const imgKey = 'portrait_' + speakerKey;
+    const hasImg = this.scene.textures.exists(imgKey);
+
     this.portraitBg.clear();
-    this.portraitBg.fillStyle(p.color, 1);
-    this.portraitBg.fillRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
-    this.portraitBg.lineStyle(1.5, 0xc8956c, 0.7);
-    this.portraitBg.strokeRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
-    this.portraitLetter.setText(p.label);
+
+    if (hasImg) {
+      // Show portrait image
+      this.portraitImg.setTexture(imgKey).setVisible(true);
+      this.portraitLetter.setVisible(false);
+      // Still draw the gold border
+      this.portraitBg.lineStyle(1.5, 0xc8956c, 0.7);
+      this.portraitBg.strokeRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
+    } else {
+      // Fallback: colored rectangle with initial letter
+      this.portraitImg.setVisible(false);
+      this.portraitBg.fillStyle(p.color, 1);
+      this.portraitBg.fillRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
+      this.portraitBg.lineStyle(1.5, 0xc8956c, 0.7);
+      this.portraitBg.strokeRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
+      this.portraitLetter.setText(p.label).setVisible(true);
+    }
     this.speakerTxt.setText(p.name);
   }
 
@@ -254,6 +276,7 @@ class DialogueSystem {
     this.boxBg.destroy();
     this.portraitBg.destroy();
     this.portraitLetter.destroy();
+    this.portraitImg.destroy();
     this.speakerTxt.destroy();
     this.bodyTxt.destroy();
     this.hintTxt.destroy();

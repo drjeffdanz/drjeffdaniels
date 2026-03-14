@@ -8,16 +8,60 @@
 class PalaceLibraryScene extends BaseScene {
   constructor() { super({ key: 'PalaceLibraryScene' }); }
 
+  preload() {
+    this.load.image('bg_library', 'assets/backgrounds/palace-library.jpg');
+  }
+
   create() {
     const W = this.scale.width;
     const H = this.scale.height;
+    const WH = H - 156;
 
     GameState.setCurrentScene('PalaceLibraryScene');
 
-    // ── Room ──────────────────────────────────────────────────
-    this._drawBackground(W, H);
-    this._drawShelves(W, H);
-    this._drawFurniture(W, H);
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, WH / 2, 'bg_library').setDisplaySize(W, WH).setDepth(0);
+
+    // ── Animated fire flicker ─────────────────────────────────
+    const fireG = this.add.graphics().setDepth(1);
+    this.tweens.add({
+      targets: fireG, alpha: { from: 0.65, to: 1.0 },
+      duration: 1100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      onUpdate: () => {
+        fireG.clear();
+        const a = fireG.alpha;
+        fireG.fillStyle(0xd04808, 0.20 * a);
+        fireG.fillCircle(W - 50, WH - 105, 155);
+        fireG.fillStyle(0xe06820, 0.12 * a);
+        fireG.fillCircle(W - 50, WH - 105, 220);
+      },
+    });
+
+    // ── Book markers (gameplay indicators for shelf books) ────
+    const dX = W/2 - 10, dY = WH - 138;
+    const books = [
+      { key: 'magical_fibers',       color: 0x2d5016, sym: '📗', label: 'Fibers',  dy: -34 },
+      { key: 'curses_seventh_kind',  color: 0x5c0a0a, sym: '📕', label: 'Curses',  dy: 12  },
+      { key: 'weavers_atlas',        color: 0x0a2040, sym: '🗺',  label: 'Atlas',   dy: 58  },
+    ];
+    books.forEach(b => {
+      if (GameState.hasItem(b.key)) return;
+      const bx = dX + 218 + 12, by = dY + b.dy;
+      const bg2 = this.add.graphics().setDepth(4);
+      bg2.fillStyle(b.color, 0.75);
+      bg2.fillRoundedRect(bx, by, 34, 34, 3);
+      bg2.lineStyle(1.5, 0xc8956c, 0.55);
+      bg2.strokeRoundedRect(bx, by, 34, 34, 3);
+      this.add.text(bx+17, by+12, b.sym,   { fontFamily:'Arial',         fontSize:'16px' }).setOrigin(0.5).setDepth(5);
+      this.add.text(bx+17, by+26, b.label, { fontFamily:'Georgia, serif', fontSize:'8px',  color:'#c8956c' }).setOrigin(0.5).setDepth(5);
+    });
+
+    // ── Exit door label ───────────────────────────────────────
+    this.add.text(W-30, 68, 'Exit →', {
+      fontFamily:'Georgia, serif', fontSize:'10px', color:'#4a3010', fontStyle:'italic'
+    }).setOrigin(0.5).setDepth(4);
+
+    // ── Mackenzie character ───────────────────────────────────
     this._drawMackenzie(W, H);
 
     this.add.text(W / 2, 18, "The Palace Library  ·  Palace of Elderwyn", {
@@ -55,156 +99,6 @@ class PalaceLibraryScene extends BaseScene {
     });
 
     this._updateStatus();
-  }
-
-  // ── Background ──────────────────────────────────────────────
-
-  _drawBackground(W, H) {
-    const WH = H - 156;
-    const g  = this.add.graphics();
-
-    // Warm dark wood
-    g.fillGradientStyle(0x100a04, 0x100a04, 0x160e06, 0x160e06, 1);
-    g.fillRect(0, 0, W, WH);
-
-    // Ceiling beam suggestion
-    g.fillStyle(0x0c0804, 1);
-    g.fillRect(0, 0, W, 22);
-
-    // Floor
-    g.fillStyle(0x0e0904, 1);
-    g.fillRect(0, WH - 52, W, 52);
-    g.lineStyle(1, 0x1e1208, 1);
-    g.lineBetween(0, WH - 52, W, WH - 52);
-    g.lineStyle(1, 0x1a1008, 0.7);
-    for (let x = 0; x < W; x += 38) g.lineBetween(x, WH - 52, x, WH);
-
-    // Fireplace (right side)
-    this._drawFireplace(g, W - 98, WH - 195, 96, 138);
-
-    // Warm glow from fire
-    g.fillStyle(0xd05010, 0.05);
-    g.fillRect(W - 260, WH - 195, 260, 195);
-  }
-
-  _drawFireplace(g, x, y, fw, fh) {
-    // Stone surround
-    g.fillStyle(0x2a2018, 1); g.fillRect(x, y, fw, fh);
-    g.lineStyle(2, 0x4a3828, 1); g.strokeRect(x, y, fw, fh);
-    // Inner box
-    g.fillStyle(0x0e0806, 1); g.fillRect(x+10, y+12, fw-20, fh-28);
-    // Flames
-    const cx = x + fw/2;
-    g.fillStyle(0xc05010, 0.65); g.fillTriangle(cx-20, y+fh-20, cx, y+38, cx+20, y+fh-20);
-    g.fillStyle(0xe07020, 0.55); g.fillTriangle(cx-14, y+fh-20, cx, y+52, cx+14, y+fh-20);
-    g.fillStyle(0xf0b030, 0.45); g.fillTriangle(cx-8,  y+fh-20, cx, y+64, cx+8,  y+fh-20);
-    g.fillStyle(0xffd860, 0.35); g.fillTriangle(cx-4,  y+fh-20, cx, y+74, cx+4,  y+fh-20);
-    // Mantle
-    g.fillStyle(0x3a2a18, 1); g.fillRect(x-8, y-12, fw+16, 13);
-    g.lineStyle(1, 0x5a4228, 1); g.strokeRect(x-8, y-12, fw+16, 13);
-  }
-
-  _drawShelves(W, H) {
-    const WH = H - 156;
-    const g  = this.add.graphics();
-    this._fillShelf(g, 0,        28, 155, WH - 85);
-    this._fillShelf(g, 165,      28, W/2 - 25, WH - 85);
-    this._fillShelf(g, W/2 + 18, 28, W - 215,  WH - 85);
-  }
-
-  _fillShelf(g, x1, y1, x2, y2) {
-    const W  = x2 - x1;
-    const H  = y2 - y1;
-    const SH = 68;
-    const rows = Math.floor(H / SH);
-
-    g.fillStyle(0x1a0e06, 1); g.fillRect(x1, y1, W, H);
-    g.lineStyle(1, 0x2a1a0a, 1); g.strokeRect(x1, y1, W, H);
-
-    const PALETTE = [
-      0x4a1a08, 0x1a3a0e, 0x08183a, 0x3a2a08,
-      0x2a0a2a, 0x0a2a2a, 0x3a1a1a, 0x1a1a3a,
-      0x4a3808, 0x2a3a18,
-    ];
-
-    for (let r = 0; r < rows; r++) {
-      const shY = y1 + r * SH;
-      g.fillStyle(0x3a2010, 1); g.fillRect(x1, shY + SH - 5, W, 5);
-      g.lineStyle(1, 0x5a3818, 1); g.lineBetween(x1, shY + SH - 5, x1 + W, shY + SH - 5);
-
-      let bx = x1 + 3;
-      while (bx < x1 + W - 8) {
-        const bw = Phaser.Math.Between(10, 20);
-        const bh = Phaser.Math.Between(35, SH - 11);
-        g.fillStyle(Phaser.Math.RND.pick(PALETTE), 1);
-        g.fillRect(bx, shY + SH - 5 - bh, bw, bh);
-        g.fillStyle(0xffffff, 0.03); g.fillRect(bx, shY + SH - 5 - bh, 2, bh);
-        bx += bw + 1;
-      }
-    }
-  }
-
-  _drawFurniture(W, H) {
-    const WH = H - 156;
-    const g  = this.add.graphics();
-
-    // Reading desk
-    const dX = W/2 - 10, dY = WH - 138, dW = 218, dH = 78;
-    g.fillStyle(0x2e1a08, 1); g.fillRect(dX, dY, dW, dH);
-    g.lineStyle(2, 0x5a3a14, 1); g.strokeRect(dX, dY, dW, dH);
-    g.fillStyle(0xffffff, 0.02); g.fillRect(dX+2, dY+2, dW-4, 4);
-    g.fillStyle(0x231506, 1);
-    g.fillRect(dX+10, dY+dH, 16, 18); g.fillRect(dX+dW-26, dY+dH, 16, 18);
-
-    // Open book on desk
-    g.fillStyle(0xf0e8d0, 1); g.fillRoundedRect(dX+28, dY+12, 80, 50, 2);
-    g.lineStyle(1, 0xc8a870, 1); g.strokeRoundedRect(dX+28, dY+12, 80, 50, 2);
-    g.lineStyle(2, 0xaa8840, 1); g.lineBetween(dX+68, dY+12, dX+68, dY+62);
-    g.lineStyle(1, 0xb8a888, 0.4);
-    for (let l = 0; l < 5; l++) {
-      g.lineBetween(dX+32, dY+20+l*8, dX+66, dY+20+l*8);
-      g.lineBetween(dX+72, dY+20+l*8, dX+106, dY+20+l*8);
-    }
-
-    // Inkpot + quill
-    g.fillStyle(0x1a1a1a, 1); g.fillCircle(dX+130, dY+34, 8);
-    g.lineStyle(1, 0x3a3a3a, 1); g.strokeCircle(dX+130, dY+34, 8);
-    g.lineStyle(1, 0xf5e8c0, 0.7); g.lineBetween(dX+140, dY+18, dX+126, dY+38);
-
-    // Desk lamp
-    g.fillStyle(0x888830, 1); g.fillRect(dX+170, dY+14, 6, 28);
-    g.fillStyle(0xffdd40, 0.9); g.fillEllipse(dX+173, dY+10, 8, 14);
-    g.fillStyle(0xffee80, 0.28); g.fillCircle(dX+173, dY+12, 14);
-
-    // ── Three special book markers on desk edge ─────────────
-    // These give visual cues for the books to find in shelves.
-    // Only draw if not yet collected.
-    const books = [
-      { key: 'magical_fibers',       color: 0x2d5016, sym: '📗', label: 'Fibers',  dy: -34 },
-      { key: 'curses_seventh_kind',  color: 0x5c0a0a, sym: '📕', label: 'Curses',  dy: 12  },
-      { key: 'weavers_atlas',        color: 0x0a2040, sym: '🗺',  label: 'Atlas',   dy: 58  },
-    ];
-    books.forEach(b => {
-      if (GameState.hasItem(b.key)) return;
-      const bx = dX + dW + 12, by = dY + b.dy;
-      const bg2 = this.add.graphics().setDepth(4);
-      bg2.fillStyle(b.color, 0.75);
-      bg2.fillRoundedRect(bx, by, 34, 34, 3);
-      bg2.lineStyle(1.5, 0xc8956c, 0.55);
-      bg2.strokeRoundedRect(bx, by, 34, 34, 3);
-      this.add.text(bx+17, by+12, b.sym,   { fontFamily:'Arial',         fontSize:'16px' }).setOrigin(0.5).setDepth(5);
-      this.add.text(bx+17, by+26, b.label, { fontFamily:'Georgia, serif', fontSize:'8px',  color:'#c8956c' }).setOrigin(0.5).setDepth(5);
-    });
-
-    // Palace gate / exit door (right side)
-    g.fillStyle(0x2e1c08, 1);
-    g.fillRect(W-52, 78, 44, WH - 135);
-    g.lineStyle(2, 0x5a3a14, 1);
-    g.strokeRect(W-52, 78, 44, WH - 135);
-    g.fillStyle(0xc8a050, 1); g.fillCircle(W-16, WH/2, 5);
-    this.add.text(W-30, 68, 'Exit →', {
-      fontFamily:'Georgia, serif', fontSize:'10px', color:'#4a3010', fontStyle:'italic'
-    }).setOrigin(0.5);
   }
 
   _drawMackenzie(W, H) {

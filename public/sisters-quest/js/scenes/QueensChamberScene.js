@@ -7,16 +7,36 @@
 class QueensChamberScene extends BaseScene {
   constructor() { super({ key: 'QueensChamberScene' }); }
 
+  preload() {
+    this.load.image('bg_queens', 'assets/backgrounds/queens-chamber.jpg');
+  }
+
   create() {
     const W = this.scale.width;
     const H = this.scale.height;
+    const WH = H - 156;
 
     GameState.setCurrentScene('QueensChamberScene');
 
-    // ── Room ──────────────────────────────────────────────────
-    this._drawBackground(W, H);
-    this._drawFurniture(W, H);
-    this._drawQueenFigure(W, H);
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, WH / 2, 'bg_queens').setDisplaySize(W, WH).setDepth(0);
+
+    // ── Animated queen mist pulse ─────────────────────────────
+    const hX = W/2 + 28, hY = WH - 175;
+    const mistG = this.add.graphics().setDepth(6);
+    this.tweens.add({
+      targets: mistG, alpha: { from: 0.4, to: 1.0 },
+      duration: 2400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      onUpdate: () => {
+        mistG.clear();
+        mistG.fillStyle(0xe0ecff, 0.10 * mistG.alpha);
+        mistG.fillCircle(hX, hY, 70);
+        mistG.fillStyle(0xc8d8f4, 0.12 * mistG.alpha);
+        mistG.fillEllipse(hX, hY+32, 120, 40);
+      },
+    });
+
+    // ── Mist particles ────────────────────────────────────────
     this._addMistParticles(W, H);
 
     // Scene label
@@ -50,196 +70,6 @@ class QueensChamberScene extends BaseScene {
 
     // Initial status
     this.setStatus('Seven days remain.  ·  Examine the room.');
-  }
-
-  // ── Background ──────────────────────────────────────────────
-
-  _drawBackground(W, H) {
-    const WH = H - 156; // game world height
-    const g  = this.add.graphics();
-
-    // Stone walls — deep midnight blue
-    g.fillGradientStyle(0x0c0e1a, 0x0c0e1a, 0x10121e, 0x10121e, 1);
-    g.fillRect(0, 0, W, WH);
-
-    // Stone block grid
-    g.lineStyle(1, 0x181a28, 1);
-    for (let row = 0; row * 40 < WH; row++) {
-      const off = (row % 2 === 0) ? 0 : 40;
-      for (let col = -1; col * 80 < W + 80; col++) {
-        g.strokeRect(col * 80 + off, row * 40, 80, 40);
-      }
-    }
-
-    // Ceiling
-    g.fillStyle(0x070910, 1);
-    g.fillRect(0, 0, W, 20);
-
-    // Floor
-    g.fillStyle(0x0f0c08, 1);
-    g.fillRect(0, WH - 55, W, 55);
-    g.lineStyle(1, 0x251a0c, 1);
-    g.lineBetween(0, WH - 55, W, WH - 55);
-
-    // Rug
-    g.fillStyle(0x3a1a0a, 0.55);
-    g.fillRoundedRect(W * 0.2, WH - 53, W * 0.6, 44, 4);
-
-    // Windows
-    this._drawWindow(g, W * 0.07, 55, 68, 155);
-    this._drawWindow(g, W * 0.82, 55, 68, 155);
-
-    // Candle glow on walls
-    g.fillStyle(0xd08020, 0.04);
-    g.fillCircle(W * 0.07 + 34, 132, 85);
-    g.fillCircle(W * 0.82 + 34, 132, 85);
-  }
-
-  _drawWindow(g, x, y, w, h) {
-    g.fillStyle(0x050710, 1);
-    g.fillRect(x - 6, y - 6, w + 12, h + 12);
-    g.fillStyle(0x09090f, 1);
-    g.fillRect(x, y, w, h);
-    g.fillStyle(0xb8c8e0, 0.09);
-    g.fillRect(x, y, w, h / 2);
-    g.fillStyle(0xffffff, 0.6);
-    [[x+14,y+18],[x+38,y+32],[x+52,y+14],[x+24,y+50]].forEach(([sx,sy]) => g.fillCircle(sx,sy,1));
-    g.lineStyle(2, 0x05070e, 1);
-    g.lineBetween(x, y + h/2, x + w, y + h/2);
-    g.lineBetween(x + w/2, y, x + w/2, y + h);
-  }
-
-  _drawFurniture(W, H) {
-    const WH = H - 156;
-    const g  = this.add.graphics();
-
-    // ── Tapestry ───────────────────────────────────────────
-    const tX = W/2 - 78, tY = 50, tW = 156, tH = 118;
-    g.fillStyle(0x271630, 1);
-    g.fillRect(tX, tY, tW, tH);
-    g.lineStyle(1.5, 0xc8956c, 0.6);
-    g.strokeRect(tX, tY, tW, tH);
-
-    // Map lines on tapestry
-    g.lineStyle(1, 0x5a3a6a, 0.5);
-    g.lineBetween(tX+18, tY+58, tX+tW-18, tY+58);
-    g.lineBetween(tX+78, tY+18, tX+78, tY+tH-18);
-    g.lineBetween(tX+18, tY+28, tX+58, tY+58);
-    g.lineBetween(tX+98, tY+58, tX+tW-18, tY+88);
-    g.fillStyle(0x8a6090, 0.7);
-    [[28,58],[78,38],[78,58],[78,83],[118,58],[138,33]].forEach(([dx,dy]) =>
-      g.fillCircle(tX+dx, tY+dy, 3)
-    );
-
-    // Scratched-out name
-    g.fillStyle(0x1a0e26, 0.9);
-    g.fillRect(tX+tW-48, tY+tH-17, 42, 11);
-    g.lineStyle(1, 0x7a4a4a, 0.8);
-    for (let ln = 0; ln < 3; ln++) {
-      g.lineBetween(tX+tW-46, tY+tH-14+ln*3, tX+tW-8, tY+tH-14+ln*3);
-    }
-
-    this.add.text(W/2, tY+tH+8, 'Tapestry of Elderwyn', {
-      fontFamily: 'Georgia, serif', fontSize: '10px', color: '#4a3a58', fontStyle: 'italic'
-    }).setOrigin(0.5);
-
-    // ── Bed ────────────────────────────────────────────────
-    const bX = W/2 - 108, bY = WH - 195, bW = 216, bH = 138;
-
-    // Headboard
-    g.fillStyle(0x3c1f08, 1);
-    g.fillRect(bX, bY, bW, 28);
-    g.lineStyle(2, 0x6a3a10, 1);
-    g.strokeRect(bX, bY, bW, 28);
-    g.lineStyle(1, 0x8a5a20, 0.4);
-    g.lineBetween(bX+18, bY+5, bX+18, bY+23);
-    g.lineBetween(bX+bW-18, bY+5, bX+bW-18, bY+23);
-
-    // Frame
-    g.fillStyle(0x2e1606, 1);
-    g.fillRect(bX, bY+28, bW, bH-8);
-    g.lineStyle(1, 0x4a2a0a, 1);
-    g.strokeRect(bX, bY+28, bW, bH-8);
-
-    // Coverlet
-    g.fillStyle(0xe8eaf2, 0.93);
-    g.fillRoundedRect(bX+5, bY+32, bW-10, bH-18, 4);
-    g.lineStyle(1, 0xc0c8da, 0.5);
-    g.strokeRoundedRect(bX+5, bY+32, bW-10, bH-18, 4);
-    g.lineStyle(1, 0xb0b8ca, 0.25);
-    for (let y = bY+42; y < bY+bH-8; y += 11) {
-      g.lineBetween(bX+9, y, bX+bW-9, y);
-    }
-
-    // Unraveling hem (fraying threads at bottom)
-    g.lineStyle(1, 0xd0d8ea, 0.35);
-    for (let i = 0; i < 9; i++) {
-      const tx = bX + 20 + i * 23;
-      g.lineBetween(tx, bY+bH-22, tx + Phaser.Math.Between(-3,3), bY+bH-6);
-    }
-
-    // ── Bedside table ──────────────────────────────────────
-    const tblX = bX + bW + 10, tblY = bY + 38;
-    g.fillStyle(0x2e1a08, 1);
-    g.fillRect(tblX, tblY, 70, 92);
-    g.lineStyle(1, 0x4a2a0a, 1);
-    g.strokeRect(tblX, tblY, 70, 92);
-
-    // Tea cup
-    g.fillStyle(0xf5f0e8, 1); g.fillEllipse(tblX+20, tblY+15, 28, 13);
-    g.fillStyle(0xc8a87a, 1); g.fillEllipse(tblX+20, tblY+12, 24, 9);
-    g.lineStyle(1, 0x8a6a3a, 1); g.strokeEllipse(tblX+20, tblY+15, 28, 13);
-    // Silver sediment
-    g.fillStyle(0xd0d8ea, 0.5); g.fillEllipse(tblX+20, tblY+12, 12, 4);
-    this.add.text(tblX+20, tblY+25, 'Tea', { fontFamily: 'Georgia, serif', fontSize: '9px', color: '#5a4a2a' }).setOrigin(0.5);
-
-    // Letter
-    g.fillStyle(0xf5e8b0, 1); g.fillRect(tblX+8, tblY+38, 50, 34);
-    g.lineStyle(1, 0xc8a050, 1); g.strokeRect(tblX+8, tblY+38, 50, 34);
-    g.fillStyle(0xaa2010, 1); g.fillCircle(tblX+33, tblY+60, 7);
-    this.add.text(tblX+33, tblY+79, 'Letter', { fontFamily: 'Georgia, serif', fontSize: '9px', color: '#a08030' }).setOrigin(0.5);
-
-    // Book
-    g.fillStyle(0x4a2810, 1); g.fillRect(tblX+2, tblY+76, 36, 10);
-    g.lineStyle(1, 0x7a4820, 1); g.strokeRect(tblX+2, tblY+76, 36, 10);
-    this.add.text(tblX+20, tblY+92, 'Book', { fontFamily: 'Georgia, serif', fontSize: '9px', color: '#6a3810' }).setOrigin(0.5);
-
-    // Candelabra (left side)
-    g.fillStyle(0x7a6020, 1);
-    g.fillRect(W*0.17-2, WH-210, 4, 50);
-    g.fillRect(W*0.17-10, WH-162, 20, 5);
-    g.fillStyle(0xf0c020, 0.9); g.fillEllipse(W*0.17, WH-216, 6, 12);
-    g.fillStyle(0xffe860, 0.3); g.fillCircle(W*0.17, WH-212, 10);
-
-    // Library door (right wall)
-    g.fillStyle(0x2e1c08, 1);
-    g.fillRect(W-52, 80, 44, WH-140);
-    g.lineStyle(2, 0x5a3a14, 1);
-    g.strokeRect(W-52, 80, 44, WH-140);
-    g.fillStyle(0xc8a050, 1); g.fillCircle(W-16, WH/2, 5);
-    this.add.text(W-30, 70, 'Library →', {
-      fontFamily: 'Georgia, serif', fontSize: '10px', color: '#4a3010', fontStyle: 'italic'
-    }).setOrigin(0.5);
-  }
-
-  _drawQueenFigure(W, H) {
-    const WH = H - 156;
-    const g  = this.add.graphics().setDepth(5);
-    const hX = W/2 + 28, hY = WH - 175;
-
-    // Pillow
-    g.fillStyle(0xdde0ec, 1); g.fillEllipse(hX-8, hY+10, 68, 30);
-    // Head
-    g.fillStyle(0xf0d8c0, 1); g.fillCircle(hX, hY, 17);
-    // Hair
-    g.fillStyle(0x2a1a10, 1); g.fillEllipse(hX, hY+2, 40, 24); g.fillCircle(hX, hY-8, 17);
-    // Closed eyes
-    g.lineStyle(1, 0x6a4030, 1);
-    g.lineBetween(hX-8, hY+2, hX-2, hY+2);
-    g.lineBetween(hX+2, hY+2, hX+8, hY+2);
-    // Silver mist halo
-    g.fillStyle(0xc8d4ea, 0.05);
-    g.fillCircle(hX, hY, 42); g.fillCircle(hX-18, hY+32, 28); g.fillCircle(hX+18, hY+32, 28);
   }
 
   _addMistParticles(W, H) {

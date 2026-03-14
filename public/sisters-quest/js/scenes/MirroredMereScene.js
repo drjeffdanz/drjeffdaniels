@@ -7,6 +7,8 @@
 class MirroredMereScene extends BaseScene {
   constructor() { super({ key: 'MirroredMereScene' }); }
 
+  preload() { this.load.image('bg_mere', 'assets/backgrounds/mirrored-mere.jpg'); }
+
   create() {
     const W  = this.scale.width;
     const H  = this.scale.height;
@@ -15,10 +17,10 @@ class MirroredMereScene extends BaseScene {
     GameState.setCurrentScene('MirroredMereScene');
     this.cameras.main.fadeIn(500, 0, 0, 0);
 
+    // ── Background image ──────────────────────────────────────
+    this.add.image(W / 2, WH / 2, 'bg_mere').setDisplaySize(W, WH).setDepth(0);
+
     // ── Draw world ────────────────────────────────────────────
-    this._drawSky(W, WH);
-    this._drawTrees(W, WH);
-    this._drawGround(W, WH);
     this._drawMere(W, WH);
     this._drawMoon(W, WH);
     this._createShardObject(W, WH);
@@ -60,109 +62,6 @@ class MirroredMereScene extends BaseScene {
     });
 
     this.setStatus('The Mere. Still as a held breath.');
-  }
-
-  // ── Sky ──────────────────────────────────────────────────────
-
-  _drawSky(W, WH) {
-    const g = this.add.graphics();
-
-    // Deep night sky — blue-black gradient
-    g.fillGradientStyle(0x01020c, 0x01020c, 0x030616, 0x030616, 1);
-    g.fillRect(0, 0, W, WH * 0.52);
-
-    // Stars in sky — many and varied
-    const starData = [
-      [30,  12, 1  ], [88,  6,  1.5], [155, 18, 1  ], [220, 8,  2  ],
-      [285, 25, 1  ], [340, 10, 1.5], [400, 4,  1  ], [460, 20, 1  ],
-      [515, 8,  1.5], [570, 32, 1  ], [630, 12, 2  ], [685, 6,  1  ],
-      [740, 28, 1  ], [795, 14, 1.5], [850, 8,  1  ], [905, 22, 1.5],
-      [950, 10, 1  ], [65,  38, 1  ], [192, 44, 1  ], [310, 36, 1.5],
-      [445, 42, 1  ], [558, 38, 1  ], [670, 44, 1  ], [780, 36, 1  ],
-      [880, 42, 1.5], [120, 52, 1  ], [375, 58, 1  ], [600, 50, 1  ],
-      [820, 56, 1  ], [950, 48, 1  ],
-    ];
-
-    starData.forEach(([sx, sy, sr]) => {
-      const alpha = 0.5 + Math.random() * 0.5;
-      g.fillStyle(0xd8e4f8, alpha);
-      g.fillCircle(sx, sy, sr);
-    });
-
-    // Subtle star shimmer clusters
-    g.fillStyle(0xc0d0f0, 0.3);
-    g.fillCircle(220, 8, 4);
-    g.fillCircle(630, 12, 5);
-  }
-
-  // ── Trees ────────────────────────────────────────────────────
-
-  _drawTrees(W, WH) {
-    const g = this.add.graphics();
-    const horizon = WH * 0.52;
-
-    // Dark silhouette treeline around clearing
-    g.fillStyle(0x02040e, 1);
-
-    const treeSets = [
-      // Left bank
-      { x: -20, h: 180, w: 65  },
-      { x: 30,  h: 220, w: 55  },
-      { x: 75,  h: 200, w: 60  },
-      { x: 120, h: 240, w: 50  },
-      { x: 165, h: 190, w: 58  },
-      // Right bank
-      { x: W - 215, h: 200, w: 60 },
-      { x: W - 165, h: 240, w: 55 },
-      { x: W - 115, h: 190, w: 65 },
-      { x: W - 65,  h: 220, w: 70 },
-      { x: W - 15,  h: 200, w: 60 },
-    ];
-
-    treeSets.forEach(t => {
-      const cx = t.x + t.w / 2;
-      // Trunk
-      g.fillRect(cx - 6, horizon - t.h * 0.25, 12, t.h * 0.25);
-      // Crown
-      g.fillTriangle(
-        cx - t.w * 0.5, horizon - t.h * 0.28,
-        cx,             horizon - t.h,
-        cx + t.w * 0.5, horizon - t.h * 0.24
-      );
-      g.fillTriangle(
-        cx - t.w * 0.4, horizon - t.h * 0.48,
-        cx + 8,         horizon - t.h * 1.14,
-        cx + t.w * 0.4, horizon - t.h * 0.44
-      );
-    });
-
-    // Fill sky above treeline at edges
-    g.fillStyle(0x01020c, 1);
-    g.fillRect(0, 0, 200, horizon);
-    g.fillRect(W - 200, 0, 200, horizon);
-
-    // Far background treeline (even darker)
-    g.fillStyle(0x010208, 1);
-    g.fillRect(0, horizon - 40, W, 40);
-  }
-
-  // ── Ground clearing ──────────────────────────────────────────
-
-  _drawGround(W, WH) {
-    const g       = this.add.graphics();
-    const horizon = WH * 0.52;
-
-    // Ground beneath the Mere — dark earth, grass
-    g.fillGradientStyle(0x04080e, 0x04080e, 0x060c10, 0x060c10, 1);
-    g.fillRect(0, horizon, W, WH - horizon);
-
-    // Grass / moss tufts at water edge
-    g.fillStyle(0x080f12, 1);
-    for (let i = 0; i < 20; i++) {
-      const gx = W * 0.18 + i * (W * 0.64) / 20;
-      const gy = WH * 0.76 + Math.sin(i * 1.3) * 8;
-      g.fillTriangle(gx - 4, gy, gx, gy - 10, gx + 4, gy);
-    }
   }
 
   // ── The Mere ─────────────────────────────────────────────────
@@ -207,11 +106,13 @@ class MirroredMereScene extends BaseScene {
       g.fillCircle(sx, sy, 1.2);
     });
 
-    // Reflected moon shimmer — elongated highlight on water
-    g.fillStyle(0xd0daf8, 0.18);
-    g.fillEllipse(cx, cy - WH * 0.08, 24, 60);
-    g.fillStyle(0xe0e8ff, 0.08);
-    g.fillEllipse(cx, cy - WH * 0.06, 14, 40);
+    // Reflected moon shimmer — elongated highlight on water (brightened)
+    g.fillStyle(0xd0daf8, 0.55);
+    g.fillEllipse(cx, cy - WH * 0.08, 30, 72);
+    g.fillStyle(0xe0e8ff, 0.30);
+    g.fillEllipse(cx, cy - WH * 0.06, 18, 50);
+    g.fillStyle(0xffffff, 0.14);
+    g.fillEllipse(cx, cy - WH * 0.075, 10, 28);
 
     // Very subtle ripple rings — static suggestion of stillness
     g.lineStyle(1, 0x1a3060, 0.3);
@@ -222,6 +123,35 @@ class MirroredMereScene extends BaseScene {
     // Shore edge — slightly lighter rock/mud line
     g.lineStyle(2, 0x0a1828, 0.9);
     g.strokeEllipse(cx, cy, rx * 2 + 16, ry * 2 + 10);
+
+    // Animated water caustic shimmer
+    const shimmerG = this.add.graphics().setDepth(4);
+    this.tweens.add({
+      targets: shimmerG,
+      alpha: { from: 0.5, to: 1.0 },
+      duration: 2600,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      onUpdate: () => {
+        shimmerG.clear();
+        const t = Date.now() / 3000;
+        // Drifting caustic glints across the Mere surface
+        for (let i = 0; i < 5; i++) {
+          const lx = cx + Math.sin(t + i * 1.3) * rx * 0.42;
+          const ly = cy + Math.cos(t * 0.7 + i * 0.9) * ry * 0.28;
+          const lw = 20 + Math.sin(t * 1.4 + i) * 7;
+          shimmerG.fillStyle(0xc8d8f8, 0.045 * shimmerG.alpha);
+          shimmerG.fillEllipse(lx, ly, lw, lw * 0.22);
+        }
+        // Pulsing moon reflection
+        const rAlpha = (0.45 + Math.sin(t * 2.1) * 0.10) * shimmerG.alpha;
+        shimmerG.fillStyle(0xd8e8ff, rAlpha);
+        shimmerG.fillEllipse(cx, cy - ry * 0.42, 28 + Math.sin(t * 1.5) * 3, 66 + Math.sin(t) * 5);
+        shimmerG.fillStyle(0xffffff, 0.10 * shimmerG.alpha);
+        shimmerG.fillEllipse(cx, cy - ry * 0.36, 10, 24);
+      },
+    });
   }
 
   // ── Moon ─────────────────────────────────────────────────────
@@ -232,25 +162,48 @@ class MirroredMereScene extends BaseScene {
     const my = WH * 0.16;
     const mr = 26;
 
-    // Moon halo
-    g.fillStyle(0xd8e4f8, 0.06);
-    g.fillCircle(mx, my, mr + 22);
-    g.fillStyle(0xe8f0ff, 0.10);
-    g.fillCircle(mx, my, mr + 12);
-
-    // Moon body
-    g.fillStyle(0xf0f4ff, 1);
+    // Outer corona
+    g.fillStyle(0xc8d8ff, 0.04);
+    g.fillCircle(mx, my, mr + 56);
+    g.fillStyle(0xc8d8ff, 0.07);
+    g.fillCircle(mx, my, mr + 44);
+    // Mid glow rings
+    g.fillStyle(0xdde8ff, 0.18);
+    g.fillCircle(mx, my, mr + 30);
+    g.fillStyle(0xe8f0ff, 0.35);
+    g.fillCircle(mx, my, mr + 18);
+    // Moon face — bright cool white
+    g.fillStyle(0xf0f4ff, 0.88);
     g.fillCircle(mx, my, mr);
-
-    // Moon surface detail — subtle craters
-    g.fillStyle(0xe0e8fa, 1);
-    g.fillCircle(mx - 8, my - 6, 5);
-    g.fillCircle(mx + 10, my + 4, 4);
-    g.fillCircle(mx - 3, my + 10, 3);
-
+    // Subtle surface shading (lower-right)
+    g.fillStyle(0xd8e4f8, 0.18);
+    g.fillCircle(mx + 8, my + 6, 10);
+    // Bright highlight (upper-left)
+    g.fillStyle(0xffffff, 0.55);
+    g.fillCircle(mx - 8, my - 7, 9);
+    g.fillStyle(0xffffff, 0.25);
+    g.fillCircle(mx - 5, my - 4, 14);
     // Atmosphere rim
     g.lineStyle(1, 0xd0dcf8, 0.5);
     g.strokeCircle(mx, my, mr);
+
+    // Animated shimmer ring
+    const shimmer = this.add.graphics().setDepth(2);
+    this.tweens.add({
+      targets: shimmer,
+      alpha: { from: 0.6, to: 1.0 },
+      duration: 2800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      onUpdate: () => {
+        shimmer.clear();
+        shimmer.lineStyle(1.5, 0xc8d8ff, 0.18 * shimmer.alpha);
+        shimmer.strokeCircle(mx, my, mr + 4 + shimmer.alpha * 6);
+        shimmer.lineStyle(1, 0xffffff, 0.08 * shimmer.alpha);
+        shimmer.strokeCircle(mx, my, mr + 14 + shimmer.alpha * 8);
+      },
+    });
   }
 
   // ── Shard object (hidden until triggered) ────────────────────
