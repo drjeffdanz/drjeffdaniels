@@ -13,6 +13,7 @@ const navLinks = [
   { label: "Attention Matrix", href: "/attention-matrix" },
   { label: "Tech Radar", href: "/tech-radar" },
   { label: "Zork", href: "/zork" },
+  { label: "Sisters' Quest", href: "/sisters-quest" },
   { label: "Contact", href: "/#contact" },
 ];
 

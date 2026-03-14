@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sisters' Quest: The Moonveil Crown</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-family: Georgia, serif;
+    }
+
+    #game-container {
+      position: relative;
+      /* Phaser will size the canvas; this centers it */
+    }
+
+    /* Loading screen (shown before Phaser boots) */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #050510;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.6s ease;
+    }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #loading-title {
+      font-family: Georgia, serif;
+      font-size: 26px;
+      color: #c8956c;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    #loading-subtitle {
+      font-family: Georgia, serif;
+      font-size: 13px;
+      color: #555;
+      font-style: italic;
+      margin-bottom: 32px;
+    }
+
+    #loading-bar-outer {
+      width: 240px;
+      height: 3px;
+      background: #1a1408;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    #loading-bar-inner {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #8a5a2a, #c8956c);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading screen shown while scripts load -->
+  <div id="loading-screen">
+    <div id="loading-title">Sisters' Quest</div>
+    <div id="loading-subtitle">The Moonveil Crown</div>
+    <div id="loading-bar-outer">
+      <div id="loading-bar-inner" id="lbar"></div>
+    </div>
+  </div>
+
+  <div id="game-container"></div>
+
+  <!-- ── Phaser 3 (CDN) ──────────────────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
+  <!-- ── Load order: data → state → systems → scenes → config ── -->
+
+  <!-- State -->
+  <script src="js/GameState.js"></script>
+
+  <!-- Data -->
+  <script src="js/data/items.js"></script>
+  <script src="js/data/dialogues.js"></script>
+
+  <!-- Systems -->
+  <script src="js/systems/VerbSystem.js"></script>
+  <script src="js/systems/DialogueSystem.js"></script>
+
+  <!-- Scenes -->
+  <script src="js/scenes/BootScene.js"></script>
+  <script src="js/scenes/MenuScene.js"></script>
+  <script src="js/scenes/UIScene.js"></script>
+  <script src="js/scenes/QueensChamberScene.js"></script>
+  <script src="js/scenes/PalaceLibraryScene.js"></script>
+  <script src="js/scenes/Act1EndScene.js"></script>
+
+  <!-- ── Game configuration ────────────────────────────── -->
+  <script>
+    // Animate loading bar while scripts initialize
+    let barWidth = 0;
+    const barEl = document.getElementById('loading-bar-inner');
+    const barInterval = setInterval(() => {
+      barWidth = Math.min(barWidth + 8, 90);
+      barEl.style.width = barWidth + '%';
+    }, 60);
+
+    // Compute game size — fill available space, maintain 16:9-ish
+    function getGameSize() {
+      const maxW = window.innerWidth;
+      const maxH = window.innerHeight;
+      const aspect = 960 / 600;
+      let w = maxW;
+      let h = Math.round(w / aspect);
+      if (h > maxH) {
+        h = maxH;
+        w = Math.round(h * aspect);
+      }
+      return { width: w, height: h };
+    }
+
+    const { width, height } = getGameSize();
+
+    const config = {
+      type: Phaser.AUTO,
+      width,
+      height,
+      backgroundColor: '#0a0a0a',
+      parent: 'game-container',
+      scene: [
+        BootScene,
+        MenuScene,
+        UIScene,
+        QueensChamberScene,
+        PalaceLibraryScene,
+        Act1EndScene,
+      ],
+      scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width,
+        height,
+      },
+      input: {
+        keyboard: true,
+        mouse: true,
+        touch: true,
+      },
+      callbacks: {
+        postBoot: (game) => {
+          // Complete loading bar and hide loading screen
+          clearInterval(barInterval);
+          barEl.style.width = '100%';
+          setTimeout(() => {
+            document.getElementById('loading-screen').classList.add('hidden');
+            setTimeout(() => {
+              document.getElementById('loading-screen').remove();
+            }, 700);
+          }, 300);
+        },
+      },
+      render: {
+        antialias: true,
+        pixelArt: false,
+      },
+    };
+
+    const game = new Phaser.Game(config);
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+      const { width: w, height: h } = getGameSize();
+      game.scale.resize(w, h);
+    });
+  </script>
+
+</body>
+</html>
