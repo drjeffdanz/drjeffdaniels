@@ -26,12 +26,50 @@ class MenuScene extends Phaser.Scene {
       this.add.circle(x, y, r, 0xffffff, alpha);
     }
 
-    // Moon — large, soft
+    // Moon — bright, layered glow
+    const moonX = W * 0.78, moonY = H * 0.22;
     const moon = this.add.graphics();
-    moon.fillStyle(0xdde8f5, 0.15);
-    moon.fillCircle(W * 0.78, H * 0.22, 90);
-    moon.fillStyle(0xdde8f5, 0.10);
-    moon.fillCircle(W * 0.78, H * 0.22, 110);
+    // Outer corona
+    moon.fillStyle(0xc8d8ff, 0.04);
+    moon.fillCircle(moonX, moonY, 160);
+    moon.fillStyle(0xc8d8ff, 0.07);
+    moon.fillCircle(moonX, moonY, 130);
+    // Mid glow ring
+    moon.fillStyle(0xdde8ff, 0.18);
+    moon.fillCircle(moonX, moonY, 108);
+    moon.fillStyle(0xe8f0ff, 0.35);
+    moon.fillCircle(moonX, moonY, 94);
+    // Moon face — bright cool white
+    moon.fillStyle(0xf0f4ff, 0.88);
+    moon.fillCircle(moonX, moonY, 82);
+    // Subtle surface shading (darker patch lower-right)
+    moon.fillStyle(0xd8e4f8, 0.18);
+    moon.fillCircle(moonX + 22, moonY + 18, 38);
+    moon.fillStyle(0xd0ddf5, 0.12);
+    moon.fillCircle(moonX + 30, moonY + 28, 22);
+    // Bright highlight upper-left
+    moon.fillStyle(0xffffff, 0.55);
+    moon.fillCircle(moonX - 24, moonY - 20, 28);
+    moon.fillStyle(0xffffff, 0.25);
+    moon.fillCircle(moonX - 16, moonY - 12, 44);
+
+    // Animated moonveil shimmer ring
+    const shimmer = this.add.graphics();
+    this.tweens.add({
+      targets: shimmer,
+      alpha: { from: 0.6, to: 1.0 },
+      duration: 2800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      onUpdate: () => {
+        shimmer.clear();
+        shimmer.lineStyle(1.5, 0xc8d8ff, 0.18 * shimmer.alpha);
+        shimmer.strokeCircle(moonX, moonY, 96 + shimmer.alpha * 6);
+        shimmer.lineStyle(1, 0xffffff, 0.08 * shimmer.alpha);
+        shimmer.strokeCircle(moonX, moonY, 112 + shimmer.alpha * 8);
+      },
+    });
 
     // Tower silhouette on the right
     this._drawTower(W * 0.78, H, 60, H * 0.55);
@@ -41,18 +79,24 @@ class MenuScene extends Phaser.Scene {
     hill.fillStyle(0x08050f, 1);
     hill.fillEllipse(W * 0.5, H + 60, W * 1.6, 200);
 
-    // ── Mist particles ────────────────────────────────────────
-    this.add.particles(0, 0, 'mist_particle', {
-      x: { min: 0, max: W },
-      y: { min: H * 0.55, max: H },
-      alpha: { start: 0.06, end: 0 },
-      scale: { start: 0.5, end: 2 },
-      speed: { min: 8, max: 20 },
-      angle: { min: -10, max: 10 },
-      lifespan: 6000,
-      frequency: 180,
-      quantity: 1,
-      blendMode: 'ADD',
+    // ── Ground mist (graphics-based, no texture needed) ───────
+    const mistG = this.add.graphics();
+    this.tweens.add({
+      targets: mistG,
+      alpha: { from: 0.5, to: 1.0 },
+      duration: 3200,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      onUpdate: () => {
+        mistG.clear();
+        for (let i = 0; i < 6; i++) {
+          const mx = W * (0.05 + i * 0.18);
+          const my = H * 0.78 + Math.sin(Date.now() / 4000 + i) * 8;
+          mistG.fillStyle(0x8090c0, 0.025 * mistG.alpha);
+          mistG.fillEllipse(mx, my, 280 + i * 30, 60);
+        }
+      },
     });
 
     // ── Title ─────────────────────────────────────────────────
@@ -131,18 +175,27 @@ class MenuScene extends Phaser.Scene {
       }
     }
 
-    // Windows (lit faintly)
-    const winColor = 0x1a0a30;
-    g.fillStyle(winColor, 1);
-    g.fillRect(cx - 10, groundY - height + 30, 20, 28);
-    g.fillRect(cx - 10, groundY - height + 80, 20, 28);
-    g.fillRect(cx - 10, groundY - height + 130, 20, 28);
-
-    // Faint glow behind windows
+    // Windows — warm amber glow (lit from within)
     const glow = this.add.graphics();
-    glow.fillStyle(0x8040c0, 0.08);
-    glow.fillRect(cx - 18, groundY - height + 22, 36, 44);
-    glow.fillRect(cx - 18, groundY - height + 72, 36, 44);
+    const wins = [
+      groundY - height + 30,
+      groundY - height + 80,
+      groundY - height + 130,
+    ];
+    wins.forEach(wy => {
+      // Glow halo
+      glow.fillStyle(0xd08020, 0.12);
+      glow.fillRect(cx - 22, wy - 8, 44, 44);
+      glow.fillStyle(0xffa030, 0.07);
+      glow.fillRect(cx - 30, wy - 14, 60, 56);
+      // Window pane
+      g.fillStyle(0xd08828, 0.9);
+      g.fillRect(cx - 9, wy, 18, 26);
+      // Cross bar
+      g.fillStyle(0x06040e, 1);
+      g.fillRect(cx - 9, wy + 12, 18, 2);
+      g.fillRect(cx, wy, 2, 26);
+    });
   }
 
   _makeButton(x, y, label, callback, disabled = false) {
