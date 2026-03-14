@@ -1,680 +1,504 @@
 // ============================================================
 // scenes/QueensChamberScene.js — Sisters' Quest
 // Act 1, Room 1: The Queen's Chamber
-// Hotspots: Queen, Tapestry, Tea Cup, Sealed Letter, Poetry Book, Door
-// Cutscene: Crafty Birdie enters after examining the Queen
+// Extends BaseScene — verb bar and inventory built in.
 // ============================================================
 
-class QueensChamberScene extends Phaser.Scene {
-  constructor() {
-    super({ key: 'QueensChamberScene' });
-  }
+class QueensChamberScene extends BaseScene {
+  constructor() { super({ key: 'QueensChamberScene' }); }
 
   create() {
-    this.W = this.scale.width;
-    this.H = this.scale.height;
-    this.WORLD_H = this.H - 156; // game world above the UI bar + status bar
-    this._dialogueLock = false;
+    const W = this.scale.width;
+    const H = this.scale.height;
 
     GameState.setCurrentScene('QueensChamberScene');
 
-    // ── Draw the room ─────────────────────────────────────────
-    this._drawBackground();
-    this._drawFurniture();
-    this._drawQueenSleeping();
-    this._addMistParticles();
+    // ── Room ──────────────────────────────────────────────────
+    this._drawBackground(W, H);
+    this._drawFurniture(W, H);
+    this._drawQueenFigure(W, H);
+    this._addMistParticles(W, H);
 
-    // ── Scene label ───────────────────────────────────────────
-    this._sceneLabel = this.add.text(this.W / 2, 18, "The Queen's Chamber  ·  Palace of Elderwyn", {
-      fontFamily: 'Georgia, serif',
-      fontSize: '12px',
-      color: '#555555',
-      fontStyle: 'italic',
+    // Scene label
+    this.add.text(W / 2, 18, "The Queen's Chamber  ·  Palace of Elderwyn", {
+      fontFamily: 'Georgia, serif', fontSize: '12px',
+      color: '#3a3540', fontStyle: 'italic',
     }).setOrigin(0.5).setDepth(10);
 
     // ── Dialogue system ───────────────────────────────────────
     this.dialogue = new DialogueSystem(this);
 
+    // Dialogue event handlers — lock / unlock hotspots and UI
     this.events.on('sq_dialogue_start', () => {
-      this._dialogueLock = true;
-      this._disableHotspots();
-      this.game.events.emit('sq_dialogue_start_global');
+      this._locked = true;
+      this._setHotspotsEnabled(false);
+      this.disableUI();
     });
-
     this.events.on('sq_dialogue_end', () => {
-      this._dialogueLock = false;
-      this._enableHotspots();
-      this.game.events.emit('sq_dialogue_end_global');
-      // Re-evaluate which hotspots should now be active
-      this._syncHotspotState();
+      this._locked = false;
+      this._setHotspotsEnabled(true);
+      this.enableUI();
     });
 
     // ── Hotspots ──────────────────────────────────────────────
     this._hotspots = [];
-    this._buildHotspots();
+    this._locked   = false;
+    this._buildHotspots(W, H);
 
-    // ── Entrance narration ────────────────────────────────────
-    this.time.delayedCall(300, () => {
-      const ui = this.scene.get('UIScene');
-      if (ui) ui.setStatus('The Queen\'s Chamber  ·  Seven days remain.');
-    });
+    // ── Build shared UI (verb bar + inventory) — ALWAYS LAST ─
+    this._initUI();
+
+    // Initial status
+    this.setStatus('Seven days remain.  ·  Examine the room.');
   }
 
-  // ── Background drawing ──────────────────────────────────────
+  // ── Background ──────────────────────────────────────────────
 
-  _drawBackground() {
-    const g = this.add.graphics();
-    const W = this.W;
-    const H = this.WORLD_H;
+  _drawBackground(W, H) {
+    const WH = H - 156; // game world height
+    const g  = this.add.graphics();
 
-    // Stone wall — deep blue-grey
-    g.fillGradientStyle(0x0c0e18, 0x0c0e18, 0x10121e, 0x10121e, 1);
-    g.fillRect(0, 0, W, H);
+    // Stone walls — deep midnight blue
+    g.fillGradientStyle(0x0c0e1a, 0x0c0e1a, 0x10121e, 0x10121e, 1);
+    g.fillRect(0, 0, W, WH);
 
-    // Stone block texture
-    g.lineStyle(1, 0x191c2a, 1);
-    const blockH = 40;
-    const blockW = 80;
-    for (let row = 0; row * blockH < H; row++) {
-      const offset = (row % 2 === 0) ? 0 : blockW / 2;
-      for (let col = -1; col * blockW < W + blockW; col++) {
-        const bx = col * blockW + offset;
-        const by = row * blockH;
-        g.strokeRect(bx, by, blockW, blockH);
+    // Stone block grid
+    g.lineStyle(1, 0x181a28, 1);
+    for (let row = 0; row * 40 < WH; row++) {
+      const off = (row % 2 === 0) ? 0 : 40;
+      for (let col = -1; col * 80 < W + 80; col++) {
+        g.strokeRect(col * 80 + off, row * 40, 80, 40);
       }
     }
 
-    // Ceiling arch suggestion
-    g.fillStyle(0x080a14, 1);
-    g.fillRect(0, 0, W, 18);
+    // Ceiling
+    g.fillStyle(0x070910, 1);
+    g.fillRect(0, 0, W, 20);
 
-    // Floor — darker, warmer
-    g.fillStyle(0x0f0b08, 1);
-    g.fillRect(0, H - 60, W, 60);
-    g.lineStyle(1, 0x2a1e0e, 1);
-    g.lineBetween(0, H - 60, W, H - 60);
+    // Floor
+    g.fillStyle(0x0f0c08, 1);
+    g.fillRect(0, WH - 55, W, 55);
+    g.lineStyle(1, 0x251a0c, 1);
+    g.lineBetween(0, WH - 55, W, WH - 55);
 
-    // Rug on floor
-    g.fillStyle(0x3a1a08, 0.6);
-    g.fillRoundedRect(W * 0.2, H - 58, W * 0.6, 46, 4);
-    g.lineStyle(1, 0x5a2a10, 0.5);
-    g.strokeRoundedRect(W * 0.2, H - 58, W * 0.6, 46, 4);
+    // Rug
+    g.fillStyle(0x3a1a0a, 0.55);
+    g.fillRoundedRect(W * 0.2, WH - 53, W * 0.6, 44, 4);
 
-    // Windows (left and right)
-    this._drawWindow(g, W * 0.08, 60, 70, 160);
-    this._drawWindow(g, W * 0.82, 60, 70, 160);
+    // Windows
+    this._drawWindow(g, W * 0.07, 55, 68, 155);
+    this._drawWindow(g, W * 0.82, 55, 68, 155);
 
-    // Candle light pools on walls
-    g.fillStyle(0xc87820, 0.05);
-    g.fillCircle(W * 0.08 + 35, 140, 80);
-    g.fillCircle(W * 0.82 + 35, 140, 80);
+    // Candle glow on walls
+    g.fillStyle(0xd08020, 0.04);
+    g.fillCircle(W * 0.07 + 34, 132, 85);
+    g.fillCircle(W * 0.82 + 34, 132, 85);
   }
 
   _drawWindow(g, x, y, w, h) {
-    // Window frame (dark stone)
-    g.fillStyle(0x06080f, 1);
+    g.fillStyle(0x050710, 1);
     g.fillRect(x - 6, y - 6, w + 12, h + 12);
-
-    // Night sky
-    g.fillStyle(0x0a0c18, 1);
+    g.fillStyle(0x09090f, 1);
     g.fillRect(x, y, w, h);
-
-    // Moonlight glow
-    g.fillStyle(0xc0d0e8, 0.12);
+    g.fillStyle(0xb8c8e0, 0.09);
     g.fillRect(x, y, w, h / 2);
-
-    // Stars in window
-    g.fillStyle(0xffffff, 0.7);
-    [[x + 15, y + 20], [x + 40, y + 35], [x + 55, y + 15], [x + 25, y + 55]].forEach(([sx, sy]) => {
-      g.fillCircle(sx, sy, 1);
-    });
-
-    // Window cross-bar
-    g.lineStyle(2, 0x06080f, 1);
-    g.lineBetween(x, y + h / 2, x + w, y + h / 2);
-    g.lineBetween(x + w / 2, y, x + w / 2, y + h);
+    g.fillStyle(0xffffff, 0.6);
+    [[x+14,y+18],[x+38,y+32],[x+52,y+14],[x+24,y+50]].forEach(([sx,sy]) => g.fillCircle(sx,sy,1));
+    g.lineStyle(2, 0x05070e, 1);
+    g.lineBetween(x, y + h/2, x + w, y + h/2);
+    g.lineBetween(x + w/2, y, x + w/2, y + h);
   }
 
-  _drawFurniture() {
-    const g = this.add.graphics();
-    const W = this.W;
-    const H = this.WORLD_H;
+  _drawFurniture(W, H) {
+    const WH = H - 156;
+    const g  = this.add.graphics();
 
-    // ── Tapestry on back wall ──────────────────────
-    const tapX = W / 2 - 80;
-    const tapY = 50;
-    const tapW = 160;
-    const tapH = 120;
+    // ── Tapestry ───────────────────────────────────────────
+    const tX = W/2 - 78, tY = 50, tW = 156, tH = 118;
+    g.fillStyle(0x271630, 1);
+    g.fillRect(tX, tY, tW, tH);
+    g.lineStyle(1.5, 0xc8956c, 0.6);
+    g.strokeRect(tX, tY, tW, tH);
 
-    g.fillStyle(0x2a1a3a, 1);
-    g.fillRect(tapX, tapY, tapW, tapH);
-    g.lineStyle(2, 0xc8956c, 0.7);
-    g.strokeRect(tapX, tapY, tapW, tapH);
+    // Map lines on tapestry
+    g.lineStyle(1, 0x5a3a6a, 0.5);
+    g.lineBetween(tX+18, tY+58, tX+tW-18, tY+58);
+    g.lineBetween(tX+78, tY+18, tX+78, tY+tH-18);
+    g.lineBetween(tX+18, tY+28, tX+58, tY+58);
+    g.lineBetween(tX+98, tY+58, tX+tW-18, tY+88);
+    g.fillStyle(0x8a6090, 0.7);
+    [[28,58],[78,38],[78,58],[78,83],[118,58],[138,33]].forEach(([dx,dy]) =>
+      g.fillCircle(tX+dx, tY+dy, 3)
+    );
 
-    // Tapestry pattern — map-like lines
-    g.lineStyle(1, 0x5a3a6a, 0.6);
-    // Roads
-    g.lineBetween(tapX + 20, tapY + 60, tapX + tapW - 20, tapY + 60);
-    g.lineBetween(tapX + 80, tapY + 20, tapX + 80, tapY + tapH - 20);
-    g.lineBetween(tapX + 20, tapY + 30, tapX + 60, tapY + 60);
-    g.lineBetween(tapX + 100, tapY + 60, tapX + tapW - 20, tapY + 90);
-    // Settlement dots
-    g.fillStyle(0x8a6090, 0.8);
-    [[30, 60], [80, 40], [80, 60], [80, 85], [120, 60], [140, 35]].forEach(([dx, dy]) => {
-      g.fillCircle(tapX + dx, tapY + dy, 3);
-    });
+    // Scratched-out name
+    g.fillStyle(0x1a0e26, 0.9);
+    g.fillRect(tX+tW-48, tY+tH-17, 42, 11);
+    g.lineStyle(1, 0x7a4a4a, 0.8);
+    for (let ln = 0; ln < 3; ln++) {
+      g.lineBetween(tX+tW-46, tY+tH-14+ln*3, tX+tW-8, tY+tH-14+ln*3);
+    }
 
-    // Scratched-out name (bottom corner)
-    g.lineStyle(1, 0x3a2a4a, 1);
-    g.fillStyle(0x1e102e, 0.9);
-    g.fillRect(tapX + tapW - 50, tapY + tapH - 18, 44, 12);
-    g.lineStyle(1, 0x6a4a4a, 1);
-    g.lineBetween(tapX + tapW - 48, tapY + tapH - 12, tapX + tapW - 8, tapY + tapH - 12);
-    g.lineBetween(tapX + tapW - 48, tapY + tapH - 10, tapX + tapW - 8, tapY + tapH - 10);
-    g.lineBetween(tapX + tapW - 48, tapY + tapH - 14, tapX + tapW - 8, tapY + tapH - 14);
-
-    // Tapestry label
-    this.add.text(W / 2, tapY + tapH + 8, "Tapestry of Elderwyn", {
-      fontFamily: 'Georgia, serif', fontSize: '10px', color: '#4a3a5a', fontStyle: 'italic'
+    this.add.text(W/2, tY+tH+8, 'Tapestry of Elderwyn', {
+      fontFamily: 'Georgia, serif', fontSize: '10px', color: '#4a3a58', fontStyle: 'italic'
     }).setOrigin(0.5);
 
-    // ── Bed ─────────────────────────────────────────
-    const bedX = W / 2 - 110;
-    const bedY = H - 200;
-    const bedW = 220;
-    const bedH = 140;
+    // ── Bed ────────────────────────────────────────────────
+    const bX = W/2 - 108, bY = WH - 195, bW = 216, bH = 138;
 
     // Headboard
-    g.fillStyle(0x3a1e08, 1);
-    g.fillRect(bedX, bedY, bedW, 30);
+    g.fillStyle(0x3c1f08, 1);
+    g.fillRect(bX, bY, bW, 28);
     g.lineStyle(2, 0x6a3a10, 1);
-    g.strokeRect(bedX, bedY, bedW, 30);
-    // Headboard detail
-    g.lineStyle(1, 0x8a5a20, 0.5);
-    g.lineBetween(bedX + 20, bedY + 6, bedX + 20, bedY + 24);
-    g.lineBetween(bedX + bedW - 20, bedY + 6, bedX + bedW - 20, bedY + 24);
+    g.strokeRect(bX, bY, bW, 28);
+    g.lineStyle(1, 0x8a5a20, 0.4);
+    g.lineBetween(bX+18, bY+5, bX+18, bY+23);
+    g.lineBetween(bX+bW-18, bY+5, bX+bW-18, bY+23);
 
-    // Bed frame
+    // Frame
     g.fillStyle(0x2e1606, 1);
-    g.fillRect(bedX, bedY + 30, bedW, bedH - 10);
+    g.fillRect(bX, bY+28, bW, bH-8);
     g.lineStyle(1, 0x4a2a0a, 1);
-    g.strokeRect(bedX, bedY + 30, bedW, bedH - 10);
+    g.strokeRect(bX, bY+28, bW, bH-8);
 
-    // Coverlet — white/silver with unraveling effect
-    g.fillStyle(0xe8eaf0, 0.92);
-    g.fillRoundedRect(bedX + 6, bedY + 34, bedW - 12, bedH - 20, 4);
-    g.lineStyle(1, 0xc0c8d8, 0.5);
-    g.strokeRoundedRect(bedX + 6, bedY + 34, bedW - 12, bedH - 20, 4);
-
-    // Thread pattern on coverlet
-    g.lineStyle(1, 0xb0b8c8, 0.3);
-    for (let y = bedY + 44; y < bedY + bedH - 10; y += 12) {
-      g.lineBetween(bedX + 10, y, bedX + bedW - 10, y);
+    // Coverlet
+    g.fillStyle(0xe8eaf2, 0.93);
+    g.fillRoundedRect(bX+5, bY+32, bW-10, bH-18, 4);
+    g.lineStyle(1, 0xc0c8da, 0.5);
+    g.strokeRoundedRect(bX+5, bY+32, bW-10, bH-18, 4);
+    g.lineStyle(1, 0xb0b8ca, 0.25);
+    for (let y = bY+42; y < bY+bH-8; y += 11) {
+      g.lineBetween(bX+9, y, bX+bW-9, y);
     }
 
-    // Fraying hem (bottom of coverlet — threads unweaving)
-    g.lineStyle(1, 0xd0d8e8, 0.4);
-    for (let i = 0; i < 8; i++) {
-      const tx = bedX + 20 + i * 26;
-      const ty = bedY + bedH - 24;
-      g.lineBetween(tx, ty, tx + Phaser.Math.Between(-4, 4), ty + Phaser.Math.Between(10, 22));
+    // Unraveling hem (fraying threads at bottom)
+    g.lineStyle(1, 0xd0d8ea, 0.35);
+    for (let i = 0; i < 9; i++) {
+      const tx = bX + 20 + i * 23;
+      g.lineBetween(tx, bY+bH-22, tx + Phaser.Math.Between(-3,3), bY+bH-6);
     }
 
-    // ── Bedside table ────────────────────────────────
-    const tableX = bedX + bedW + 12;
-    const tableY = bedY + 40;
+    // ── Bedside table ──────────────────────────────────────
+    const tblX = bX + bW + 10, tblY = bY + 38;
     g.fillStyle(0x2e1a08, 1);
-    g.fillRect(tableX, tableY, 68, 90);
+    g.fillRect(tblX, tblY, 70, 92);
     g.lineStyle(1, 0x4a2a0a, 1);
-    g.strokeRect(tableX, tableY, 68, 90);
+    g.strokeRect(tblX, tblY, 70, 92);
 
     // Tea cup
-    g.fillStyle(0xf5f0e8, 1);
-    g.fillEllipse(tableX + 20, tableY + 16, 28, 14);
-    g.fillStyle(0xc8a87a, 1);
-    g.fillEllipse(tableX + 20, tableY + 13, 24, 10);
-    g.lineStyle(1, 0x8a6a3a, 1);
-    g.strokeEllipse(tableX + 20, tableY + 16, 28, 14);
-
-    // Silver sediment hint in cup
-    g.fillStyle(0xd0d8e8, 0.6);
-    g.fillEllipse(tableX + 20, tableY + 13, 14, 5);
-
-    this.add.text(tableX + 20, tableY + 26, 'Tea', {
-      fontFamily: 'Georgia, serif', fontSize: '9px', color: '#5a4a2a'
-    }).setOrigin(0.5);
+    g.fillStyle(0xf5f0e8, 1); g.fillEllipse(tblX+20, tblY+15, 28, 13);
+    g.fillStyle(0xc8a87a, 1); g.fillEllipse(tblX+20, tblY+12, 24, 9);
+    g.lineStyle(1, 0x8a6a3a, 1); g.strokeEllipse(tblX+20, tblY+15, 28, 13);
+    // Silver sediment
+    g.fillStyle(0xd0d8ea, 0.5); g.fillEllipse(tblX+20, tblY+12, 12, 4);
+    this.add.text(tblX+20, tblY+25, 'Tea', { fontFamily: 'Georgia, serif', fontSize: '9px', color: '#5a4a2a' }).setOrigin(0.5);
 
     // Letter
-    g.fillStyle(0xf5e8b0, 1);
-    g.fillRect(tableX + 8, tableY + 38, 50, 34);
-    g.lineStyle(1, 0xc8a050, 1);
-    g.strokeRect(tableX + 8, tableY + 38, 50, 34);
-    // Wax seal
-    g.fillStyle(0xaa2010, 1);
-    g.fillCircle(tableX + 33, tableY + 60, 7);
-    this.add.text(tableX + 33, tableY + 79, 'Letter', {
-      fontFamily: 'Georgia, serif', fontSize: '9px', color: '#a08030'
-    }).setOrigin(0.5);
+    g.fillStyle(0xf5e8b0, 1); g.fillRect(tblX+8, tblY+38, 50, 34);
+    g.lineStyle(1, 0xc8a050, 1); g.strokeRect(tblX+8, tblY+38, 50, 34);
+    g.fillStyle(0xaa2010, 1); g.fillCircle(tblX+33, tblY+60, 7);
+    this.add.text(tblX+33, tblY+79, 'Letter', { fontFamily: 'Georgia, serif', fontSize: '9px', color: '#a08030' }).setOrigin(0.5);
 
-    // Poetry book
-    g.fillStyle(0x4a2810, 1);
-    g.fillRect(tableX + 2, tableY + 76, 36, 10);
-    g.lineStyle(1, 0x7a4820, 1);
-    g.strokeRect(tableX + 2, tableY + 76, 36, 10);
-    this.add.text(tableX + 20, tableY + 90, 'Book', {
-      fontFamily: 'Georgia, serif', fontSize: '9px', color: '#6a3810'
-    }).setOrigin(0.5);
+    // Book
+    g.fillStyle(0x4a2810, 1); g.fillRect(tblX+2, tblY+76, 36, 10);
+    g.lineStyle(1, 0x7a4820, 1); g.strokeRect(tblX+2, tblY+76, 36, 10);
+    this.add.text(tblX+20, tblY+92, 'Book', { fontFamily: 'Georgia, serif', fontSize: '9px', color: '#6a3810' }).setOrigin(0.5);
 
-    // ── Candelabra (left side) ───────────────────────
-    const candleX = W * 0.18;
-    const candleY = H - 210;
+    // Candelabra (left side)
     g.fillStyle(0x7a6020, 1);
-    g.fillRect(candleX - 2, candleY, 4, 50);
-    g.fillRect(candleX - 10, candleY + 48, 20, 6);
-    // Candle flame
-    g.fillStyle(0xf0c020, 0.9);
-    g.fillEllipse(candleX, candleY - 6, 6, 12);
-    g.fillStyle(0xffe860, 0.4);
-    g.fillCircle(candleX, candleY - 4, 10);
+    g.fillRect(W*0.17-2, WH-210, 4, 50);
+    g.fillRect(W*0.17-10, WH-162, 20, 5);
+    g.fillStyle(0xf0c020, 0.9); g.fillEllipse(W*0.17, WH-216, 6, 12);
+    g.fillStyle(0xffe860, 0.3); g.fillCircle(W*0.17, WH-212, 10);
+
+    // Library door (right wall)
+    g.fillStyle(0x2e1c08, 1);
+    g.fillRect(W-52, 80, 44, WH-140);
+    g.lineStyle(2, 0x5a3a14, 1);
+    g.strokeRect(W-52, 80, 44, WH-140);
+    g.fillStyle(0xc8a050, 1); g.fillCircle(W-16, WH/2, 5);
+    this.add.text(W-30, 70, 'Library →', {
+      fontFamily: 'Georgia, serif', fontSize: '10px', color: '#4a3010', fontStyle: 'italic'
+    }).setOrigin(0.5);
   }
 
-  _drawQueenSleeping() {
-    const g = this.add.graphics().setDepth(5);
-    const W = this.W;
-    const H = this.WORLD_H;
-
-    // Queen's face / head on pillow
-    const headX = W / 2 + 30;
-    const headY = H - 175;
+  _drawQueenFigure(W, H) {
+    const WH = H - 156;
+    const g  = this.add.graphics().setDepth(5);
+    const hX = W/2 + 28, hY = WH - 175;
 
     // Pillow
-    g.fillStyle(0xdde0ea, 1);
-    g.fillEllipse(headX - 10, headY + 10, 70, 32);
-
+    g.fillStyle(0xdde0ec, 1); g.fillEllipse(hX-8, hY+10, 68, 30);
     // Head
-    g.fillStyle(0xf0d8c0, 1);
-    g.fillCircle(headX, headY, 18);
-
-    // Hair (dark, spread on pillow)
-    g.fillStyle(0x2a1a10, 1);
-    g.fillEllipse(headX, headY + 2, 42, 24);
-    g.fillCircle(headX, headY - 8, 18);
-
+    g.fillStyle(0xf0d8c0, 1); g.fillCircle(hX, hY, 17);
+    // Hair
+    g.fillStyle(0x2a1a10, 1); g.fillEllipse(hX, hY+2, 40, 24); g.fillCircle(hX, hY-8, 17);
     // Closed eyes
     g.lineStyle(1, 0x6a4030, 1);
-    g.lineBetween(headX - 8, headY + 2, headX - 2, headY + 2);
-    g.lineBetween(headX + 2, headY + 2, headX + 8, headY + 2);
-
-    // Silver mist hint around her (drawn as faint circles)
-    g.fillStyle(0xc8d4e8, 0.06);
-    g.fillCircle(headX, headY, 40);
-    g.fillCircle(headX - 20, headY + 30, 30);
-    g.fillCircle(headX + 20, headY + 30, 30);
-
-    this._queenGraphics = g;
+    g.lineBetween(hX-8, hY+2, hX-2, hY+2);
+    g.lineBetween(hX+2, hY+2, hX+8, hY+2);
+    // Silver mist halo
+    g.fillStyle(0xc8d4ea, 0.05);
+    g.fillCircle(hX, hY, 42); g.fillCircle(hX-18, hY+32, 28); g.fillCircle(hX+18, hY+32, 28);
   }
 
-  _addMistParticles() {
-    const W = this.W;
-    const H = this.WORLD_H;
-    const bedCenterX = W / 2 + 20;
-    const bedCenterY = H - 120;
-
-    // Silver mist rising from the Queen
-    this._mistEmitter = this.add.particles(bedCenterX, bedCenterY, 'mist_particle', {
-      x: { min: -80, max: 80 },
-      y: { min: -20, max: 20 },
-      alpha: { start: 0.18, end: 0 },
-      scale: { start: 0.15, end: 0.7 },
-      speed: { min: 6, max: 18 },
+  _addMistParticles(W, H) {
+    const WH = H - 156;
+    this.add.particles(W/2+20, WH-115, 'mist_particle', {
+      x: { min: -78, max: 78 },
+      y: { min: -18, max: 18 },
+      alpha: { start: 0.16, end: 0 },
+      scale: { start: 0.12, end: 0.65 },
+      speed: { min: 5, max: 16 },
       angle: { min: 240, max: 300 },
-      lifespan: 3500,
-      frequency: 120,
+      lifespan: 3800,
+      frequency: 130,
       quantity: 1,
-      tint: [0xc8d8f0, 0xd0dced, 0xe0e8f8],
+      tint: [0xc8d8f2, 0xd4e0f0, 0xe0e8fa],
     }).setDepth(6);
   }
 
-  // ── Hotspots ───────────────────────────────────────────────
+  // ── Hotspots ────────────────────────────────────────────────
 
-  _buildHotspots() {
-    const W = this.W;
-    const H = this.WORLD_H;
-
-    const hotspotDefs = [
+  _buildHotspots(W, H) {
+    const WH = H - 156;
+    const defs = [
       {
-        id: 'queen',
-        name: 'Queen Elara',
-        x: W / 2 + 20, y: H - 160,
-        w: 140, h: 80,
-        look: () => this._onQueenLook(),
-        talk: () => this._onQueenTalk(),
+        id: 'queen', name: 'Queen Elara',
+        x: W/2+20, y: WH-158, w: 145, h: 82,
+        look: () => this._queenLook(),
+        talk: () => this._play(DIALOGUE_QUEEN_TALK),
         take: () => this._cantTake('Her Majesty'),
-        use:  () => this._onQueenUse(),
+        use:  () => this._queenUse(),
       },
       {
-        id: 'tapestry',
-        name: 'Tapestry of Elderwyn',
-        x: W / 2, y: 110,
-        w: 170, h: 130,
-        look: () => this._onTapestryLook(),
-        talk: () => this._narratorSay("The tapestry doesn't respond. Tapestries rarely do."),
+        id: 'tapestry', name: 'Tapestry of Elderwyn',
+        x: W/2, y: 108, w: 168, h: 128,
+        look: () => this._tapestryLook(),
+        talk: () => this._narrate("The tapestry doesn't respond. Tapestries rarely do."),
         take: () => this._cantTake('the tapestry'),
-        use:  () => this._narratorSay("You examine the stitching closely but find no hidden mechanism."),
+        use:  () => this._narrate("You examine the stitching closely but find no hidden mechanism."),
       },
       {
-        id: 'tea',
-        name: 'Teacup',
-        x: W / 2 + 148, y: H - 240,
-        w: 50, h: 36,
-        look: () => this._onTeaLook(),
-        talk: () => this._narratorSay("The teacup does not have much to say."),
+        id: 'tea', name: 'Teacup',
+        x: W/2+148, y: WH-242, w: 50, h: 36,
+        look: () => this._play(DIALOGUE_TEA),
+        talk: () => this._narrate("The teacup has nothing useful to say."),
         take: () => this._cantTake('the teacup'),
-        use:  () => this._onTeaUse(),
+        use:  () => this._play([
+          { speaker:'mackenzie', text:"Don't drink that." },
+          { speaker:'cambrie',   text:"I wasn't going to." },
+          { speaker:'mackenzie', text:"I know your face. You were thinking about it." },
+        ]),
       },
       {
-        id: 'letter',
-        name: "The Queen's Letter",
-        x: W / 2 + 152, y: H - 208,
-        w: 54, h: 40,
-        look: () => this._onLetterLook(),
-        talk: () => this._narratorSay("The sealed letter awaits in silence."),
-        take: () => this._onLetterTake(),
-        use:  () => this._onLetterUse(),
+        id: 'letter', name: "The Queen's Letter",
+        x: W/2+152, y: WH-208, w: 54, h: 40,
+        look: () => this._play(DIALOGUE_LETTER_LOOK),
+        talk: () => this._narrate("The sealed letter waits in silence."),
+        take: () => this._letterTake(),
+        use:  () => this._letterTake(),
       },
       {
-        id: 'book',
-        name: 'Book of Ballads',
-        x: W / 2 + 144, y: H - 175,
-        w: 44, h: 22,
-        look: () => this._onBookLook(),
-        talk: () => this._narratorSay("It's a book. It does not talk back, unlike some other things in this palace."),
-        take: () => this._onBookTake(),
-        use:  () => this._narratorSay("You flip through the ballads again. The dog-eared page is still there."),
+        id: 'book', name: 'Book of Ballads',
+        x: W/2+140, y: WH-172, w: 44, h: 20,
+        look: () => this._play(DIALOGUE_BOOK_LOOK),
+        talk: () => this._narrate("It's a book. It does not answer."),
+        take: () => this._bookTake(),
+        use:  () => this._bookTake(),
       },
       {
-        id: 'door',
-        name: 'Door to Library',
-        x: W - 40, y: H / 2,
-        w: 60, h: H * 0.4,
-        look: () => this._onDoorLook(),
-        talk: () => this._narratorSay("The door is sturdy and reliable and does not answer back."),
+        id: 'door', name: 'Door to Library',
+        x: W-28, y: WH/2 + 30, w: 54, h: WH*0.5,
+        look: () => this._doorLook(),
+        talk: () => this._narrate("The door is solid and reliable and says nothing."),
         take: () => this._cantTake('the door'),
-        use:  () => this._onDoorUse(),
+        use:  () => this._doorUse(),
       },
     ];
 
-    hotspotDefs.forEach(def => this._createHotspot(def));
-  }
+    defs.forEach(def => {
+      const outline = this.add.graphics().setDepth(49);
+      const zone    = this.add.zone(def.x, def.y, def.w, def.h)
+        .setInteractive({ useHandCursor: true })
+        .setDepth(50);
 
-  _createHotspot(def) {
-    const zone = this.add.zone(def.x, def.y, def.w, def.h)
-      .setInteractive({ useHandCursor: true })
-      .setDepth(50);
+      zone.on('pointerover', () => {
+        if (this._locked) return;
+        outline.clear();
+        outline.lineStyle(1.5, 0xc8956c, 0.45);
+        outline.strokeRect(def.x - def.w/2, def.y - def.h/2, def.w, def.h);
+        this.setStatus(VerbSystem.getActionLabel() + '  ·  ' + def.name);
+      });
+      zone.on('pointerout', () => {
+        outline.clear();
+        this.setStatus('');
+      });
+      zone.on('pointerdown', () => {
+        if (this._locked) return;
+        const verb = VerbSystem.activeVerb;
+        if (def[verb]) def[verb]();
+      });
 
-    // Hover outline
-    const outline = this.add.graphics().setDepth(49);
-
-    zone.on('pointerover', () => {
-      if (this._dialogueLock) return;
-      outline.clear();
-      outline.lineStyle(1.5, 0xc8956c, 0.5);
-      outline.strokeRect(def.x - def.w / 2, def.y - def.h / 2, def.w, def.h);
-      const ui = this.scene.get('UIScene');
-      if (ui) ui.setStatus(VerbSystem.getActionLabel() + ' · ' + def.name);
+      this._hotspots.push({ zone, outline });
     });
+  }
 
-    zone.on('pointerout', () => {
-      outline.clear();
-      const ui = this.scene.get('UIScene');
-      if (ui) ui.setStatus('');
+  _setHotspotsEnabled(on) {
+    this._hotspots.forEach(h => {
+      on ? h.zone.setInteractive({ useHandCursor: true })
+         : h.zone.disableInteractive();
     });
-
-    zone.on('pointerdown', () => {
-      if (this._dialogueLock) return;
-      const verb = VerbSystem.activeVerb;
-      if (def[verb]) def[verb]();
-    });
-
-    this._hotspots.push({ zone, outline, def });
-    return { zone, outline };
-  }
-
-  _disableHotspots() {
-    this._hotspots.forEach(h => h.zone.disableInteractive());
-  }
-
-  _enableHotspots() {
-    this._hotspots.forEach(h => h.zone.setInteractive({ useHandCursor: true }));
-  }
-
-  _syncHotspotState() {
-    // Hide door hotspot until Birdie scene is done
-    const doorHotspot = this._hotspots.find(h => h.def.id === 'door');
-    // Door is always visible but only navigable after Birdie scene
   }
 
   // ── Hotspot handlers ────────────────────────────────────────
 
-  _onQueenLook() {
+  _queenLook() {
     const lines = GameState.getFlag('queen_examined')
-      ? [{ speaker: 'narrator', text: "Your mother lies still. The silver mist continues to rise from the coverlet, thread by thread." }]
+      ? [{ speaker:'narrator', text:"The silver mist still rises from the coverlet, thread by thread." }]
       : DIALOGUE_QUEEN_EXAMINE;
 
-    this.dialogue.play(lines, () => {
+    this._play(lines, () => {
       if (!GameState.getFlag('queen_examined')) {
         GameState.setFlag('queen_examined', true);
         if (!GameState.getFlag('birdie_done')) {
-          this.time.delayedCall(400, () => this._playBirdieCutscene());
+          this.time.delayedCall(500, () => this._birdieCutscene());
         }
       }
     });
   }
 
-  _onQueenTalk() {
-    this.dialogue.play(DIALOGUE_QUEEN_TALK);
-  }
-
-  _onQueenUse() {
+  _queenUse() {
     if (VerbSystem.activeItem === 'sealed_letter') {
-      this.dialogue.play([{
-        speaker: 'cambrie',
-        text: "Not yet. We shouldn't open it while she might still wake and speak for herself.",
-      }]);
+      this._play([{ speaker:'cambrie', text:"Not yet. Not while she might still wake." }]);
     } else {
-      this.dialogue.play([{
-        speaker: 'mackenzie',
-        text: "There's nothing to do for her here. We need to find Vessa.",
-      }]);
+      this._play([{ speaker:'mackenzie', text:"We need to find Vessa." }]);
     }
   }
 
-  _onTapestryLook() {
+  _tapestryLook() {
     const lines = GameState.getFlag('tapestry_examined')
       ? DIALOGUE_TAPESTRY_REPEAT
       : DIALOGUE_TAPESTRY_FIRST;
-
-    this.dialogue.play(lines, () => {
-      GameState.setFlag('tapestry_examined', true);
-    });
+    this._play(lines, () => GameState.setFlag('tapestry_examined', true));
   }
 
-  _onTeaLook() {
-    this.dialogue.play(DIALOGUE_TEA, () => {
-      GameState.setFlag('tea_examined', true);
-    });
-  }
-
-  _onTeaUse() {
-    if (VerbSystem.activeItem) {
-      this._narratorSay("Using items on cold cursed tea is not the solution here.");
-    } else {
-      this.dialogue.play([{
-        speaker: 'mackenzie',
-        text: "Don't drink that.",
-      }, {
-        speaker: 'cambrie',
-        text: "I wasn't going to.",
-      }, {
-        speaker: 'mackenzie',
-        text: "I know your face. You were thinking about it.",
-      }]);
-    }
-  }
-
-  _onLetterLook() {
-    this.dialogue.play(DIALOGUE_LETTER_LOOK);
-  }
-
-  _onLetterTake() {
+  _letterTake() {
     if (GameState.hasItem('sealed_letter')) {
-      this._narratorSay("You've already taken the letter. It's safe in Cambrie's journal.");
+      this._narrate("The letter is safe in Cambrie's journal.");
       return;
     }
-    this.dialogue.play(DIALOGUE_LETTER_TAKE, () => {
-      GameState.addItem('sealed_letter');
+    this._play(DIALOGUE_LETTER_LOOK, () => {
+      this._play(DIALOGUE_LETTER_TAKE, () => GameState.addItem('sealed_letter'));
     });
   }
 
-  _onLetterUse() {
-    if (GameState.hasItem('sealed_letter')) {
-      this.dialogue.play([{
-        speaker: 'cambrie',
-        text: "We shouldn't open it yet. Not until we have no other choice.",
-      }]);
-    } else {
-      this._onLetterTake();
-    }
-  }
-
-  _onBookLook() {
-    this.dialogue.play(DIALOGUE_BOOK_LOOK);
-  }
-
-  _onBookTake() {
+  _bookTake() {
     if (GameState.hasItem('ballad_book')) {
-      this._narratorSay("The ballad book is already in Cambrie's bag.");
+      this._narrate("The ballad book is already in Cambrie's bag.");
       return;
     }
-    this.dialogue.play(DIALOGUE_BOOK_TAKE, () => {
-      GameState.addItem('ballad_book');
+    this._play(DIALOGUE_BOOK_LOOK, () => {
+      this._play(DIALOGUE_BOOK_TAKE, () => GameState.addItem('ballad_book'));
     });
   }
 
-  _onDoorLook() {
+  _doorLook() {
     if (!GameState.getFlag('birdie_done')) {
-      this._narratorSay("A door leading to the palace corridor. You're not ready to leave yet — you need to understand what you're facing.");
+      this._narrate("A door to the palace corridor. You're not ready to leave yet.");
     } else {
-      this._narratorSay("The door to the palace corridor. Beyond it, the library and answers.");
+      this._narrate("The way to the library — and answers.");
     }
   }
 
-  _onDoorUse() {
+  _doorUse() {
     if (!GameState.getFlag('birdie_done')) {
-      this.dialogue.play([{
-        speaker: 'mackenzie',
-        text: "We can't just leave without knowing what we're up against.",
-      }, {
-        speaker: 'cambrie',
-        text: "The library. We need the library first.",
-      }]);
+      this._play([
+        { speaker:'mackenzie', text:"We can't leave without knowing what we're up against." },
+        { speaker:'cambrie',   text:"The library. We need the library first." },
+      ]);
     } else {
-      // Transition to library
       this._goToLibrary();
     }
   }
 
   // ── Birdie cutscene ─────────────────────────────────────────
 
-  _playBirdieCutscene() {
-    // Animate Birdie entering from the door
-    const W = this.W;
-    const H = this.WORLD_H;
+  _birdieCutscene() {
+    const W = this.scale.width;
+    const H = this.scale.height;
+    const WH = H - 156;
 
-    const birdieG = this.add.graphics().setDepth(20);
-    // Birdie sprite (placeholder: layered robe figure)
-    this._drawBirdieFigure(birdieG, W + 30, H - 220);
+    // Draw Birdie at her own local origin, placed off-screen right
+    const g = this.add.graphics().setDepth(20);
+    const targetX = W * 0.14; // where she ends up (left area)
+    g.setPosition(W + 60, WH - 225);  // start off-screen right
+    this._drawBirdie(g);               // draw at local (0,0)
 
-    // Slide Birdie in
     this.tweens.add({
-      targets: birdieG,
-      x: -180,
-      duration: 600,
+      targets: g,
+      x: targetX,
+      duration: 650,
       ease: 'Power2.easeOut',
       onComplete: () => {
-        this.dialogue.play(DIALOGUE_BIRDIE_ENTRANCE, () => {
+        this._play(DIALOGUE_BIRDIE_ENTRANCE, () => {
           GameState.setFlag('birdie_done', true);
-          // Birdie shuffles out
           this.tweens.add({
-            targets: birdieG,
-            x: 200,
+            targets: g,
+            x: W + 80,
             duration: 500,
             ease: 'Power2.easeIn',
-            onComplete: () => birdieG.destroy(),
+            onComplete: () => g.destroy(),
           });
-          // Now the door is available
-          const ui = this.scene.get('UIScene');
-          if (ui) ui.setStatus('Use the door to head to the Palace Library.');
+          this.setStatus('Use the door on the right to go to the Library.');
         });
       },
     });
   }
 
-  _drawBirdieFigure(g, offsetX = 0, y = 0) {
-    // Robes (layered, brown/gold)
+  _drawBirdie(g) {
+    // Robes (layered)
     g.fillStyle(0x8b6914, 1);
-    g.fillTriangle(
-      offsetX,     y,
-      offsetX - 28, y + 90,
-      offsetX + 28, y + 90
-    );
+    g.fillTriangle(0, 0, -28, 88, 28, 88);
     g.fillStyle(0x6a4a0a, 1);
-    g.fillTriangle(
-      offsetX,     y + 10,
-      offsetX - 22, y + 90,
-      offsetX + 22, y + 90
-    );
+    g.fillTriangle(0, 10, -22, 88, 22, 88);
     // Head
-    g.fillStyle(0xf0c090, 1);
-    g.fillCircle(offsetX, y - 12, 14);
-    // Hair — feathery wisps
-    g.fillStyle(0x5a3a10, 1);
-    g.fillEllipse(offsetX, y - 22, 32, 18);
-    // "Feather" wisps sticking out
+    g.fillStyle(0xf0c090, 1); g.fillCircle(0, -14, 14);
+    // Hair
+    g.fillStyle(0x5a3a10, 1); g.fillEllipse(0, -22, 32, 18);
+    // Feather wisps
     g.lineStyle(1, 0x8a6020, 1);
-    g.lineBetween(offsetX - 14, y - 22, offsetX - 22, y - 36);
-    g.lineBetween(offsetX, y - 26, offsetX - 4, y - 40);
-    g.lineBetween(offsetX + 14, y - 22, offsetX + 18, y - 36);
+    g.lineBetween(-14, -22, -22, -36);
+    g.lineBetween(0, -26, -4, -40);
+    g.lineBetween(14, -22, 18, -36);
     // Candelabra
-    g.fillStyle(0xaa8830, 1);
-    g.fillRect(offsetX + 22, y + 10, 4, 40);
-    g.fillStyle(0xffdd40, 0.9);
-    g.fillEllipse(offsetX + 24, y + 6, 6, 12);
+    g.fillStyle(0xaa8830, 1); g.fillRect(22, 8, 4, 40);
+    g.fillStyle(0xffdd40, 0.9); g.fillEllipse(24, 4, 6, 12);
   }
 
   _goToLibrary() {
     GameState.save('PalaceLibraryScene');
     this.cameras.main.fadeOut(500, 0, 0, 0);
-    this.time.delayedCall(500, () => {
-      this.scene.stop('UIScene');
-      this.scene.start('PalaceLibraryScene');
-      this.scene.launch('UIScene');
-    });
+    this.time.delayedCall(500, () => this.scene.start('PalaceLibraryScene'));
   }
 
-  // ── Helpers ────────────────────────────────────────────────
+  // ── Helpers ─────────────────────────────────────────────────
+
+  _play(lines, cb = null) {
+    this.dialogue.play(lines, cb);
+  }
+
+  _narrate(text) {
+    this._play([{ speaker: 'narrator', text }]);
+  }
 
   _cantTake(name) {
-    const phrases = [
-      `Taking ${name} would not help the situation.`,
-      `${name.charAt(0).toUpperCase() + name.slice(1)} is not something you can carry.`,
-      `Mackenzie considers taking ${name}, but even she admits this isn't the moment.`,
+    const msgs = [
+      `Taking ${name} would not help here.`,
+      `${name.charAt(0).toUpperCase() + name.slice(1)} is not something to carry.`,
+      `Mackenzie considers it, then decides against it.`,
     ];
-    this._narratorSay(Phaser.Math.RND.pick(phrases));
-  }
-
-  _narratorSay(text) {
-    this.dialogue.play([{ speaker: 'narrator', text }]);
+    this._narrate(Phaser.Math.RND.pick(msgs));
   }
 
   update() {

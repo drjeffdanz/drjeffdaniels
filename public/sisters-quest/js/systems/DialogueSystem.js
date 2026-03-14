@@ -1,257 +1,265 @@
 // ============================================================
 // systems/DialogueSystem.js — Sisters' Quest: The Moonveil Crown
-// Handles dialogue box, portrait, typewriter effect, sequencing
+// Dialogue box, typewriter effect, portrait, reliable click-to-advance
 // ============================================================
 
 class DialogueSystem {
   constructor(scene) {
-    this.scene = scene;
-    this.isActive = false;
-    this.lines = [];
-    this.currentIndex = 0;
+    this.scene      = scene;
+    this.isActive   = false;
+    this.lines      = [];
+    this.lineIndex  = 0;
     this.onComplete = null;
-    this.typewriterTimer = null;
-    this.currentText = '';
+    this.isTyping   = false;
+    this.typeTimer  = null;
+    this.charIndex  = 0;
     this.targetText = '';
-    this.charIndex = 0;
-    this.isTyping = false;
 
-    // UI dimensions
-    this.W = scene.scale.width;
-    this.H = scene.scale.height;
-    this.BOX_HEIGHT = 160;
-    this.BOX_Y = this.H - this.BOX_HEIGHT - 120; // sits above the verb/inventory bar
+    const W = scene.scale.width;
+    const H = scene.scale.height;
+    this.W = W;
+    this.H = H;
+
+    // Dialogue box sits above the verb bar (bottom 120 + status 36 = 156px)
+    // so the box occupies the bottom of the game world area.
+    this.BOX_H = 158;
+    this.BOX_Y = H - 156 - this.BOX_H - 6; // snug above UI strips
+    // For H=600: BOX_Y = 600 - 156 - 158 - 6 = 280
 
     this._buildUI();
     this._setVisible(false);
   }
 
+  // ── Build ────────────────────────────────────────────────────
+
   _buildUI() {
-    const scene = this.scene;
-    const W = this.W;
-    const BOX_Y = this.BOX_Y;
-    const BOX_H = this.BOX_HEIGHT;
+    const { W, H, BOX_Y, BOX_H } = this;
+    const D = 300; // base depth — above all game world objects, below nothing
 
-    // Background panel
-    this.bg = scene.add.graphics();
-    this.bg.fillStyle(0x0a0a0a, 0.92);
-    this.bg.fillRoundedRect(20, BOX_Y, W - 40, BOX_H, 8);
-    this.bg.lineStyle(2, 0xc8956c, 1);
-    this.bg.strokeRoundedRect(20, BOX_Y, W - 40, BOX_H, 8);
-    this.bg.setDepth(100);
+    // Subtle dimmer over the game world above the box
+    this.dimmer = this.scene.add.graphics().setDepth(D);
+    this.dimmer.fillStyle(0x000000, 0.35);
+    this.dimmer.fillRect(0, 0, W, BOX_Y);
 
-    // Portrait box
-    this.portraitBg = scene.add.graphics();
-    this.portraitBg.setDepth(101);
+    // Box background
+    this.boxBg = this.scene.add.graphics().setDepth(D + 1);
+    this.boxBg.fillStyle(0x08060e, 0.96);
+    this.boxBg.fillRoundedRect(16, BOX_Y, W - 32, BOX_H, 6);
+    this.boxBg.lineStyle(1.5, 0xc8956c, 1);
+    this.boxBg.strokeRoundedRect(16, BOX_Y, W - 32, BOX_H, 6);
+
+    // Portrait box (left of text)
+    this.portraitBg = this.scene.add.graphics().setDepth(D + 2);
+
+    // Portrait initial letter
+    this.portraitLetter = this.scene.add.text(80, BOX_Y + BOX_H / 2, '', {
+      fontFamily: 'Georgia, serif', fontSize: '40px', color: '#ffffff',
+      fontStyle: 'bold', alpha: 0.85,
+    }).setOrigin(0.5).setDepth(D + 3);
 
     // Speaker name
-    this.speakerText = scene.add.text(130, BOX_Y + 14, '', {
-      fontFamily: 'Georgia, serif',
-      fontSize: '13px',
-      color: '#c8956c',
-      fontStyle: 'bold',
-    }).setDepth(101);
+    this.speakerTxt = this.scene.add.text(132, BOX_Y + 12, '', {
+      fontFamily: 'Georgia, serif', fontSize: '12px',
+      color: '#c8956c', fontStyle: 'bold',
+    }).setDepth(D + 3);
 
-    // Dialogue text
-    this.dialogueText = scene.add.text(130, BOX_Y + 34, '', {
-      fontFamily: 'Georgia, serif',
-      fontSize: '15px',
-      color: '#e8e0d0',
-      wordWrap: { width: W - 180 },
-      lineSpacing: 4,
-    }).setDepth(101);
+    // Dialogue body text
+    this.bodyTxt = this.scene.add.text(132, BOX_Y + 32, '', {
+      fontFamily: 'Georgia, serif', fontSize: '15px',
+      color: '#e8e0d0', wordWrap: { width: W - 180 }, lineSpacing: 5,
+    }).setDepth(D + 3);
 
-    // "Click to continue" hint
-    this.continueHint = scene.add.text(W - 40, BOX_Y + BOX_H - 18, '▶ click', {
-      fontFamily: 'Georgia, serif',
-      fontSize: '11px',
-      color: '#c8956c',
-      alpha: 0.7,
-    }).setOrigin(1, 0).setDepth(101);
+    // "▶ click" hint
+    this.hintTxt = this.scene.add.text(W - 36, BOX_Y + BOX_H - 18, '▶ click', {
+      fontFamily: 'Georgia, serif', fontSize: '11px', color: '#c8956c',
+    }).setOrigin(1, 0).setDepth(D + 3);
 
-    // Flashing animation on continue hint
-    scene.tweens.add({
-      targets: this.continueHint,
-      alpha: 0.2,
-      duration: 600,
-      yoyo: true,
-      repeat: -1,
+    this.scene.tweens.add({
+      targets: this.hintTxt, alpha: { from: 0.8, to: 0.15 },
+      duration: 700, yoyo: true, repeat: -1,
     });
 
-    // Click anywhere to advance (on the dialogue box area)
-    this.clickZone = scene.add.zone(W / 2, BOX_Y + BOX_H / 2, W - 40, BOX_H)
-      .setInteractive()
-      .setDepth(102);
+    // ── Full-screen click zone ───────────────────────────────
+    // Covers the entire canvas so ANY click advances when dialogue is active.
+    // Depth above everything so it always wins pointer events.
+    this.clickZone = this.scene.add.zone(W / 2, H / 2, W, H)
+      .setDepth(D + 20)
+      .setInteractive();
 
     this.clickZone.on('pointerdown', () => this._advance());
 
-    // Also listen for spacebar
-    this._spaceKey = scene.input.keyboard.addKey(
+    // Keyboard fallback
+    this._spaceKey = this.scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
+    );
+    this._enterKey = this.scene.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ENTER
     );
   }
 
-  _setVisible(visible) {
-    this.bg.setVisible(visible);
-    this.portraitBg.setVisible(visible);
-    this.speakerText.setVisible(visible);
-    this.dialogueText.setVisible(visible);
-    this.continueHint.setVisible(visible);
-    this.clickZone.setVisible(visible);
-    if (visible) {
+  // ── Visibility ───────────────────────────────────────────────
+
+  _setVisible(v) {
+    this.dimmer.setVisible(v);
+    this.boxBg.setVisible(v);
+    this.portraitBg.setVisible(v);
+    this.portraitLetter.setVisible(v);
+    this.speakerTxt.setVisible(v);
+    this.bodyTxt.setVisible(v);
+    this.hintTxt.setVisible(v);
+
+    if (v) {
       this.clickZone.setInteractive();
     } else {
       this.clickZone.disableInteractive();
     }
   }
 
-  _drawPortrait(speaker) {
+  // ── Portrait ─────────────────────────────────────────────────
+
+  _drawPortrait(speakerKey) {
+    const p = PORTRAITS[speakerKey] || PORTRAITS.narrator;
     this.portraitBg.clear();
-    const BOX_Y = this.BOX_Y;
-    const portrait = PORTRAITS[speaker] || PORTRAITS.narrator;
-
-    // Portrait background square
-    this.portraitBg.fillStyle(portrait.color, 1);
-    this.portraitBg.fillRoundedRect(30, BOX_Y + 10, 90, 90, 6);
-    this.portraitBg.lineStyle(2, 0xc8956c, 0.8);
-    this.portraitBg.strokeRoundedRect(30, BOX_Y + 10, 90, 90, 6);
-
-    // Initial letter
-    if (this.portraitLabel) this.portraitLabel.destroy();
-    this.portraitLabel = this.scene.add.text(75, BOX_Y + 55, portrait.label, {
-      fontFamily: 'Georgia, serif',
-      fontSize: '38px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-      alpha: 0.9,
-    }).setOrigin(0.5).setDepth(102);
+    this.portraitBg.fillStyle(p.color, 1);
+    this.portraitBg.fillRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
+    this.portraitBg.lineStyle(1.5, 0xc8956c, 0.7);
+    this.portraitBg.strokeRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
+    this.portraitLetter.setText(p.label);
+    this.speakerTxt.setText(p.name);
   }
 
-  _showLine(line) {
-    const portrait = PORTRAITS[line.speaker] || PORTRAITS.narrator;
+  // ── Typewriter ───────────────────────────────────────────────
 
-    this._drawPortrait(line.speaker);
-    this.speakerText.setText(portrait.name);
-    this.dialogueText.setText('');
-    this.continueHint.setVisible(false);
+  _startTypewriter(text) {
+    this.targetText = text;
+    this.charIndex  = 0;
+    this.isTyping   = true;
+    this.bodyTxt.setText('');
+    this.hintTxt.setVisible(false);
 
-    // Start typewriter
-    this.targetText = line.text;
-    this.charIndex = 0;
-    this.isTyping = true;
+    if (this.typeTimer) { this.typeTimer.remove(false); this.typeTimer = null; }
 
-    if (this.typewriterTimer) {
-      this.typewriterTimer.remove();
-    }
-
-    this.typewriterTimer = this.scene.time.addEvent({
-      delay: 22,
-      callback: this._typeNextChar,
+    this.typeTimer = this.scene.time.addEvent({
+      delay: 20,
+      callback: this._tick,
       callbackScope: this,
       loop: true,
     });
-
-    // Run onShow callback if present (e.g. for giving items)
-    if (line.onShow) {
-      line.onShow();
-    }
   }
 
-  _typeNextChar() {
+  _tick() {
     if (this.charIndex < this.targetText.length) {
       this.charIndex++;
-      this.dialogueText.setText(this.targetText.slice(0, this.charIndex));
+      this.bodyTxt.setText(this.targetText.slice(0, this.charIndex));
     } else {
-      this.isTyping = false;
-      this.typewriterTimer.remove();
-      this.typewriterTimer = null;
-      this.continueHint.setVisible(true);
+      this._finishTyping();
     }
   }
+
+  _finishTyping() {
+    this.isTyping = false;
+    if (this.typeTimer) { this.typeTimer.remove(false); this.typeTimer = null; }
+    this.bodyTxt.setText(this.targetText);
+    this.hintTxt.setVisible(true);
+  }
+
+  // ── Show a single line ───────────────────────────────────────
+
+  _showLine(line) {
+    if (line.onShow) line.onShow();
+    this._drawPortrait(line.speaker || 'narrator');
+    this._startTypewriter(line.text || '');
+  }
+
+  // ── Advance ──────────────────────────────────────────────────
 
   _advance() {
     if (!this.isActive) return;
 
-    // If still typing, skip to end of current line
     if (this.isTyping) {
-      if (this.typewriterTimer) {
-        this.typewriterTimer.remove();
-        this.typewriterTimer = null;
-      }
-      this.isTyping = false;
-      this.dialogueText.setText(this.targetText);
-      this.continueHint.setVisible(true);
+      // Skip typewriter — show full line immediately
+      this._finishTyping();
       return;
     }
 
-    // Advance to next line
-    this.currentIndex++;
-    if (this.currentIndex < this.lines.length) {
-      this._showLine(this.lines[this.currentIndex]);
+    this.lineIndex++;
+    if (this.lineIndex < this.lines.length) {
+      this._showLine(this.lines[this.lineIndex]);
     } else {
       this._close();
     }
   }
 
+  // ── Close ────────────────────────────────────────────────────
+
   _close() {
     this.isActive = false;
     this._setVisible(false);
-    if (this.portraitLabel) {
-      this.portraitLabel.destroy();
-      this.portraitLabel = null;
-    }
-    if (this.typewriterTimer) {
-      this.typewriterTimer.remove();
-      this.typewriterTimer = null;
-    }
 
-    // Re-enable scene interaction
+    if (this.typeTimer) { this.typeTimer.remove(false); this.typeTimer = null; }
+
+    // Notify scene — scene re-enables hotspots and UI
     this.scene.events.emit('sq_dialogue_end');
 
+    // Fire completion callback AFTER scene has processed sq_dialogue_end
     if (this.onComplete) {
       const cb = this.onComplete;
       this.onComplete = null;
-      cb();
+      // Small delay to let sq_dialogue_end handlers run first
+      this.scene.time.delayedCall(50, cb);
     }
   }
 
-  // ── Public API ─────────────────────────────────────────────
+  // ── Public API ───────────────────────────────────────────────
 
+  /**
+   * Play a sequence of dialogue lines.
+   * @param {Array}    lines       Array of { speaker, text, onShow? }
+   * @param {Function} onComplete  Called after the last line is dismissed
+   */
   play(lines, onComplete = null) {
+    // Guard: never start if already playing
+    if (this.isActive) return;
+
     if (!lines || lines.length === 0) {
       if (onComplete) onComplete();
       return;
     }
 
-    this.lines = lines;
-    this.currentIndex = 0;
+    this.lines      = lines;
+    this.lineIndex  = 0;
     this.onComplete = onComplete;
-    this.isActive = true;
+    this.isActive   = true;
 
     this._setVisible(true);
     this._showLine(this.lines[0]);
 
-    // Notify scene that dialogue is running (disable hotspot clicks)
+    // Tell scene to disable hotspots and verb bar
     this.scene.events.emit('sq_dialogue_start');
   }
 
+  // ── update() — call from scene's update() ───────────────────
+
   update() {
     if (!this.isActive) return;
-    if (Phaser.Input.Keyboard.JustDown(this._spaceKey)) {
+    if (Phaser.Input.Keyboard.JustDown(this._spaceKey) ||
+        Phaser.Input.Keyboard.JustDown(this._enterKey)) {
       this._advance();
     }
   }
 
   destroy() {
     this._setVisible(false);
-    this.bg.destroy();
+    this.dimmer.destroy();
+    this.boxBg.destroy();
     this.portraitBg.destroy();
-    this.speakerText.destroy();
-    this.dialogueText.destroy();
-    this.continueHint.destroy();
+    this.portraitLetter.destroy();
+    this.speakerTxt.destroy();
+    this.bodyTxt.destroy();
+    this.hintTxt.destroy();
     this.clickZone.destroy();
-    if (this.portraitLabel) this.portraitLabel.destroy();
-    if (this.typewriterTimer) this.typewriterTimer.remove();
+    if (this.typeTimer) this.typeTimer.remove(false);
     if (this._spaceKey) this._spaceKey.destroy();
+    if (this._enterKey) this._enterKey.destroy();
   }
 }

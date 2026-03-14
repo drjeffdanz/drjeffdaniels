@@ -196,7 +196,6 @@ class MenuScene extends Phaser.Scene {
   _startNewGame() {
     GameState.reset();
     this.scene.start('QueensChamberScene');
-    this.scene.launch('UIScene');
   }
 
   _continueGame() {
@@ -204,7 +203,6 @@ class MenuScene extends Phaser.Scene {
     if (save) {
       const sceneName = save.scene || 'QueensChamberScene';
       this.scene.start(sceneName);
-      this.scene.launch('UIScene');
     } else {
       this._startNewGame();
     }
