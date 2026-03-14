@@ -24,29 +24,24 @@ class WayneShackScene extends BaseScene {
     }).setOrigin(0.5).setDepth(10);
 
     // ── World ─────────────────────────────────────────────────
-    const _dbg = (n, fn) => { try { console.log('[WSS] start ' + n); fn(); console.log('[WSS] done  ' + n); } catch(e) { console.error('[WSS] CRASH in ' + n + ': ' + e.message); throw e; } };
-    _dbg('sky',       () => this._drawSky(W, WH));
-    _dbg('ocean',     () => this._drawOcean(W, WH));
-    _dbg('beach',     () => this._drawBeach(W, WH));
-    _dbg('shack',     () => this._drawShack(W, WH));
-    _dbg('surfboards',() => this._drawSurfboards(W, WH));
-    _dbg('firepit',   () => this._drawFirePit(W, WH));
-    _dbg('dock',      () => this._drawDockAndBoat(W, WH));
-    _dbg('wayne',     () => this._drawWayne(W, WH));
-    _dbg('jennibelle',() => this._drawJennibelle(W, WH));
-    _dbg('arrow',     () => this._drawReturnArrow(W, WH));
+    this._drawSky(W, WH);
+    this._drawOcean(W, WH);
+    this._drawBeach(W, WH);
+    this._drawShack(W, WH);
+    this._drawSurfboards(W, WH);
+    this._drawFirePit(W, WH);
+    this._drawDockAndBoat(W, WH);
+    this._drawWayne(W, WH);
+    this._drawJennibelle(W, WH);
+    this._drawReturnArrow(W, WH);
 
     // ── Ocean wave animation ───────────────────────────────────
-    console.log('[WSS] waves start');
     this._waveOffset = 0;
     this._waveGraphics = this.add.graphics().setDepth(3);
     this._drawWaveLayer(W, WH);
-    console.log('[WSS] waves done');
 
     // ── Dialogue ──────────────────────────────────────────────
-    console.log('[WSS] dialogue start');
     this.dialogue = new DialogueSystem(this);
-    console.log('[WSS] dialogue done');
     this._locked   = false;
     this._hotspots = [];
 
@@ -63,14 +58,10 @@ class WayneShackScene extends BaseScene {
     });
 
     // ── Hotspots ──────────────────────────────────────────────
-    console.log('[WSS] hotspots start');
     this._buildHotspots(W, WH);
-    console.log('[WSS] hotspots done');
 
     // ── Shared UI — always last ───────────────────────────────
-    console.log('[WSS] initUI start');
     this._initUI();
-    console.log('[WSS] initUI done — create() complete');
 
     // ── Show Jennibelle if already appeared ───────────────────
     this._refreshJennibelle();
