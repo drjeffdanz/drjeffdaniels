@@ -226,15 +226,14 @@ class WayneShackScene extends BaseScene {
     for (let py = sY + 14; py < sY + sH; py += 18) {
       g.lineBetween(sX, py, sX + sW, py);
     }
-    // Board vertical seams (staggered)
+    // Board vertical seams (staggered — two offset rows)
     g.lineStyle(0.5, 0x2e2010, 0.5);
-    let seam = sX + 22;
-    let row  = 0;
-    while (seam < sX + sW) {
-      const startY = sY + (row % 2 === 0 ? 0 : 9);
-      g.lineBetween(seam, startY, seam, sY + sH);
-      seam += 22;
-      if (seam >= sX + sW - 8) { seam = sX + 11 + (row % 2) * 11; row++; }
+    for (let r = 0; r < 2; r++) {
+      const startSeam = sX + 11 + r * 11;
+      const startY    = sY + (r === 0 ? 0 : 9);
+      for (let s = startSeam; s < sX + sW; s += 22) {
+        g.lineBetween(s, startY, s, sY + sH);
+      }
     }
 
     // Wall outline
