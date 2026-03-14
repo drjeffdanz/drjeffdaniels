@@ -87,8 +87,8 @@
 
   <div id="game-container"></div>
 
-  <!-- ── Phaser 3 (CDN) ──────────────────────────────────── -->
-  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <!-- ── Phaser 3 (vendored locally for offline/itch.io play) ── -->
+  <script src="js/phaser.min.js"></script>
 
   <!-- ── Load order: data → state → systems → scenes → config ── -->
 
@@ -202,10 +202,12 @@
       render: {
         antialias: true,
         pixelArt: false,
+        preserveDrawingBuffer: true,
       },
     };
 
     const game = new Phaser.Game(config);
+    window.__phaserGame = game;  // expose for dev/testing
 
     // Resize handler
     window.addEventListener('resize', () => {
