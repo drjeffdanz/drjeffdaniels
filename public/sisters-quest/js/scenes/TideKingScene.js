@@ -231,6 +231,18 @@ class TideKingScene extends BaseScene {
     g.lineBetween(W * 0.46, WH * 0.54, W * 0.49, ledgeY);
   }
 
+  // ── Star-polygon helper (Phaser has no fillStar) ──────────
+
+  _starPoints(cx, cy, n, innerR, outerR, rot) {
+    const pts = [], step = Math.PI / n;
+    for (let i = 0; i < n * 2; i++) {
+      const r = i % 2 === 0 ? outerR : innerR;
+      const a = i * step + rot - Math.PI / 2;
+      pts.push({ x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r });
+    }
+    return pts;
+  }
+
   // ── Tide Pools ────────────────────────────────────────────
 
   _drawTidePools(W, WH) {
@@ -262,7 +274,7 @@ class TideKingScene extends BaseScene {
       g.fillEllipse(p.x + p.w / 2, p.y + p.h / 2, p.w, p.h);
       // Tiny crabs / sea stars (simplified shapes)
       g.fillStyle(0xe08040, 0.7);
-      g.fillStar(p.x + p.w * 0.4, p.y + p.h * 0.55, 5, 3, 6, 0);
+      g.fillPoints(this._starPoints(p.x + p.w * 0.4, p.y + p.h * 0.55, 5, 3, 6, 0), true);
       g.fillStyle(0x4888a0, 0.5);
       g.lineStyle(1, 0x3a7090, 0.4);
       g.strokeEllipse(p.x + p.w / 2, p.y + p.h / 2, p.w, p.h);
@@ -319,9 +331,9 @@ class TideKingScene extends BaseScene {
     }
     // Glowing center rune (carved star)
     g.fillStyle(0x4888a8, 0.3);
-    g.fillStar(alcCX, this._alcoveY + this._alcoveH * 0.6, 6, 12, 22, 0);
+    g.fillPoints(this._starPoints(alcCX, this._alcoveY + this._alcoveH * 0.6, 6, 12, 22, 0), true);
     g.lineStyle(1.5, 0x6aa8c8, 0.6);
-    g.strokeStar(alcCX, this._alcoveY + this._alcoveH * 0.6, 6, 12, 22, 0);
+    g.strokePoints(this._starPoints(alcCX, this._alcoveY + this._alcoveH * 0.6, 6, 12, 22, 0), true);
 
     // Small candle-like sea glass lights on the shrine ledge
     const candleX = [alcCX - 48, alcCX - 24, alcCX + 24, alcCX + 48];
