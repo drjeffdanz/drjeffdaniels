@@ -37,12 +37,16 @@ class WayneShackScene extends BaseScene {
     _dbg('arrow',     () => this._drawReturnArrow(W, WH));
 
     // ── Ocean wave animation ───────────────────────────────────
+    console.log('[WSS] waves start');
     this._waveOffset = 0;
     this._waveGraphics = this.add.graphics().setDepth(3);
     this._drawWaveLayer(W, WH);
+    console.log('[WSS] waves done');
 
     // ── Dialogue ──────────────────────────────────────────────
+    console.log('[WSS] dialogue start');
     this.dialogue = new DialogueSystem(this);
+    console.log('[WSS] dialogue done');
     this._locked   = false;
     this._hotspots = [];
 
@@ -59,10 +63,14 @@ class WayneShackScene extends BaseScene {
     });
 
     // ── Hotspots ──────────────────────────────────────────────
+    console.log('[WSS] hotspots start');
     this._buildHotspots(W, WH);
+    console.log('[WSS] hotspots done');
 
     // ── Shared UI — always last ───────────────────────────────
+    console.log('[WSS] initUI start');
     this._initUI();
+    console.log('[WSS] initUI done — create() complete');
 
     // ── Show Jennibelle if already appeared ───────────────────
     this._refreshJennibelle();
