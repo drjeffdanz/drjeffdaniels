@@ -247,9 +247,7 @@ class EdwardFarrisScene extends BaseScene {
     this._locked = true;
     GameState.save(scene);
     this.cameras.main.fadeOut(500, 0, 0, 0);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start(scene);
-    });
+    this.time.delayedCall(520, () => this.scene.start(scene));
   }
 
   // ── Helpers ───────────────────────────────────────────────
