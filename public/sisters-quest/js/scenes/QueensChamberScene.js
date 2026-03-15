@@ -22,8 +22,8 @@ class QueensChamberScene extends BaseScene {
     // ── Background image ──────────────────────────────────────
     this.add.image(W / 2, WH / 2, 'bg_queens').setDisplaySize(W, WH).setDepth(0);
 
-    // ── Animated queen mist pulse ─────────────────────────────
-    const hX = W/2 + 28, hY = WH - 175;
+    // ── Animated queen mist pulse — centered over the bed ─────
+    const hX = W * 0.60, hY = WH * 0.50;
     const mistG = this.add.graphics().setDepth(6);
     this.tweens.add({
       targets: mistG, alpha: { from: 0.4, to: 1.0 },
@@ -75,7 +75,7 @@ class QueensChamberScene extends BaseScene {
 
   _addMistParticles(W, H) {
     const WH = H - 156;
-    this.add.particles(W/2+20, WH-115, 'mist_particle', {
+    this.add.particles(W * 0.60, WH * 0.44, 'mist_particle', {
       x: { min: -78, max: 78 },
       y: { min: -18, max: 18 },
       alpha: { start: 0.16, end: 0 },
@@ -96,7 +96,7 @@ class QueensChamberScene extends BaseScene {
     const defs = [
       {
         id: 'queen', name: 'Queen Elara',
-        x: W/2+20, y: WH-158, w: 145, h: 82,
+        x: W*0.60, y: WH*0.52, w: 180, h: 100,
         look: () => this._queenLook(),
         talk: () => this._play(DIALOGUE_QUEEN_TALK),
         take: () => this._cantTake('Her Majesty'),
@@ -104,7 +104,7 @@ class QueensChamberScene extends BaseScene {
       },
       {
         id: 'tapestry', name: 'Tapestry of Elderwyn',
-        x: W/2, y: 108, w: 168, h: 128,
+        x: W*0.62, y: WH*0.18, w: 168, h: 120,
         look: () => this._tapestryLook(),
         talk: () => this._narrate("The tapestry doesn't respond. Tapestries rarely do."),
         take: () => this._cantTake('the tapestry'),
@@ -112,7 +112,7 @@ class QueensChamberScene extends BaseScene {
       },
       {
         id: 'tea', name: 'Teacup',
-        x: W/2+138, y: WH-142, w: 50, h: 36,
+        x: W*0.86, y: WH*0.62, w: 60, h: 42,
         look: () => this._play(DIALOGUE_TEA),
         talk: () => this._narrate("The teacup has nothing useful to say."),
         take: () => this._cantTake('the teacup'),
@@ -124,7 +124,7 @@ class QueensChamberScene extends BaseScene {
       },
       {
         id: 'letter', name: "The Queen's Letter",
-        x: W/2+151, y: WH-102, w: 54, h: 40,
+        x: W*0.88, y: WH*0.70, w: 60, h: 44,
         look: () => this._play(DIALOGUE_LETTER_LOOK),
         talk: () => this._narrate("The sealed letter waits in silence."),
         take: () => this._letterTake(),
@@ -132,7 +132,7 @@ class QueensChamberScene extends BaseScene {
       },
       {
         id: 'book', name: 'Book of Ballads',
-        x: W/2+138, y: WH-76, w: 44, h: 20,
+        x: W*0.84, y: WH*0.78, w: 54, h: 28,
         look: () => this._play(DIALOGUE_BOOK_LOOK),
         talk: () => this._narrate("It's a book. It does not answer."),
         take: () => this._bookTake(),
@@ -256,32 +256,10 @@ class QueensChamberScene extends BaseScene {
   // ── Birdie cutscene ─────────────────────────────────────────
 
   _birdieCutscene() {
-    const W = this.scale.width;
-    const H = this.scale.height;
-    const WH = H - 156;
-
-    const targetX = W * 0.14; // where she ends up (left area)
-    const birdieImg = this.add.image(W + 80, WH * 0.88, 'sprite_birdie')
-      .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(2);
-
-    this.tweens.add({
-      targets: birdieImg,
-      x: targetX,
-      duration: 650,
-      ease: 'Power2.easeOut',
-      onComplete: () => {
-        this._play(DIALOGUE_BIRDIE_ENTRANCE, () => {
-          GameState.setFlag('birdie_done', true);
-          this.tweens.add({
-            targets: birdieImg,
-            x: W + 80,
-            duration: 500,
-            ease: 'Power2.easeIn',
-            onComplete: () => birdieImg.destroy(),
-          });
-          this.setStatus('Use the door on the right to go to the Library.');
-        });
-      },
+    // Birdie is already present in the background — play dialogue directly
+    this._play(DIALOGUE_BIRDIE_ENTRANCE, () => {
+      GameState.setFlag('birdie_done', true);
+      this.setStatus('Use the door on the right to go to the Library.');
     });
   }
 

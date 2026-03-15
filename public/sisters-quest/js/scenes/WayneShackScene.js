@@ -7,7 +7,7 @@
 class WayneShackScene extends BaseScene {
   constructor() { super({ key: 'WayneShackScene' }); }
 
-  preload() { this.load.image('bg_wayne', 'assets/backgrounds/wayne-shack.jpg'); }
+  preload() { this.load.image('bg_wayne', 'assets/backgrounds/wayne-shack-.png'); }
 
   create() {
     MusicManager.play(this, 'music_beach');
@@ -33,23 +33,9 @@ class WayneShackScene extends BaseScene {
     this._initChairCoords(W, WH);
     this._drawFirePit(W, WH);
 
-    // Wayne portrait — left side of scene
-    // Warm glow backlight (draws the eye)
-    this.add.graphics().setDepth(0).fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.26, WH * 0.88 - 130, 110, 260);
-    // Ground shadow
-    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.26, WH * 0.88, 80, 20);
-    this.add.image(W * 0.26, WH * 0.88, 'sprite_wayne')
-      .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(1);
-    this._wayneX = W * 0.26 + 21;
-    this._wayneY = this._chairY - 10;
-
-    // Jennibelle portrait — right side of scene (hidden until flag set)
-    this._jennibelleGlow = this.add.graphics().setDepth(0);
-    this._jennibelleGlow.fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.72, WH * 0.88 - 130, 110, 260);
-    this._jennibelleGlow.setVisible(false);
-    this._jennibelleImg = this.add.image(W * 0.72, WH * 0.88, 'sprite_jennibelle')
-      .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(1)
-      .setVisible(false);
+    // Character coordinates — Wayne and Jennibelle are in the background image
+    this._wayneX = W * 0.39;
+    this._wayneY = WH * 0.48;
 
     this._drawReturnArrow(W, WH);
 
@@ -96,19 +82,19 @@ class WayneShackScene extends BaseScene {
     // Surfboard hotspot bounds
     this._surfboardsBounds = { x: sX, y: WH * 0.37, w: sX + sW * 0.14 + 30, h: WH * 0.30 };
 
-    // Boat / dock coords (used by hotspots)
-    const dX = W * 0.72, dY = WH * 0.62, dW = W * 0.24, dH = WH * 0.10;
+    // Boat / dock coords — pier visible in background center-right
+    const dX = W * 0.58, dY = WH * 0.32, dW = W * 0.22, dH = WH * 0.14;
     const bX = dX + 14;
     this._boatX = bX + (dW - 28) / 2;
-    this._boatY = dY + dH - 6 + 20;   // approximate mid-hull
+    this._boatY = dY + dH / 2;
     this._dockX = dX;
-    this._dockY = WH * 0.62;
+    this._dockY = dY;
     this._dockW = dW;
-    this._dockH = dH + 40;
+    this._dockH = dH + 20;
 
-    // Jennibelle coords
-    this._jennibelleX = W * 0.72;
-    this._jennibelleY = WH * 0.60;
+    // Jennibelle coords — right side of background image
+    this._jennibelleX = W * 0.64;
+    this._jennibelleY = WH * 0.43;
   }
 
   // ── Wave animation layer ──────────────────────────────────
@@ -212,14 +198,8 @@ class WayneShackScene extends BaseScene {
   // ── Jennibelle (hidden until flag set) ───────────────────
 
   _refreshJennibelle() {
+    // Jennibelle is in the background image; just control hotspot interactivity
     const appeared = GameState.getFlag('jennibelle_appeared');
-    if (this._jennibelleImg) {
-      this._jennibelleImg.setVisible(appeared);
-    }
-    if (this._jennibelleGlow) {
-      this._jennibelleGlow.setVisible(appeared);
-    }
-    // Update hotspot interactivity
     const jHotspot = this._hotspots.find(h => h.def.id === 'jennibelle');
     if (jHotspot) {
       if (appeared) {
@@ -251,7 +231,7 @@ class WayneShackScene extends BaseScene {
     // ── Wayne ─────────────────────────────────────────────────
     this._addHotspot({
       id: 'wayne', name: 'Wayne Havasu',
-      x: this._wayneX, y: this._wayneY + 30, w: 64, h: 100,
+      x: this._wayneX, y: this._wayneY + 30, w: 75, h: 115,
       look: () => this._narrate("Wayne Havasu watches the ocean with the patience of someone who has made peace with the sea."),
       talk: () => this._talkToWayne(),
       take: () => this._narrate("Wayne Havasu is not available for taking."),
@@ -300,7 +280,7 @@ class WayneShackScene extends BaseScene {
     // ── Surfboards ────────────────────────────────────────────
     this._addHotspot({
       id: 'surfboards', name: 'Surfboards',
-      x: W * 0.04 + 20, y: WH * 0.55, w: 60, h: 90,
+      x: W * 0.21, y: WH * 0.55, w: 60, h: 90,
       look: () => this._narrate("Two surfboards, salt-worn and well-loved. One has a crack repaired with — yes, that's duct tape."),
       talk: () => this._narrate("The boards lean in contemplative silence."),
       take: () => this._narrate("You can't take Wayne's surfboards. They belong to him and the ocean."),
@@ -330,7 +310,7 @@ class WayneShackScene extends BaseScene {
     // ── Jennibelle ────────────────────────────────────────────
     this._addHotspot({
       id: 'jennibelle', name: 'Jennibelle',
-      x: this._jennibelleX + 4, y: this._jennibelleY + 38, w: 50, h: 88,
+      x: this._jennibelleX + 4, y: this._jennibelleY + 38, w: 70, h: 115,
       look: () => this._narrate("Jennibelle has the energy of someone who learned to surf before she learned to worry. She carries the board with the ease of long practice."),
       talk: () => {
         if (!GameState.getFlag('jennibelle_talked')) {

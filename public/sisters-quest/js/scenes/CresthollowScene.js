@@ -31,14 +31,9 @@ class CresthollowScene extends BaseScene {
     // ── Thornwood gate, notice board, Bram, path arrows ───────
     this._drawThornwoodGate(W, WH);
     this._drawNoticeBoard(W, WH);
-    this._bramX = W * 0.16;
-    this._bramY = WH * 0.58;
-    // Warm glow backlight (draws the eye)
-    this.add.graphics().setDepth(0).fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.16, WH * 0.88 - 130, 110, 260);
-    // Ground shadow
-    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.16, WH * 0.88, 80, 20);
-    this.add.image(W * 0.16, WH * 0.88, 'sprite_bram')
-      .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(1);
+    // Character coordinates — Bram is in the background image
+    this._bramX = W * 0.18;
+    this._bramY = WH * 0.41;
     this._drawPathArrows(W, WH);
 
     // ── Dialogue ──────────────────────────────────────────────
@@ -266,7 +261,7 @@ class CresthollowScene extends BaseScene {
     // ── Bram ─────────────────────────────────────────────────
     this._addHotspot({
       id: 'bram', name: 'Bram (Innkeeper)',
-      x: this._bramX, y: this._bramY + 40, w: 60, h: 100,
+      x: this._bramX, y: this._bramY + 40, w: 75, h: 120,
       look: () => this._narrate("The innkeeper watches the gate with the expression of a man who has given up being surprised."),
       talk: () => this._talkToBram(),
       take: () => this._narrate("You cannot take the innkeeper. He would resist."),

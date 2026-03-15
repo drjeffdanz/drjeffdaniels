@@ -31,14 +31,9 @@ class EdwardFarrisScene extends BaseScene {
 
     // ── World ──────────────────────────────────────────────────
     this._initSceneCoords(W, WH);
-    this._farrisX = W * 0.68;
-    this._farrisY = this._deskY - 68;
-    // Warm glow backlight (draws the eye)
-    this.add.graphics().setDepth(0).fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.68, WH * 0.86 - 130, 110, 260);
-    // Ground shadow
-    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.68, WH * 0.86, 80, 20);
-    this.add.image(W * 0.68, WH * 0.86, 'sprite_farris')
-      .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(1);
+    // Character coordinates — Farris is in the background image (center-right, by the window)
+    this._farrisX = W * 0.60;
+    this._farrisY = WH * 0.37;
 
     // ── Stamp animation ────────────────────────────────────────
     this._stampY = 0;
@@ -72,23 +67,23 @@ class EdwardFarrisScene extends BaseScene {
   // ── Scene coordinate initialiser ──────────────────────────
 
   _initSceneCoords(W, WH) {
-    // Filing cabinet bounds (used by hotspots)
+    // Left wall — maps, charts, navigation instruments
     this._leftCabX  = 0;
-    this._leftCabW  = W * 0.22;
+    this._leftCabW  = W * 0.46;
     this._rightCabX = W * 0.84;
     this._rightCabW = W * 0.16;
 
-    // Harbor window bounds
-    this._windowX = W * 0.56;
-    this._windowY = WH * 0.08;
-    this._windowW = W * 0.24;
-    this._windowH = WH * 0.34;
+    // Harbor window bounds — center-right behind Farris
+    this._windowX = W * 0.53;
+    this._windowY = WH * 0.07;
+    this._windowW = W * 0.29;
+    this._windowH = WH * 0.50;
 
-    // Desk bounds (also used by _drawFarris)
-    this._deskX = W * 0.22;
-    this._deskY = WH * 0.48;
-    this._deskW = W * 0.58;
-    this._deskH = WH * 0.26;
+    // Desk bounds — large wooden desk, left-center of room
+    this._deskX = W * 0.03;
+    this._deskY = WH * 0.50;
+    this._deskW = W * 0.52;
+    this._deskH = WH * 0.35;
 
     // Stamp position (used by animated arm in _drawFarris)
     this._stampBaseX = this._deskX + this._deskW * 0.60 + 11;
@@ -108,7 +103,7 @@ class EdwardFarrisScene extends BaseScene {
     // ── Farris at desk ────────────────────────────────────────
     this._addHotspot({
       id: 'farris', name: 'Capt. Edward Farris',
-      x: this._farrisX, y: this._farrisY + 20, w: 72, h: 88,
+      x: this._farrisX, y: this._farrisY + 20, w: 80, h: 115,
       look: () => this._narrate("Capt. Edward Farris is a man who has found meaning in filing systems. Every paper on that desk is exactly where it should be. Probably in triplicate. The Good Ship Peabody is lucky to have him — when he's not here stamping forms."),
       talk: () => this._talkToFarris(),
       take: () => this._narrate("Capt. Farris would not appreciate that."),

@@ -62,9 +62,7 @@ class PalaceLibraryScene extends BaseScene {
       fontFamily:'Georgia, serif', fontSize:'10px', color:'#4a3010', fontStyle:'italic'
     }).setOrigin(0.5).setDepth(4);
 
-    // ── Mackenzie character ───────────────────────────────────
-    this.add.image(W * 0.20, WH - 80, 'sprite_mackenzie')
-      .setDisplaySize(120, 270).setOrigin(0.5, 1).setDepth(1);
+    // Mackenzie is in the background image (right side, near fireplace)
 
     this.add.text(W / 2, 18, "The Palace Library  ·  Palace of Elderwyn", {
       fontFamily: 'Georgia, serif', fontSize: '12px',
@@ -110,7 +108,7 @@ class PalaceLibraryScene extends BaseScene {
     const defs = [
       {
         id: 'book_fibers', name: '"Magical Fibers of the Known World"',
-        x: W*0.20, y: WH*0.35, w: 118, h: 95,
+        x: W*0.18, y: WH*0.32, w: 118, h: 95,
         look: () => this._play([{ speaker:'cambrie', text:"'Magical Fibers of the Known World.' This has everything on moonveil thread. Let me take it." }]),
         talk: () => this._narrate("Books don't talk. In this palace you've stopped assuming."),
         take: () => this._takeBook('magical_fibers', DIALOGUE_FIBERS_FOUND),
@@ -118,7 +116,7 @@ class PalaceLibraryScene extends BaseScene {
       },
       {
         id: 'book_curses', name: '"Curses of the Seventh Kind"',
-        x: W*0.47, y: WH*0.28, w: 118, h: 95,
+        x: W*0.27, y: WH*0.50, w: 118, h: 95,
         look: () => this._play([{ speaker:'cambrie', text:"'Curses of the Seventh Kind.' Grim but necessary reading." }]),
         talk: () => this._narrate("The book on curses looks as grim as expected."),
         take: () => this._takeBook('curses_seventh_kind', DIALOGUE_CURSES_FOUND),
@@ -126,7 +124,7 @@ class PalaceLibraryScene extends BaseScene {
       },
       {
         id: 'book_atlas', name: "The Weaver's Atlas",
-        x: W*0.66, y: WH*0.35, w: 118, h: 95,
+        x: W*0.46, y: WH*0.63, w: 118, h: 95,
         look: () => this._play([{ speaker:'cambrie', text:"The Weaver's Atlas. Maps of magical craftwork. If Vessa has a tower, this will know where." }]),
         talk: () => this._narrate("An atlas. It maps things that were woven, once."),
         take: () => this._takeBook('weavers_atlas', DIALOGUE_ATLAS_FOUND),
@@ -134,7 +132,7 @@ class PalaceLibraryScene extends BaseScene {
       },
       {
         id: 'mackenzie', name: 'Mackenzie',
-        x: W*0.20, y: WH-125, w: 60, h: 85,
+        x: W*0.72, y: WH*0.55, w: 70, h: 105,
         look: () => this._narrate("Your sister paces with the focused energy of someone who has decided action is imminent, plans or not."),
         talk: () => this._play(
           GameState.getFlag('atlas_done') ? [{ speaker:'mackenzie', text:"We have what we need. The door. Now." }]
@@ -145,7 +143,7 @@ class PalaceLibraryScene extends BaseScene {
       },
       {
         id: 'desk', name: 'Reading Desk',
-        x: W/2+100, y: WH-88, w: 230, h: 78,
+        x: W*0.47, y: WH*0.68, w: 220, h: 85,
         look: () => this._narrate("A large desk covered in research notes left by scholars who had the luxury of time. Someone was very interested in enchanted thread."),
         talk: () => this._narrate("The desk keeps its own counsel."),
         take: () => this._cantTake('the desk'),
@@ -162,7 +160,7 @@ class PalaceLibraryScene extends BaseScene {
       },
       {
         id: 'fireplace', name: 'Fireplace',
-        x: W-48, y: WH-130, w: 108, h: 158,
+        x: W*0.88, y: WH*0.62, w: 160, h: 200,
         look: () => this._narrate("The fire crackles warmly. In other circumstances this would be a pleasant room to spend an evening."),
         talk: () => this._narrate("The fire has nothing to add."),
         take: () => this._narrate("You are not going to take the fireplace."),
