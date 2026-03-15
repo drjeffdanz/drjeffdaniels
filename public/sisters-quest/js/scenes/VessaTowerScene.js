@@ -23,10 +23,12 @@ class VessaTowerScene extends BaseScene {
     this._drawMasterLoom(W, H, WH);
 
     // Portrait: Vessa of Elderwyn
+    // Warm glow backlight (draws the eye)
+    this.add.graphics().setDepth(0).fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.22, WH * 0.85 - 130, 110, 260);
     // Ground shadow
-    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.22, WH * 0.85, 70, 18);
+    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.22, WH * 0.85, 80, 20);
     this.add.image(W * 0.22, WH * 0.85, 'sprite_vessa')
-      .setDisplaySize(120, 300).setOrigin(0.5, 1).setDepth(1);
+      .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(1);
 
     this.add.text(W / 2, 18, "Vessa's Tower", {
       fontFamily: 'Georgia, serif', fontSize: '12px',

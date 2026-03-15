@@ -34,16 +34,21 @@ class WayneShackScene extends BaseScene {
     this._drawFirePit(W, WH);
 
     // Wayne portrait — left side of scene
+    // Warm glow backlight (draws the eye)
+    this.add.graphics().setDepth(0).fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.26, WH * 0.88 - 130, 110, 260);
     // Ground shadow
-    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.26, WH * 0.88, 70, 18);
+    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.26, WH * 0.88, 80, 20);
     this.add.image(W * 0.26, WH * 0.88, 'sprite_wayne')
-      .setDisplaySize(120, 300).setOrigin(0.5, 1).setDepth(1);
+      .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(1);
     this._wayneX = W * 0.26 + 21;
     this._wayneY = this._chairY - 10;
 
     // Jennibelle portrait — right side of scene (hidden until flag set)
+    this._jennibelleGlow = this.add.graphics().setDepth(0);
+    this._jennibelleGlow.fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.72, WH * 0.88 - 130, 110, 260);
+    this._jennibelleGlow.setVisible(false);
     this._jennibelleImg = this.add.image(W * 0.72, WH * 0.88, 'sprite_jennibelle')
-      .setDisplaySize(120, 300).setOrigin(0.5, 1).setDepth(1)
+      .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(1)
       .setVisible(false);
 
     this._drawReturnArrow(W, WH);
@@ -210,6 +215,9 @@ class WayneShackScene extends BaseScene {
     const appeared = GameState.getFlag('jennibelle_appeared');
     if (this._jennibelleImg) {
       this._jennibelleImg.setVisible(appeared);
+    }
+    if (this._jennibelleGlow) {
+      this._jennibelleGlow.setVisible(appeared);
     }
     // Update hotspot interactivity
     const jHotspot = this._hotspots.find(h => h.def.id === 'jennibelle');
