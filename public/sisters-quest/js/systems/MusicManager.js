@@ -12,6 +12,20 @@ const MusicManager = (() => {
   const FADE_OUT_MS = 800;
   const FADE_IN_MS  = 1600;
 
+  // Safe wrapper-based fadeout — avoids the Phaser tween bug where tweening a
+  // sound object directly causes "Cannot set properties of null (setting 'volume')"
+  // when the sound is destroyed and any sibling tween still holds a reference.
+  function _fadeOutAndDestroy(scene, sound) {
+    const wrapper = { vol: sound.volume > 0 ? sound.volume : _volume };
+    scene.tweens.add({
+      targets:    wrapper,
+      vol:        0,
+      duration:   FADE_OUT_MS,
+      onUpdate:   () => { try { sound.volume = wrapper.vol; } catch (_) {} },
+      onComplete: () => { try { sound.stop(); sound.destroy(); } catch (_) {} },
+    });
+  }
+
   return {
 
     // ── Play a track (no-op if already playing) ───────────────
@@ -21,14 +35,9 @@ const MusicManager = (() => {
       const prev    = _sound;
       _currentKey   = key;
 
-      // Fade out old track using the incoming scene's tween manager
+      // Fade out old track via wrapper (never tween the sound directly)
       if (prev) {
-        scene.tweens.add({
-          targets:    prev,
-          volume:     0,
-          duration:   FADE_OUT_MS,
-          onComplete: () => { try { prev.stop(); prev.destroy(); } catch (_) {} },
-        });
+        _fadeOutAndDestroy(scene, prev);
       }
 
       // Fade in new track
@@ -47,12 +56,7 @@ const MusicManager = (() => {
       const s   = _sound;
       _sound      = null;
       _currentKey = null;
-      scene.tweens.add({
-        targets:    s,
-        volume:     0,
-        duration:   FADE_OUT_MS,
-        onComplete: () => { try { s.stop(); s.destroy(); } catch (_) {} },
-      });
+      _fadeOutAndDestroy(scene, s);
     },
 
     // ── Adjust master volume (0–1) ────────────────────────────
