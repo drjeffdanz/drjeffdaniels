@@ -22,8 +22,8 @@ class SunkenGardenScene extends BaseScene {
     this._drawMoonveilPlants(W, H, WH);
     this._drawTidalPools(W, H, WH);
     this._dorianAwake = GameState.getFlag('dorian_awake');
-    this.add.image(W * 0.78, WH * 0.65, 'portrait_dorian')
-      .setDisplaySize(180, 180).setOrigin(0.5, 1).setDepth(1);
+    this.add.image(W * 0.78, WH * 0.65, 'sprite_dorian')
+      .setDisplaySize(96, 240).setOrigin(0.5, 1).setDepth(1);
 
     this.add.text(W / 2, 18, 'The Sunken Garden', {
       fontFamily: 'Georgia, serif', fontSize: '12px',

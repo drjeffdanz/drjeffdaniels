@@ -63,8 +63,8 @@ class PalaceLibraryScene extends BaseScene {
     }).setOrigin(0.5).setDepth(4);
 
     // ── Mackenzie character ───────────────────────────────────
-    this.add.image(W * 0.20, WH - 80, 'portrait_mackenzie')
-      .setDisplaySize(160, 160).setOrigin(0.5, 1).setDepth(1);
+    this.add.image(W * 0.20, WH - 80, 'sprite_mackenzie')
+      .setDisplaySize(120, 270).setOrigin(0.5, 1).setDepth(1);
 
     this.add.text(W / 2, 18, "The Palace Library  ·  Palace of Elderwyn", {
       fontFamily: 'Georgia, serif', fontSize: '12px',

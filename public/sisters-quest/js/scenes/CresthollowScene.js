@@ -36,8 +36,8 @@ class CresthollowScene extends BaseScene {
     this._drawNoticeBoard(W, WH);
     this._bramX = W * 0.16;
     this._bramY = WH * 0.58;
-    this.add.image(W * 0.16, WH * 0.68, 'portrait_bram')
-      .setDisplaySize(170, 170).setOrigin(0.5, 1).setDepth(1);
+    this.add.image(W * 0.16, WH * 0.68, 'sprite_bram')
+      .setDisplaySize(96, 240).setOrigin(0.5, 1).setDepth(1);
     this._drawPathArrows(W, WH);
 
     // ── Dialogue ──────────────────────────────────────────────

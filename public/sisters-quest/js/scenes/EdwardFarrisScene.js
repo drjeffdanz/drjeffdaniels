@@ -33,8 +33,8 @@ class EdwardFarrisScene extends BaseScene {
     this._initSceneCoords(W, WH);
     this._farrisX = W * 0.50;
     this._farrisY = this._deskY - 68;
-    this.add.image(W * 0.50, WH * 0.55, 'portrait_farris')
-      .setDisplaySize(160, 160).setOrigin(0.5, 1).setDepth(1);
+    this.add.image(W * 0.50, WH * 0.55, 'sprite_farris')
+      .setDisplaySize(96, 240).setOrigin(0.5, 1).setDepth(1);
 
     // ── Stamp animation ────────────────────────────────────────
     this._stampY = 0;
