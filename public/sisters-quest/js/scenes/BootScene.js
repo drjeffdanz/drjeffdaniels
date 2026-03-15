@@ -70,6 +70,7 @@ class BootScene extends Phaser.Scene {
     this.load.audio('music_town',   'assets/music/town.mp3');
     this.load.audio('music_mystic', 'assets/music/mystic.mp3');
     this.load.audio('music_ending', 'assets/music/ending.mp3');
+    this.load.audio('music_beach',  'assets/music/beach.mp3');
   }
 
   create() {
