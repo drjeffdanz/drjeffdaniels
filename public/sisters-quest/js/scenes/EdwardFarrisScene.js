@@ -67,29 +67,33 @@ class EdwardFarrisScene extends BaseScene {
   // ── Scene coordinate initialiser ──────────────────────────
 
   _initSceneCoords(W, WH) {
-    // Left wall — maps, charts, navigation instruments
+    // Left wall — upper area only: world map, compass, framed charts
+    // Kept to upper half so it does NOT bleed into the desk area below
     this._leftCabX  = 0;
-    this._leftCabW  = W * 0.46;
+    this._leftCabW  = W * 0.40;
+
+    // Right area — telescope, instrument panel
     this._rightCabX = W * 0.84;
     this._rightCabW = W * 0.16;
 
-    // Harbor window bounds — center-right behind Farris
-    this._windowX = W * 0.53;
-    this._windowY = WH * 0.07;
-    this._windowW = W * 0.29;
-    this._windowH = WH * 0.50;
+    // Harbor window — right-side glass pane only, clear of Farris
+    // Farris occupies ~x=50-70%; the visible glass is to his right ~x=64-82%
+    this._windowX = W * 0.64;
+    this._windowY = WH * 0.06;
+    this._windowW = W * 0.18;
+    this._windowH = WH * 0.46;
 
-    // Desk bounds — large wooden desk, left-center of room
+    // Desk bounds — large wooden desk, occupies left-center foreground
     this._deskX = W * 0.03;
     this._deskY = WH * 0.50;
     this._deskW = W * 0.52;
     this._deskH = WH * 0.35;
 
-    // Stamp position (used by animated arm in _drawFarris)
+    // Stamp position
     this._stampBaseX = this._deskX + this._deskW * 0.60 + 11;
     this._stampBaseY = this._deskY - 18;
 
-    // Door bounds
+    // Door bounds — right edge
     const dX = W - 68, dW = 54, dH = WH * 0.40;
     this._doorX = dX;
     this._doorY = WH * 0.42;
@@ -100,38 +104,33 @@ class EdwardFarrisScene extends BaseScene {
   // ── Hotspots ──────────────────────────────────────────────
 
   _buildHotspots(W, WH) {
-    // ── Farris at desk ────────────────────────────────────────
-    this._addHotspot({
-      id: 'farris', name: 'Capt. Edward Farris',
-      x: this._farrisX, y: this._farrisY + 20, w: 80, h: 115,
-      look: () => this._narrate("Capt. Edward Farris is a man who has found meaning in filing systems. Every paper on that desk is exactly where it should be. Probably in triplicate. The Good Ship Peabody is lucky to have him — when he's not here stamping forms."),
-      talk: () => this._talkToFarris(),
-      take: () => this._narrate("Capt. Farris would not appreciate that."),
-      use:  () => this._narrate("Capt. Farris is a person, not a mechanism. Though he does operate with remarkable precision."),
-    });
+    // NOTE: Phaser input gives priority to the LAST-added zone at equal depth.
+    // Background elements are added first; Farris is added LAST so clicking
+    // anywhere on him always resolves to him, not the window behind him.
 
-    // ── Filing cabinets ───────────────────────────────────────
+    // ── Left wall — maps, charts, navigation instruments ──────
     this._addHotspot({
-      id: 'cabinets_left', name: 'Filing Cabinets',
-      x: this._leftCabX + this._leftCabW / 2, y: WH * 0.36,
-      w: this._leftCabW, h: WH * 0.72,
+      id: 'cabinets_left', name: 'Navigation Charts',
+      x: this._leftCabX + this._leftCabW / 2, y: WH * 0.25,
+      w: this._leftCabW, h: WH * 0.48,
       look: () => this._narrate("Forty years of harbor records. Every ship. Every cargo. Every piece of 'salvage.' Farris knows where every single form lives. This is both impressive and deeply concerning."),
-      talk: () => this._narrate("The cabinets don't answer. Filing cabinets rarely do."),
-      take: () => this._narrate("You can't take the filing cabinets."),
-      use:  () => this._narrate("You need Farris to find the right file — he knows this system. Any other approach would take weeks."),
+      talk: () => this._narrate("The charts don't answer. Charts rarely do."),
+      take: () => this._narrate("You can't take the navigation charts."),
+      use:  () => this._narrate("You need Farris to find the right record — he knows this system. Any other approach would take weeks."),
     });
 
+    // ── Right area — telescope, instruments ───────────────────
     this._addHotspot({
-      id: 'cabinets_right', name: 'Filing Cabinets',
-      x: this._rightCabX + this._rightCabW / 2, y: WH * 0.36,
-      w: this._rightCabW, h: WH * 0.72,
-      look: () => this._narrate("The right-side cabinets appear to be organized by year, decade, and 'miscellaneous incidents.' The miscellaneous section is suspiciously thick."),
-      talk: () => this._narrate("The filing system continues to not respond."),
-      take: () => this._narrate("These cabinets are the property of the Harbor Authority."),
+      id: 'cabinets_right', name: 'Navigation Instruments',
+      x: this._rightCabX + this._rightCabW / 2, y: WH * 0.45,
+      w: this._rightCabW, h: WH * 0.60,
+      look: () => this._narrate("A brass telescope and a cluster of navigation instruments. Everything here is practical and well-maintained. Farris clearly takes his position seriously."),
+      talk: () => this._narrate("The instruments continue to not respond."),
+      take: () => this._narrate("These instruments belong to the Harbor Authority."),
       use:  () => this._narrate("You need Farris to navigate this. He built it. He is probably the only one who can."),
     });
 
-    // ── Harbor window ─────────────────────────────────────────
+    // ── Harbor window — glass pane to the right of Farris ─────
     this._addHotspot({
       id: 'harbor_window', name: 'Harbor Window',
       x: this._windowX + this._windowW / 2, y: this._windowY + this._windowH / 2,
@@ -176,6 +175,16 @@ class EdwardFarrisScene extends BaseScene {
       talk: () => this._narrate("The door says nothing. It just opens and closes."),
       take: () => this._narrate("You are not going to take the door."),
       use:  () => this._goTo('CresthollowScene'),
+    });
+
+    // ── Farris — added LAST so he wins all depth-205 overlaps ─
+    this._addHotspot({
+      id: 'farris', name: 'Capt. Edward Farris',
+      x: this._farrisX, y: this._farrisY + 20, w: 90, h: 130,
+      look: () => this._narrate("Capt. Edward Farris is a man who has found meaning in filing systems. Every paper on that desk is exactly where it should be. Probably in triplicate. The Good Ship Peabody is lucky to have him — when he's not here stamping forms."),
+      talk: () => this._talkToFarris(),
+      take: () => this._narrate("Capt. Farris would not appreciate that."),
+      use:  () => this._narrate("Capt. Farris is a person, not a mechanism. Though he does operate with remarkable precision."),
     });
   }
 

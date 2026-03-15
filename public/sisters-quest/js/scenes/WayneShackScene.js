@@ -34,8 +34,8 @@ class WayneShackScene extends BaseScene {
     this._drawFirePit(W, WH);
 
     // Character coordinates — Wayne and Jennibelle are in the background image
-    this._wayneX = W * 0.39;
-    this._wayneY = WH * 0.48;
+    this._wayneX = W * 0.40;
+    this._wayneY = WH * 0.36;
 
     this._drawReturnArrow(W, WH);
 
@@ -93,8 +93,8 @@ class WayneShackScene extends BaseScene {
     this._dockH = dH + 20;
 
     // Jennibelle coords — right side of background image
-    this._jennibelleX = W * 0.64;
-    this._jennibelleY = WH * 0.43;
+    this._jennibelleX = W * 0.65;
+    this._jennibelleY = WH * 0.38;
   }
 
   // ── Wave animation layer ──────────────────────────────────
@@ -231,7 +231,7 @@ class WayneShackScene extends BaseScene {
     // ── Wayne ─────────────────────────────────────────────────
     this._addHotspot({
       id: 'wayne', name: 'Wayne Havasu',
-      x: this._wayneX, y: this._wayneY + 30, w: 75, h: 115,
+      x: this._wayneX, y: this._wayneY + 22, w: 70, h: 95,
       look: () => this._narrate("Wayne Havasu watches the ocean with the patience of someone who has made peace with the sea."),
       talk: () => this._talkToWayne(),
       take: () => this._narrate("Wayne Havasu is not available for taking."),
@@ -290,7 +290,7 @@ class WayneShackScene extends BaseScene {
     // ── Fish on fire ──────────────────────────────────────────
     this._addHotspot({
       id: 'fire_pit', name: 'Fish on the Fire',
-      x: this._firePitX, y: this._firePitY, w: 62, h: 62,
+      x: this._firePitX, y: WH * 0.76, w: 55, h: 50,
       look: () => this._narrate("Fish, rice, and beans, if the pot nearby is any indication. It smells genuinely good."),
       talk: () => this._narrate("The fish are unavailable for comment."),
       take: () => this._narrate("You are not going to steal fish off Wayne's fire."),
@@ -310,7 +310,7 @@ class WayneShackScene extends BaseScene {
     // ── Jennibelle ────────────────────────────────────────────
     this._addHotspot({
       id: 'jennibelle', name: 'Jennibelle',
-      x: this._jennibelleX + 4, y: this._jennibelleY + 38, w: 70, h: 115,
+      x: this._jennibelleX, y: this._jennibelleY + 30, w: 70, h: 110,
       look: () => this._narrate("Jennibelle has the energy of someone who learned to surf before she learned to worry. She carries the board with the ease of long practice."),
       talk: () => {
         if (!GameState.getFlag('jennibelle_talked')) {
