@@ -19,9 +19,6 @@ class CresthollowScene extends BaseScene {
 
     GameState.setCurrentScene('CresthollowScene');
 
-    // ── Camera ────────────────────────────────────────────────
-    this.cameras.main.fadeIn(500, 0, 0, 0);
-
     // ── Background image ──────────────────────────────────────
     this.add.image(W / 2, WH / 2, 'bg_cresthollow').setDisplaySize(W, WH).setDepth(0);
 
@@ -69,6 +66,9 @@ class CresthollowScene extends BaseScene {
 
     // ── Shared UI — always last ───────────────────────────────
     this._initUI();
+
+    // ── Camera fade-in (after all content is ready) ──────────
+    this.cameras.main.fadeIn(500, 0, 0, 0);
 
     // ── Entry dialogue (first visit only) ────────────────────
     if (!GameState.getFlag('cresthollow_entered')) {

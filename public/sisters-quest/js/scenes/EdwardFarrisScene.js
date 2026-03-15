@@ -21,7 +21,7 @@ class EdwardFarrisScene extends BaseScene {
     this.cameras.main.fadeIn(500, 0, 0, 0);
 
     // ── Scene label ────────────────────────────────────────────
-    this.add.text(W / 2, 18, "Harbor Master's Office  ·  Cresthollow Harbor", {
+    this.add.text(W / 2, 18, "Harbor Master's Office  ·  Good Ship Peabody  ·  Cresthollow", {
       fontFamily: 'Georgia, serif', fontSize: '12px',
       color: '#2a2e38', fontStyle: 'italic',
     }).setOrigin(0.5).setDepth(10);
@@ -31,13 +31,13 @@ class EdwardFarrisScene extends BaseScene {
 
     // ── World ──────────────────────────────────────────────────
     this._initSceneCoords(W, WH);
-    this._farrisX = W * 0.50;
+    this._farrisX = W * 0.40;
     this._farrisY = this._deskY - 68;
     // Warm glow backlight (draws the eye)
-    this.add.graphics().setDepth(0).fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.50, WH * 0.85 - 130, 110, 260);
+    this.add.graphics().setDepth(0).fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.40, WH * 0.80 - 130, 110, 260);
     // Ground shadow
-    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.50, WH * 0.85, 80, 20);
-    this.add.image(W * 0.50, WH * 0.85, 'sprite_farris')
+    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.40, WH * 0.80, 80, 20);
+    this.add.image(W * 0.40, WH * 0.80, 'sprite_farris')
       .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(1);
 
     // ── Stamp animation ────────────────────────────────────────
@@ -107,12 +107,12 @@ class EdwardFarrisScene extends BaseScene {
   _buildHotspots(W, WH) {
     // ── Farris at desk ────────────────────────────────────────
     this._addHotspot({
-      id: 'farris', name: 'Edward Farris',
+      id: 'farris', name: 'Capt. Edward Farris',
       x: this._farrisX, y: this._farrisY + 20, w: 72, h: 88,
-      look: () => this._narrate("Edward Farris is a man who has found meaning in filing systems. Every paper on that desk is exactly where it should be. Probably in triplicate."),
+      look: () => this._narrate("Capt. Edward Farris is a man who has found meaning in filing systems. Every paper on that desk is exactly where it should be. Probably in triplicate. The Good Ship Peabody is lucky to have him — when he's not here stamping forms."),
       talk: () => this._talkToFarris(),
-      take: () => this._narrate("Harbor Master Farris would not appreciate that."),
-      use:  () => this._narrate("Farris is a person, not a mechanism. Though he does operate with remarkable precision."),
+      take: () => this._narrate("Capt. Farris would not appreciate that."),
+      use:  () => this._narrate("Capt. Farris is a person, not a mechanism. Though he does operate with remarkable precision."),
     });
 
     // ── Filing cabinets ───────────────────────────────────────
@@ -167,7 +167,7 @@ class EdwardFarrisScene extends BaseScene {
         if (VerbSystem.activeItem === 'ships_manifest') {
           this._narrate("You already have the manifest. It's right there in your bag.");
         } else {
-          this._narrate("Farris is the one who can pull the right documents. The desk is just where they live.");
+          this._narrate("Capt. Farris is the one who can pull the right documents. The desk is just where they live.");
         }
       },
     });
@@ -245,8 +245,11 @@ class EdwardFarrisScene extends BaseScene {
 
   _goTo(scene) {
     this._locked = true;
+    GameState.save(scene);
     this.cameras.main.fadeOut(500, 0, 0, 0);
-    this.time.delayedCall(500, () => this.scene.start(scene));
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start(scene);
+    });
   }
 
   // ── Helpers ───────────────────────────────────────────────

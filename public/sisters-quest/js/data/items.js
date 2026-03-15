@@ -49,13 +49,13 @@ const ITEMS = {
   ships_manifest: {
     key: 'ships_manifest',
     name: "Ship's Manifest",
-    description: "A harbor manifest from Edward Farris. Lists cargo and passenger records including a seal-skin cloak logged as 'salvage' in the hold of the wrecked Sable Dawn.",
+    description: "A harbor manifest from Capt. Edward Farris of the Good Ship Peabody. Lists cargo and passenger records including a seal-skin cloak logged as 'salvage' in the hold of the wrecked Sable Dawn.",
     color: 0x4a3a28, labelColor: '#f5e8c8', symbol: '📜',
   },
   harbor_pass: {
     key: 'harbor_pass',
     name: "Harbor Pass",
-    description: "A stamped travel pass from the Harbor Master allowing passage on the next boat to the Isle of Tides.",
+    description: "A stamped travel pass from Capt. Farris of the Good Ship Peabody, allowing passage on the next boat to the Isle of Tides.",
     color: 0x2a4a2a, labelColor: '#d4f5d4', symbol: '🎫',
   },
   thorn_sonnet: {

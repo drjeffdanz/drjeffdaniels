@@ -8,7 +8,7 @@
 const PORTRAITS2 = {
   bram:       { color: 0x3a2510, label: 'Br', name: 'BRAM' },
   wayne:      { color: 0x2a5a7a, label: 'W',  name: 'WAYNE HAVASU' },
-  farris:     { color: 0x1a2a1a, label: 'F',  name: 'EDWARD FARRIS' },
+  farris:     { color: 0x1a2a1a, label: 'F',  name: 'CAPT. EDWARD FARRIS' },
   jennibelle: { color: 0xc87040, label: 'J',  name: 'JENNIBELLE' },
   tideking:   { color: 0x0a1a3a, label: 'TK', name: 'TIDE KING OF POOLVILLE' },
   thorn:      { color: 0x3a5a1a, label: 'T',  name: 'THORN' },
@@ -52,7 +52,7 @@ const DIALOGUE_BRAM_REPEAT = [
 
 const DIALOGUE_BRAM_HARBOR = [
   { speaker: 'cambrie', text: "What about the harbor? We'll need to cross to the Isle of Tides eventually." },
-  { speaker: 'bram', text: "Harbor's under quarantine — some kind of sea-creature sighting. Edward Farris has locked the boats. He's the Harbor Master. Reasonable man, mostly. Has opinions about paperwork." },
+  { speaker: 'bram', text: "Harbor's under quarantine — some kind of sea-creature sighting. Capt. Edward Farris has locked the boats. He's the Harbor Master — captains the Good Ship Peabody when he's not stamping forms. Reasonable man, mostly. Has opinions about paperwork." },
   { speaker: 'mackenzie', text: "Of course he does." },
   { speaker: 'bram', text: "There's also Wayne Havasu — lives on the south shore in a shack. Has a boat. Very relaxed man. He might be willing to help if you talk to him right." },
 ];
@@ -119,7 +119,7 @@ const DIALOGUE_WAYNE_FAREWELL = [
 // ── Edward Farris / Harbor ─────────────────────────────────
 
 const DIALOGUE_FARRIS_FIRST = [
-  { speaker: 'narrator', text: "Edward Farris's office is a wall of filing cabinets and the smell of brine. He sits behind a desk the size of a small country, stamping things." },
+  { speaker: 'narrator', text: "Capt. Edward Farris's office is a wall of filing cabinets and the smell of brine. He sits behind a desk the size of a small country, stamping things. A framed commission on the wall reads: Good Ship Peabody, Harbor Master's Office, Cresthollow." },
   { speaker: 'farris', text: "Harbor's closed. Whatever you need, the answer is no." },
   { speaker: 'mackenzie', text: "We need passage to the Isle of Tides." },
   { speaker: 'farris', text: "The answer is still no. Sea creature sighting. Protocol." },
