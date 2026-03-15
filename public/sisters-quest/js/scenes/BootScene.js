@@ -52,6 +52,8 @@ class BootScene extends Phaser.Scene {
     // ── Portrait images ──────────────────────────────────────────
     this.load.image('portrait_mackenzie',  'assets/portraits/mackenzie.jpg');
     this.load.image('portrait_cambrie',    'assets/portraits/cambrie.jpg');
+    this.load.image('sprite_mackenzie',    'assets/portraits/sprite_mackenzie.png');
+    this.load.image('sprite_cambrie',      'assets/portraits/sprite_cambrie.png');
     this.load.image('portrait_birdie',     'assets/portraits/birdie.jpg');
     this.load.image('portrait_queen',      'assets/portraits/queen.jpg');
     this.load.image('portrait_bram',       'assets/portraits/bram.jpg');

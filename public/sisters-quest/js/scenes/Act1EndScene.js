@@ -54,8 +54,12 @@ class Act1EndScene extends Phaser.Scene {
       this.add.circle(sx, sy, Math.random() > 0.8 ? 2 : 1, 0xffffff, Phaser.Math.FloatBetween(0.2, 0.9));
     }
 
-    // Figures (sisters walking away into dawn)
-    this._drawSisters(W / 2 - 14, H * 0.68);
+    // Figures (sisters walking into dawn)
+    const sisterFeetY = H * 0.68 + 44;
+    this.add.image(W / 2 - 32, sisterFeetY, 'sprite_cambrie')
+      .setDisplaySize(44, 78).setOrigin(0.5, 1).setDepth(5);
+    this.add.image(W / 2 - 6, sisterFeetY, 'sprite_mackenzie')
+      .setDisplaySize(50, 89).setOrigin(0.5, 1).setDepth(5);
 
     // ── Decorative border ────────────────────────────────────
     const border = this.add.graphics();
@@ -180,35 +184,6 @@ class Act1EndScene extends Phaser.Scene {
     this.cameras.main.fadeIn(800, 0, 0, 0);
   }
 
-  _drawSisters(x, y) {
-    const g = this.add.graphics().setDepth(5);
-
-    // Cambrie (smaller, copper hair)
-    g.fillStyle(0x7a3a0a, 1);
-    g.fillTriangle(x - 18, y, x - 28, y + 44, x - 8, y + 44);
-    g.fillStyle(0xd09060, 1);
-    g.fillCircle(x - 18, y - 10, 8);
-    g.fillStyle(0x8a4510, 1);
-    g.fillEllipse(x - 18, y - 16, 18, 10);
-
-    // Mackenzie (taller, green cloak)
-    g.fillStyle(0x2d5016, 1);
-    g.fillTriangle(x + 2, y - 10, x - 10, y + 44, x + 14, y + 44);
-    g.fillStyle(0xc8906a, 1);
-    g.fillCircle(x + 2, y - 22, 10);
-    g.fillStyle(0x1a0e08, 1);
-    g.fillEllipse(x + 2, y - 30, 22, 12);
-    // Small braid
-    g.fillRect(x + 8, y - 22, 3, 20);
-
-    // Dawn rim light on both sisters (warm left edge from horizon)
-    g.fillStyle(0xd04820, 0.18);
-    g.fillCircle(x - 18, y - 10, 12);  // Cambrie rim
-    g.fillCircle(x + 2, y - 22, 14);   // Mackenzie rim
-
-    // Walking away — slight lean
-    g.setAngle(-3);
-  }
 
   _makeButton(x, y, label, callback, primary = false) {
     const BW = primary ? 240 : 160;

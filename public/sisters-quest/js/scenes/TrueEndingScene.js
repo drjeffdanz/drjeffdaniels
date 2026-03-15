@@ -75,8 +75,12 @@ class TrueEndingScene extends Phaser.Scene {
 
     const g = this.add.graphics().setDepth(2);
 
-    // Sisters waiting on shore (two small silhouettes, center-left)
-    this._drawSisterSilhouettes(g, W * 0.28, H * 0.80);
+    // Sisters waiting on shore (center-left, silhouetted against the light)
+    const silFeetY = H * 0.80 + 38;
+    this.add.image(W * 0.28 - 20, silFeetY, 'sprite_cambrie')
+      .setDisplaySize(32, 57).setOrigin(0.5, 1).setDepth(3).setTint(0x0d0b09);
+    this.add.image(W * 0.28 + 4, silFeetY, 'sprite_mackenzie')
+      .setDisplaySize(36, 64).setOrigin(0.5, 1).setDepth(3).setTint(0x0d0b09);
 
     // Vessa descending the cliff — glowing white-gold silhouette
     this._drawVessaDescent(g, W * 0.75, H * 0.60);
@@ -112,21 +116,6 @@ class TrueEndingScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(10).setAlpha(0.7);
   }
 
-  _drawSisterSilhouettes(g, x, y) {
-    // Cambrie (smaller)
-    g.fillStyle(0x0a0808, 1);
-    g.fillTriangle(x - 18, y, x - 28, y + 38, x - 8, y + 38);
-    g.fillCircle(x - 18, y - 8, 7);
-    g.fillEllipse(x - 18, y - 14, 16, 8);
-
-    // Mackenzie (taller)
-    g.fillStyle(0x0c0a08, 1);
-    g.fillTriangle(x, y - 8, x - 12, y + 38, x + 12, y + 38);
-    g.fillCircle(x, y - 20, 9);
-    g.fillEllipse(x, y - 28, 20, 10);
-    // Braid
-    g.fillRect(x + 7, y - 20, 3, 18);
-  }
 
   _drawVessaDescent(g, x, y) {
     // Vessa — white-gold glowing silhouette descending from cliff
