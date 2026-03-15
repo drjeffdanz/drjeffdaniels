@@ -13,6 +13,7 @@ class MenuScene extends Phaser.Scene {
   }
 
   create() {
+    MusicManager.play(this, 'music_palace');
     const W = this.scale.width;
     const H = this.scale.height;
 

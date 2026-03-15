@@ -10,6 +10,7 @@ class WayneShackScene extends BaseScene {
   preload() { this.load.image('bg_wayne', 'assets/backgrounds/wayne-shack.jpg'); }
 
   create() {
+    MusicManager.play(this, 'music_town');
     const W  = this.scale.width;
     const H  = this.scale.height;
     const WH = H - 156;

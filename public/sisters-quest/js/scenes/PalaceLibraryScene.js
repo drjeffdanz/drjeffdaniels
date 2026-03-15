@@ -13,6 +13,7 @@ class PalaceLibraryScene extends BaseScene {
   }
 
   create() {
+    MusicManager.play(this, 'music_palace');
     const W = this.scale.width;
     const H = this.scale.height;
     const WH = H - 156;

@@ -26,6 +26,7 @@ class WhisperingCavesScene extends BaseScene {
   preload() { this.load.image('bg_caves', 'assets/backgrounds/whispering-caves.jpg'); }
 
   create() {
+    MusicManager.play(this, 'music_mystic');
     const W  = this.scale.width;
     const H  = this.scale.height;
     const WH = H - 156;

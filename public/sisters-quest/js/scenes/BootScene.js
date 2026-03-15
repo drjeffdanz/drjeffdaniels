@@ -64,6 +64,12 @@ class BootScene extends Phaser.Scene {
     this.load.image('portrait_vessa',      'assets/portraits/vessa.jpg');
     this.load.image('portrait_wayne',      'assets/portraits/wayne.jpg');
     this.load.image('portrait_witch',      'assets/portraits/witch.jpg');
+
+    // ── Music tracks ──────────────────────────────────────────
+    this.load.audio('music_palace', 'assets/music/palace.mp3');
+    this.load.audio('music_town',   'assets/music/town.mp3');
+    this.load.audio('music_mystic', 'assets/music/mystic.mp3');
+    this.load.audio('music_ending', 'assets/music/ending.mp3');
   }
 
   create() {

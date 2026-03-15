@@ -15,6 +15,7 @@ class TrueEndingScene extends Phaser.Scene {
   }
 
   create() {
+    MusicManager.play(this, 'music_ending');
     const W = this.scale.width;
     const H = this.scale.height;
 

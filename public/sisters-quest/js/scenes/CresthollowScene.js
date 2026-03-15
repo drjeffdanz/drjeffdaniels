@@ -12,6 +12,7 @@ class CresthollowScene extends BaseScene {
   }
 
   create() {
+    MusicManager.play(this, 'music_town');
     const W  = this.scale.width;
     const H  = this.scale.height;
     const WH = H - 156;
