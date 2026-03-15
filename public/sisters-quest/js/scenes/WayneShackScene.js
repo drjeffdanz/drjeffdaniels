@@ -33,15 +33,14 @@ class WayneShackScene extends BaseScene {
     this._initChairCoords(W, WH);
     this._drawFirePit(W, WH);
 
-    // Wayne portrait — shifted right of surfboards
-    this.add.image(this._chairX + 80, WH * 0.72, 'portrait_wayne')
+    // Wayne portrait — left side of scene
+    this.add.image(W * 0.26, WH * 0.72, 'portrait_wayne')
       .setDisplaySize(160, 160).setOrigin(0.5, 1).setDepth(1);
-    // Store coords used by hotspot (mirrors former _drawWayne assignments)
-    this._wayneX = this._chairX + 80 + 21;
+    this._wayneX = W * 0.26 + 21;
     this._wayneY = this._chairY - 10;
 
-    // Jennibelle portrait (hidden until flag set)
-    this._jennibelleImg = this.add.image(W * 0.52, WH * 0.72, 'portrait_jennibelle')
+    // Jennibelle portrait — right side of scene (hidden until flag set)
+    this._jennibelleImg = this.add.image(W * 0.72, WH * 0.72, 'portrait_jennibelle')
       .setDisplaySize(155, 155).setOrigin(0.5, 1).setDepth(1)
       .setVisible(false);
 
@@ -84,7 +83,7 @@ class WayneShackScene extends BaseScene {
   _initChairCoords(W, WH) {
     // Chair position (matches where Wayne sits, referenced by _drawWayne and hotspots)
     const sX = W * 0.04, sW = W * 0.30;
-    this._chairX = sX + sW + 22;
+    this._chairX = W * 0.35;   // guitar sits right of Wayne at W*0.26
     this._chairY = WH * 0.65;
 
     // Surfboard hotspot bounds
@@ -101,7 +100,7 @@ class WayneShackScene extends BaseScene {
     this._dockH = dH + 40;
 
     // Jennibelle coords
-    this._jennibelleX = W * 0.52;
+    this._jennibelleX = W * 0.72;
     this._jennibelleY = WH * 0.60;
   }
 
@@ -135,7 +134,7 @@ class WayneShackScene extends BaseScene {
 
   _drawFirePit(W, WH) {
     const g  = this.add.graphics().setDepth(5);
-    const fX = W * 0.38, fY = WH * 0.72;
+    const fX = W * 0.50, fY = WH * 0.72;
 
     // Stone ring
     g.fillStyle(0x484038, 1);
