@@ -69,6 +69,9 @@ class QueensChamberScene extends BaseScene {
     // ── Build shared UI (verb bar + inventory) — ALWAYS LAST ─
     this._initUI();
 
+    // ── Camera fade-in ────────────────────────────────────────
+    this.cameras.main.fadeIn(500, 0, 0, 0);
+
     // Initial status
     this.setStatus('Seven days remain.  ·  Examine the room.');
   }
@@ -137,6 +140,14 @@ class QueensChamberScene extends BaseScene {
         talk: () => this._narrate("It's a book. It does not answer."),
         take: () => this._bookTake(),
         use:  () => this._bookTake(),
+      },
+      {
+        id: 'birdie', name: 'Crafty Birdie',
+        x: W*0.15, y: WH*0.44, w: 65, h: 75,
+        look: () => this._narrate("A small, jewel-bright creature perches on the candelabra stand by the window. She watches you with the calm attention of someone who already knows how this ends."),
+        talk: () => this._talkToBirdie(),
+        take: () => this._narrate("Birdie is not something to be carried. She is something to be listened to."),
+        use:  () => this._talkToBirdie(),
       },
       {
         id: 'door', name: 'Door to Library',
@@ -236,7 +247,7 @@ class QueensChamberScene extends BaseScene {
 
   _doorLook() {
     if (!GameState.getFlag('birdie_done')) {
-      this._narrate("A door to the palace corridor. You're not ready to leave yet.");
+      this._narrate("A door to the palace corridor. But you should speak with Birdie first — she knows things about the crown no one else will tell you.");
     } else {
       this._narrate("The way to the library — and answers.");
     }
@@ -246,10 +257,22 @@ class QueensChamberScene extends BaseScene {
     if (!GameState.getFlag('birdie_done')) {
       this._play([
         { speaker:'mackenzie', text:"We can't leave without knowing what we're up against." },
-        { speaker:'cambrie',   text:"The library. We need the library first." },
+        { speaker:'cambrie',   text:"That creature near the window — Birdie. We should talk to her first." },
       ]);
     } else {
       this._goToLibrary();
+    }
+  }
+
+  // ── Birdie dialogue ──────────────────────────────────────────
+
+  _talkToBirdie() {
+    if (!GameState.getFlag('birdie_done')) {
+      this._birdieCutscene();
+    } else {
+      this._play([
+        { speaker: 'birdie', text: "Still watching. Still waiting. That is generally my role in these things." },
+      ]);
     }
   }
 
