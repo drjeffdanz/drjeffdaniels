@@ -31,8 +31,19 @@ class WayneShackScene extends BaseScene {
     // ── World ─────────────────────────────────────────────────
     this._initChairCoords(W, WH);
     this._drawFirePit(W, WH);
-    this._drawWayne(W, WH);
-    this._drawJennibelle(W, WH);
+
+    // Wayne portrait — shifted right of surfboards
+    this.add.image(this._chairX + 80, WH * 0.72, 'portrait_wayne')
+      .setDisplaySize(160, 160).setOrigin(0.5, 1).setDepth(1);
+    // Store coords used by hotspot (mirrors former _drawWayne assignments)
+    this._wayneX = this._chairX + 80 + 21;
+    this._wayneY = this._chairY - 10;
+
+    // Jennibelle portrait (hidden until flag set)
+    this._jennibelleImg = this.add.image(W * 0.52, WH * 0.72, 'portrait_jennibelle')
+      .setDisplaySize(155, 155).setOrigin(0.5, 1).setDepth(1)
+      .setVisible(false);
+
     this._drawReturnArrow(W, WH);
 
     // ── Ocean wave animation ───────────────────────────────────
@@ -191,144 +202,12 @@ class WayneShackScene extends BaseScene {
     });
   }
 
-  // ── Wayne Havasu ──────────────────────────────────────────
-
-  _drawWayne(W, WH) {
-    const g  = this.add.graphics().setDepth(9);
-    const cX = this._chairX + 21;  // centered in chair
-    const cY = this._chairY - 10;
-
-    // Body — sitting, relaxed posture, slight forward lean
-    // Legs (resting, outstretched) — tanned skin
-    g.fillStyle(0xb88050, 1);
-    g.fillRect(cX - 16, cY + 44, 14, 26);
-    g.fillRect(cX + 2, cY + 44, 14, 26);
-    // Shorts — reddish-orange board shorts
-    g.fillStyle(0xb03820, 1);
-    g.fillRect(cX - 18, cY + 36, 36, 16);
-    // Shorts pattern lines
-    g.lineStyle(1, 0xd05030, 0.5);
-    g.lineBetween(cX - 18, cY + 41, cX + 18, cY + 41);
-    g.lineBetween(cX - 18, cY + 46, cX + 18, cY + 46);
-    // Flip flops — strappy sandals
-    g.fillStyle(0xe0a040, 1);
-    g.fillEllipse(cX - 12, cY + 72, 20, 6);  // left sole
-    g.fillEllipse(cX + 12, cY + 72, 20, 6);  // right sole
-    // Flip flop strap
-    g.lineStyle(1.5, 0xc87020, 1);
-    g.lineBetween(cX - 12, cY + 70, cX - 7, cY + 66);
-    g.lineBetween(cX + 12, cY + 70, cX + 7, cY + 66);
-    // Torso (aloha-style shirt, unbuttoned, relaxed)
-    g.fillStyle(0x285070, 1);
-    g.fillRect(cX - 16, cY + 8, 32, 32);
-    // Shirt open collar / pattern suggestion
-    g.fillStyle(0x4880a0, 0.55);
-    g.fillRect(cX - 6, cY + 8, 12, 32);
-    // Shirt details (flower pattern — minimal)
-    g.fillStyle(0xe07840, 0.4);
-    g.fillCircle(cX - 10, cY + 18, 4);
-    g.fillCircle(cX + 10, cY + 28, 4);
-    // Arms (relaxed on armrests)
-    g.fillStyle(0xb88050, 1);   // weathered tan skin
-    g.fillRect(cX - 24, cY + 20, 8, 22);
-    g.fillRect(cX + 16, cY + 20, 8, 22);
-    g.fillEllipse(cX - 20, cY + 42, 10, 6);  // hands
-    g.fillEllipse(cX + 20, cY + 42, 10, 6);
-    // Head
-    g.fillStyle(0xb88050, 1);
-    g.fillCircle(cX, cY - 8, 17);
-    // Reddish-blond hair (sun-bleached surfer style)
-    g.fillStyle(0xb86028, 1);
-    g.fillEllipse(cX, cY - 22, 34, 18);
-    // Lighter blond highlights
-    g.lineStyle(1.5, 0xe8a850, 0.65);
-    g.lineBetween(cX - 8, cY - 24, cX - 6, cY - 16);
-    g.lineBetween(cX - 2, cY - 26, cX, cY - 18);
-    g.lineBetween(cX + 6, cY - 24, cX + 4, cY - 16);
-    // Reddish tones
-    g.fillStyle(0xd07830, 0.5);
-    g.fillEllipse(cX + 4, cY - 20, 14, 10);
-    // Beard stubble (dark gray)
-    g.fillStyle(0x5a5050, 0.45);
-    g.fillEllipse(cX, cY + 2, 24, 10);
-    // Eyes (half-closed, watching ocean)
-    g.fillStyle(0x101820, 1);
-    g.fillEllipse(cX - 6, cY - 8, 6, 3);
-    g.fillEllipse(cX + 6, cY - 8, 6, 3);
-    // Relaxed smile
-    g.lineStyle(1, 0x8a6040, 0.7);
-    g.arc(cX, cY + 1, 6, 0, Math.PI, false);
-    g.strokePath();
-
-    // Idle sway (ocean breathing)
-    this.tweens.add({
-      targets: g, y: { from: 0, to: -2 },
-      duration: 4000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
-    });
-
-    this._wayneX = cX;
-    this._wayneY = cY;
-  }
-
   // ── Jennibelle (hidden until flag set) ───────────────────
-
-  _drawJennibelle(W, WH) {
-    this._jennibelleGraphic = this.add.graphics().setDepth(9).setVisible(false);
-    const g  = this._jennibelleGraphic;
-    const jX = W * 0.52, jY = WH * 0.60;
-
-    // Carrying surfboard (teal one, under arm)
-    // Surfboard under arm
-    g.fillStyle(0x208080, 1);
-    g.fillEllipse(jX + 44, jY + 12, 14, 8);
-    g.fillRect(jX + 10, jY + 8, 34, 14);
-    g.fillEllipse(jX + 8, jY + 15, 14, 10);
-    g.lineStyle(1, 0x106060, 1);
-    g.strokeRect(jX + 10, jY + 8, 34, 14);
-
-    // Legs
-    g.fillStyle(0x2a3040, 1);
-    g.fillRect(jX - 6, jY + 50, 10, 30);
-    g.fillRect(jX + 6, jY + 50, 10, 30);
-    // Shorts
-    g.fillStyle(0x3848a0, 1);
-    g.fillRect(jX - 8, jY + 42, 22, 12);
-    // Feet
-    g.fillStyle(0xd0a070, 1);
-    g.fillEllipse(jX - 4, jY + 80, 14, 7);
-    g.fillEllipse(jX + 12, jY + 80, 14, 7);
-    // Torso
-    g.fillStyle(0xc83040, 1);  // red rash guard
-    g.fillRect(jX - 10, jY + 10, 26, 36);
-    // Arms
-    g.fillStyle(0xd0a070, 1);
-    g.fillRect(jX + 16, jY + 14, 8, 20);  // arm holding board
-    g.fillRect(jX - 18, jY + 14, 8, 18);  // other arm
-    // Head
-    g.fillStyle(0xd0a070, 1);
-    g.fillCircle(jX + 4, jY - 6, 14);
-    // Hair (dark, short)
-    g.fillStyle(0x1a0e08, 1);
-    g.fillEllipse(jX + 4, jY - 16, 28, 14);
-    g.fillRect(jX - 10, jY - 16, 6, 12);
-    g.fillRect(jX + 14, jY - 16, 6, 12);
-    // Eyes
-    g.fillStyle(0x101010, 1);
-    g.fillCircle(jX + 0, jY - 6, 2);
-    g.fillCircle(jX + 8, jY - 6, 2);
-    // Smile
-    g.lineStyle(1, 0xa06040, 1);
-    g.arc(jX + 4, jY + 0, 4, 0, Math.PI, false);
-    g.strokePath();
-
-    this._jennibelleX = jX;
-    this._jennibelleY = jY;
-  }
 
   _refreshJennibelle() {
     const appeared = GameState.getFlag('jennibelle_appeared');
-    if (this._jennibelleGraphic) {
-      this._jennibelleGraphic.setVisible(appeared);
+    if (this._jennibelleImg) {
+      this._jennibelleImg.setVisible(appeared);
     }
     // Update hotspot interactivity
     const jHotspot = this._hotspots.find(h => h.def.id === 'jennibelle');

@@ -52,15 +52,16 @@ class DialogueSystem {
     this.portraitBg = this.scene.add.graphics().setDepth(D + 2);
 
     // Portrait initial letter
-    this.portraitLetter = this.scene.add.text(80, BOX_Y + BOX_H / 2, '', {
+    this.portraitLetter = this.scene.add.text(60, BOX_Y + 46, '', {
       fontFamily: 'Georgia, serif', fontSize: '40px', color: '#ffffff',
       fontStyle: 'bold', alpha: 0.85,
     }).setOrigin(0.5).setDepth(D + 3);
 
     // Portrait image (shown when a texture exists for the speaker)
-    this.portraitImg = this.scene.add.image(80, BOX_Y + BOX_H / 2, '__placeholder__')
-      .setDisplaySize(96, 96)
-      .setDepth(D + 2)
+    // Center aligned with the 72×72 border: x=60, y=BOX_Y+10+36=BOX_Y+46
+    this.portraitImg = this.scene.add.image(60, BOX_Y + 46, '__placeholder__')
+      .setDisplaySize(52, 52)
+      .setDepth(D + 3)
       .setVisible(false);
 
     // Speaker name
@@ -133,18 +134,18 @@ class DialogueSystem {
 
     if (hasImg) {
       // Show portrait image
-      this.portraitImg.setTexture(imgKey).setVisible(true);
+      this.portraitImg.setTexture(imgKey).setDisplaySize(52, 52).setVisible(true);
       this.portraitLetter.setVisible(false);
       // Still draw the gold border
       this.portraitBg.lineStyle(1.5, 0xc8956c, 0.7);
-      this.portraitBg.strokeRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
+      this.portraitBg.strokeRoundedRect(24, this.BOX_Y + 10, 72, 72, 6);
     } else {
       // Fallback: colored rectangle with initial letter
       this.portraitImg.setVisible(false);
       this.portraitBg.fillStyle(p.color, 1);
-      this.portraitBg.fillRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
+      this.portraitBg.fillRoundedRect(24, this.BOX_Y + 10, 72, 72, 6);
       this.portraitBg.lineStyle(1.5, 0xc8956c, 0.7);
-      this.portraitBg.strokeRoundedRect(24, this.BOX_Y + 10, 96, 96, 6);
+      this.portraitBg.strokeRoundedRect(24, this.BOX_Y + 10, 72, 72, 6);
       this.portraitLetter.setText(p.label).setVisible(true);
     }
     this.speakerTxt.setText(p.name);

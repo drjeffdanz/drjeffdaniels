@@ -30,7 +30,10 @@ class EdwardFarrisScene extends BaseScene {
 
     // ── World ──────────────────────────────────────────────────
     this._initSceneCoords(W, WH);
-    this._drawFarris(W, WH);
+    this._farrisX = W * 0.50;
+    this._farrisY = this._deskY - 68;
+    this.add.image(W * 0.50, WH * 0.55, 'portrait_farris')
+      .setDisplaySize(160, 160).setOrigin(0.5, 1).setDepth(1);
 
     // ── Stamp animation ────────────────────────────────────────
     this._stampY = 0;
@@ -92,104 +95,6 @@ class EdwardFarrisScene extends BaseScene {
     this._doorY = WH * 0.42;
     this._doorW = dW + 12;
     this._doorH = dH + 6;
-  }
-
-  // ── Edward Farris ─────────────────────────────────────────
-
-  _drawFarris(W, WH) {
-    const g  = this.add.graphics().setDepth(9);
-    // Farris sits behind the desk
-    const fX = W * 0.50, fY = this._deskY - 68;
-
-    // Chair back (visible above desk edge)
-    g.fillStyle(0x1e1c18, 1);
-    g.fillRect(fX - 22, fY + 52, 44, 14);
-    g.lineStyle(1, 0x3a3028, 1);
-    g.strokeRect(fX - 22, fY + 52, 44, 14);
-
-    // Torso (dark uniform — naval/bureaucratic)
-    g.fillStyle(0x1e2228, 1);
-    g.fillRect(fX - 18, fY + 12, 36, 44);
-    // Uniform details
-    g.fillStyle(0x2a2e38, 1);
-    g.fillRect(fX - 8, fY + 12, 6, 44);  // lapel
-    g.fillRect(fX + 2, fY + 12, 6, 44);  // lapel
-    // Buttons
-    g.fillStyle(0xc8956c, 0.8);
-    [fY + 18, fY + 28, fY + 38].forEach(by => g.fillCircle(fX, by, 2));
-    // Epaulettes
-    g.fillStyle(0x3a3e48, 1);
-    g.fillRect(fX - 22, fY + 14, 8, 6);
-    g.fillRect(fX + 14, fY + 14, 8, 6);
-    g.fillStyle(0xc8956c, 0.5);
-    g.fillRect(fX - 20, fY + 15, 4, 4);
-    g.fillRect(fX + 16, fY + 15, 4, 4);
-
-    // Arms (bent over desk, perpetually stamping)
-    g.fillStyle(0x1e2228, 1);
-    g.fillRect(fX - 22, fY + 30, 8, 26);  // left arm
-    g.fillRect(fX + 14, fY + 30, 8, 26);  // right arm (stamp hand)
-    // Hands
-    g.fillStyle(0xc09070, 1);
-    g.fillEllipse(fX - 18, fY + 56, 12, 8);
-    g.fillEllipse(fX + 18, fY + 56, 12, 8);
-
-    // Head
-    g.fillStyle(0xc09070, 1);
-    g.fillCircle(fX, fY - 2, 17);
-    // Hair (neatly combed, dark with silver temples)
-    g.fillStyle(0x1e1a14, 1);
-    g.fillEllipse(fX, fY - 14, 34, 16);
-    g.fillStyle(0x9090a0, 0.6);
-    // Silver temples
-    g.fillRect(fX - 17, fY - 10, 5, 10);
-    g.fillRect(fX + 12, fY - 10, 5, 10);
-    // Precise side part
-    g.lineStyle(1, 0x2a2418, 1);
-    g.lineBetween(fX - 4, fY - 18, fX - 4, fY - 8);
-    // Eyes (sharp, focused on work)
-    g.fillStyle(0x201c18, 1);
-    g.fillEllipse(fX - 6, fY - 2, 6, 4);
-    g.fillEllipse(fX + 6, fY - 2, 6, 4);
-    // Small gleam in eye
-    g.fillStyle(0xc8c0b8, 0.7);
-    g.fillCircle(fX - 5, fY - 3, 1);
-    g.fillCircle(fX + 7, fY - 3, 1);
-    // Thin set mouth (concentration)
-    g.lineStyle(1, 0x9a7050, 0.8);
-    g.lineBetween(fX - 6, fY + 7, fX + 6, fY + 7);
-    // Thin mustache (neat)
-    g.lineStyle(1.5, 0x3a3028, 0.9);
-    g.lineBetween(fX - 7, fY + 3, fX - 2, fY + 4);
-    g.lineBetween(fX + 2, fY + 4, fX + 7, fY + 3);
-
-    // Subtle stamp-motion tween (right arm)
-    const armGraphic = this.add.graphics().setDepth(10);
-    this.tweens.add({
-      targets: { arm: 0 },
-      arm: 1,
-      duration: 600,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Quad.easeInOut',
-      onUpdate: (tw, tgt) => {
-        const a = tgt.arm;
-        armGraphic.clear();
-        // Right arm stamps down
-        armGraphic.fillStyle(0x1e2228, 1);
-        armGraphic.fillRect(fX + 14, fY + 30, 8, 26 + a * 8);
-        armGraphic.fillStyle(0xc09070, 1);
-        armGraphic.fillEllipse(fX + 18, fY + 56 + a * 8, 12, 8);
-        // Stamp mark flash at peak
-        if (a > 0.85) {
-          armGraphic.fillStyle(0xc8956c, 0.25);
-          armGraphic.fillRect(this._stampBaseX - 10, this._deskY + 8, 20, 8);
-        }
-      },
-    });
-
-    this._farrisX = fX;
-    this._farrisY = fY;
   }
 
   // ── Hotspots ──────────────────────────────────────────────

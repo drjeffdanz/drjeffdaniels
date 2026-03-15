@@ -33,7 +33,10 @@ class CresthollowScene extends BaseScene {
     // ── Thornwood gate, notice board, Bram, path arrows ───────
     this._drawThornwoodGate(W, WH);
     this._drawNoticeBoard(W, WH);
-    this._drawBram(W, WH);
+    this._bramX = W * 0.16;
+    this._bramY = WH * 0.58;
+    this.add.image(W * 0.16, WH * 0.68, 'portrait_bram')
+      .setDisplaySize(170, 170).setOrigin(0.5, 1).setDepth(1);
     this._drawPathArrows(W, WH);
 
     // ── Dialogue ──────────────────────────────────────────────
@@ -210,57 +213,6 @@ class CresthollowScene extends BaseScene {
     this._noticeBoardY = bY;
     this._noticeBoardW = bW;
     this._noticeBoardH = bH;
-  }
-
-  // ── Bram the Innkeeper ────────────────────────────────────
-
-  _drawBram(W, WH) {
-    const g  = this.add.graphics().setDepth(8);
-    const bx = W * 0.16, by = WH * 0.58;
-
-    // Apron/body (stocky, innkeeper build)
-    g.fillStyle(0x3a3020, 1);
-    g.fillTriangle(bx, by, bx - 22, by + 82, bx + 22, by + 82);
-    // Apron front
-    g.fillStyle(0xc8a870, 0.55);
-    g.fillTriangle(bx, by + 18, bx - 12, by + 82, bx + 12, by + 82);
-    // Legs
-    g.fillStyle(0x2a2218, 1);
-    g.fillRect(bx - 14, by + 82, 12, 22);
-    g.fillRect(bx + 2, by + 82, 12, 22);
-    // Boots
-    g.fillStyle(0x1a1208, 1);
-    g.fillRect(bx - 16, by + 100, 14, 8);
-    g.fillRect(bx + 0, by + 100, 14, 8);
-    // Head
-    g.fillStyle(0xc89070, 1);
-    g.fillCircle(bx, by - 16, 18);
-    // Grey hair
-    g.fillStyle(0x8a8880, 1);
-    g.fillEllipse(bx, by - 28, 36, 18);
-    g.fillRect(bx - 18, by - 28, 4, 16);
-    g.fillRect(bx + 14, by - 28, 4, 16);
-    // Mustache
-    g.fillStyle(0x7a7068, 1);
-    g.fillEllipse(bx - 6, by - 6, 12, 5);
-    g.fillEllipse(bx + 6, by - 6, 12, 5);
-    // Arms (watching the gate with arms crossed)
-    g.fillStyle(0x3a3020, 1);
-    g.fillRect(bx - 22, by + 22, 18, 8);
-    g.fillRect(bx + 4, by + 22, 18, 8);
-    // Hand gestures over crossed arms
-    g.fillStyle(0xc89070, 1);
-    g.fillCircle(bx - 18, by + 26, 5);
-    g.fillCircle(bx + 22, by + 26, 5);
-
-    // Subtle idle sway
-    this.tweens.add({
-      targets: g, y: { from: 0, to: -3 },
-      duration: 3200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
-    });
-
-    this._bramX = bx;
-    this._bramY = by;
   }
 
   // ── Path arrows (exit indicators) ─────────────────────────

@@ -21,7 +21,8 @@ class SunkenGardenScene extends BaseScene {
     this._drawMoonveilPlants(W, H, WH);
     this._drawTidalPools(W, H, WH);
     this._dorianAwake = GameState.getFlag('dorian_awake');
-    this._drawDorian(W, H, WH);
+    this.add.image(W * 0.78, WH * 0.65, 'portrait_dorian')
+      .setDisplaySize(180, 180).setOrigin(0.5, 1).setDepth(1);
 
     this.add.text(W / 2, 18, 'The Sunken Garden', {
       fontFamily: 'Georgia, serif', fontSize: '12px',
@@ -163,100 +164,8 @@ class SunkenGardenScene extends BaseScene {
     });
   }
 
-  _drawDorian(W, H, WH) {
-    // Store reference graphics for potential redraw
-    if (this._dorianGraphics) {
-      this._dorianGraphics.destroy();
-    }
-    const g  = this.add.graphics().setDepth(8);
-    this._dorianGraphics = g;
-
-    const dx = W * 0.78;
-    const dy = WH * 0.40;
-
-    const awake  = GameState.getFlag('dorian_awake');
-    const skin   = awake ? 0xc89070 : 0x8a8878;
-    const hair   = awake ? 0x3a2010 : 0x5a5a50;
-    const cloak  = awake ? 0x2a3a60 : 0x505050;
-    const cloak2 = awake ? 0x1a2a50 : 0x404040;
-
-    // Base/plinth
-    g.fillStyle(0x7a7060, 1);
-    g.fillRect(dx - 22, dy + 96, 44, 18);
-    g.fillRect(dx - 16, dy + 114, 32, 8);
-    g.lineStyle(1, 0x5a5048, 1);
-    g.strokeRect(dx - 22, dy + 96, 44, 18);
-
-    // Cloak / body
-    g.fillStyle(cloak, 1);
-    g.fillTriangle(dx - 22, dy + 96, dx + 22, dy + 96, dx, dy + 30);
-    // Inner cloak detail
-    g.fillStyle(cloak2, 0.5);
-    g.fillTriangle(dx - 8, dy + 96, dx + 8, dy + 96, dx, dy + 50);
-
-    // Left arm reaching slightly outward
-    g.fillStyle(cloak, 1);
-    g.fillTriangle(dx - 22, dy + 50, dx - 10, dy + 90, dx - 40, dy + 80);
-
-    // Neck
-    g.fillStyle(skin, 1);
-    g.fillRect(dx - 5, dy + 22, 10, 14);
-
-    // Head
-    g.fillStyle(skin, 1);
-    g.fillEllipse(dx, dy + 12, 28, 32);
-
-    // Hair
-    g.fillStyle(hair, 1);
-    g.fillEllipse(dx, dy - 4, 30, 16);
-    // Small strands
-    g.fillRect(dx - 8, dy - 2, 4, 18);
-    g.fillRect(dx + 4, dy - 2, 4, 14);
-
-    // Eyes — sorrowful expression
-    g.fillStyle(awake ? 0x3a2810 : 0x6a6858, 1);
-    g.fillEllipse(dx - 6, dy + 10, 5, 4);
-    g.fillEllipse(dx + 6, dy + 10, 5, 4);
-
-    // Furrowed brow lines (slight)
-    g.lineStyle(1, awake ? 0xa07050 : 0x7a7868, 0.6);
-    g.lineBetween(dx - 9, dy + 5, dx - 4, dy + 7);
-    g.lineBetween(dx + 4, dy + 7, dx + 9, dy + 5);
-
-    // Mouth — slightly downturned
-    g.lineStyle(1, awake ? 0x9a6040 : 0x6a6858, 0.8);
-    g.beginPath();
-    g.moveTo(dx - 5, dy + 18);
-    g.lineTo(dx,     dy + 20);
-    g.lineTo(dx + 5, dy + 18);
-    g.strokePath();
-
-    // Stone texture details (only when not awake)
-    if (!awake) {
-      g.lineStyle(1, 0x707060, 0.3);
-      g.lineBetween(dx - 4, dy + 40, dx - 8, dy + 70);
-      g.lineBetween(dx + 6, dy + 35, dx + 10, dy + 65);
-    } else {
-      // If awake: warm golden glow — breaking of the stone curse
-      g.fillStyle(0xffc870, 0.22);
-      g.fillCircle(dx, dy + 50, 70);
-      g.fillStyle(0xffe090, 0.12);
-      g.fillCircle(dx, dy + 50, 100);
-    }
-
-    // Label
-    const label = awake ? 'Prince Dorian' : 'Stone Statue';
-    this.add.text(dx, dy + 136, label, {
-      fontFamily: 'Georgia, serif', fontSize: '9px',
-      color: awake ? '#c89070' : '#8a8878',
-      fontStyle: 'italic',
-    }).setOrigin(0.5).setDepth(9).setAlpha(0.7);
-  }
-
   _redrawDorianAwake(W, H, WH) {
-    // Called after waking Dorian — redraw with warm colors
-    this._drawDorian(W, H, WH);
-    // Small flash effect
+    // Called after waking Dorian — flash effect
     const flash = this.add.graphics().setDepth(50);
     flash.fillStyle(0xfff0d0, 0.6);
     flash.fillRect(0, 0, W, WH);

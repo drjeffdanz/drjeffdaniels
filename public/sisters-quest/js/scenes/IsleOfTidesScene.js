@@ -21,7 +21,10 @@ class IsleOfTidesScene extends BaseScene {
 
     // ── World ─────────────────────────────────────────────────
     this._drawTidePools(W, H, WH);
-    this._drawMira(W, H, WH);
+
+    // Portrait: Selkie Mira
+    this.add.image(W * 0.82, WH * 0.58, 'portrait_mira')
+      .setDisplaySize(160, 160).setOrigin(0.5, 1).setDepth(1);
 
     this.add.text(W / 2, 18, 'The Isle of Tides', {
       fontFamily: 'Georgia, serif', fontSize: '12px',
@@ -120,71 +123,6 @@ class IsleOfTidesScene extends BaseScene {
         shimmerG.fillEllipse(W * 0.48 + Math.sin(t + 1.5) * 8, WH * 0.88, 22, 4);
       },
     });
-  }
-
-  _drawMira(W, H, WH) {
-    const g  = this.add.graphics().setDepth(8);
-    const mx = W * 0.82;
-    const my = WH * 0.48;
-
-    // Sitting figure at cliff edge, facing the sea
-    // Lower body / sitting position
-    g.fillStyle(0x2a3848, 1);
-    g.fillEllipse(mx, my + 30, 50, 20);  // lap/skirt
-
-    // Legs dangling over edge
-    g.fillStyle(0x2a3848, 1);
-    g.fillRect(mx - 14, my + 30, 10, 24);
-    g.fillRect(mx + 4,  my + 30, 10, 24);
-
-    // Torso
-    g.fillStyle(0x384858, 1);
-    g.fillTriangle(mx - 16, my + 30, mx + 16, my + 30, mx, my);
-
-    // Left arm resting on rock
-    g.fillStyle(0x384858, 1);
-    g.fillRect(mx - 28, my + 14, 16, 8);
-
-    // Right arm slightly raised, watching
-    g.fillStyle(0x384858, 1);
-    g.fillRect(mx + 12, my + 8, 14, 8);
-
-    // Neck
-    g.fillStyle(0xb08060, 1);
-    g.fillRect(mx - 4, my - 10, 8, 12);
-
-    // Head
-    g.fillStyle(0xb08060, 1);
-    g.fillEllipse(mx, my - 18, 24, 28);
-
-    // Dark hair — long, wind-moved
-    g.fillStyle(0x1a1410, 1);
-    g.fillEllipse(mx, my - 26, 28, 14);
-    // Hair flowing behind (wind)
-    g.fillStyle(0x1a1410, 0.85);
-    g.fillTriangle(mx - 8, my - 28, mx - 30, my - 10, mx - 12, my);
-    g.fillTriangle(mx - 6, my - 26, mx - 22, my, mx - 4, my + 4);
-
-    // Salt-worn clothing texture lines
-    g.lineStyle(1, 0x4a5868, 0.4);
-    g.lineBetween(mx - 14, my + 10, mx - 8, my + 26);
-    g.lineBetween(mx + 4,  my + 10, mx + 10, my + 26);
-
-    // Expression: sad, watching sea — small dots for eyes (in profile/3/4 view)
-    g.fillStyle(0x2a1a10, 1);
-    g.fillCircle(mx + 4, my - 20, 2);
-
-    // Animate: slight sway (watching the waves)
-    this.tweens.add({
-      targets: g,
-      angle: { from: -1.5, to: 1.5 },
-      duration: 3800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
-    });
-
-    this.add.text(mx, my + 60, 'Selkie Mira', {
-      fontFamily: 'Georgia, serif', fontSize: '9px',
-      color: '#5a8090', fontStyle: 'italic',
-    }).setOrigin(0.5).setDepth(9).setAlpha(0.7);
   }
 
   // ── Hotspots ──────────────────────────────────────────────────

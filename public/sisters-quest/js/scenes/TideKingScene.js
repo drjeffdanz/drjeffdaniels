@@ -36,7 +36,10 @@ class TideKingScene extends BaseScene {
 
     // ── World (drawn back to front) ───────────────────────────
     this._drawTidePools(W, WH);
-    this._drawTideKing(W, WH);
+    this.add.image(W * 0.50, WH * 0.74, 'portrait_tideking')
+      .setDisplaySize(240, 240).setOrigin(0.5, 1).setDepth(15);
+    this._tideKingX = W * 0.50;
+    this._tideKingY = WH * 0.68;
     this._drawReturnArrow(W, WH);
 
     // ── Ripple animation on pools ─────────────────────────────
@@ -134,140 +137,6 @@ class TideKingScene extends BaseScene {
     this._mainPoolY = mainY;
     this._mainPoolW = mainW;
     this._mainPoolH = mainH;
-  }
-
-  // ── The Tide King ─────────────────────────────────────────
-
-  _drawTideKing(W, WH) {
-    const g  = this.add.graphics().setDepth(12);
-    // LARGE — fills most of the main pool area, half-submerged
-    const tkX = W * 0.50, tkY = WH * 0.68;
-
-    // Submerged body (lower half in pool — large blue-green mass)
-    g.fillStyle(0x1a4858, 0.85);
-    g.fillEllipse(tkX, tkY + 12, 130, 50);  // submerged mass
-
-    // Torso (huge, ancient, half-risen from water)
-    // Pattern on skin like rippling water (layered curves)
-    g.fillStyle(0x2a6878, 1);
-    g.fillEllipse(tkX, tkY - 30, 110, 100);  // main torso mass
-    // Water pattern layers on skin
-    g.lineStyle(1.5, 0x3a8090, 0.45);
-    for (let ri = 0; ri < 5; ri++) {
-      const ry = tkY - 70 + ri * 14;
-      g.arc(tkX, ry, 35 + ri * 6, -Math.PI * 0.7, Math.PI * 0.7, false);
-      g.strokePath();
-    }
-
-    // Arms (massive, extending out from torso)
-    // Left arm
-    g.fillStyle(0x287080, 1);
-    g.fillEllipse(tkX - 72, tkY - 10, 60, 28);
-    g.fillEllipse(tkX - 96, tkY - 6, 32, 22);
-    // Right arm (partially raised — a gesture of ancient reception)
-    g.fillEllipse(tkX + 70, tkY - 18, 60, 26);
-    g.fillEllipse(tkX + 92, tkY - 30, 32, 22);
-    // Water-pattern on arms
-    g.lineStyle(1, 0x3a8090, 0.35);
-    g.lineBetween(tkX - 80, tkY - 10, tkX - 55, tkY - 6);
-    g.lineBetween(tkX + 54, tkY - 16, tkX + 80, tkY - 20);
-
-    // Hands / fingers (large, sea-creature textured)
-    g.fillStyle(0x206070, 1);
-    // Left hand (resting on pool edge)
-    g.fillEllipse(tkX - 112, tkY, 30, 18);
-    g.fillStyle(0x206070, 0.8);
-    for (let fi = -2; fi <= 2; fi++) {
-      g.fillEllipse(tkX - 112 + fi * 5, tkY - 9, 8, 16);
-    }
-    // Right hand (slightly raised)
-    g.fillStyle(0x206070, 1);
-    g.fillEllipse(tkX + 110, tkY - 28, 28, 18);
-    for (let fi = -2; fi <= 2; fi++) {
-      g.fillEllipse(tkX + 110 + fi * 5, tkY - 38, 7, 14);
-    }
-
-    // Neck / shoulders
-    g.fillStyle(0x2a6878, 1);
-    g.fillRect(tkX - 18, tkY - 80, 36, 22);
-
-    // Head (large, ancient, dignified — oceanic)
-    g.fillStyle(0x347888, 1);
-    g.fillCircle(tkX, tkY - 100, 46);
-    // Brow ridge (ancient, heavy)
-    g.fillStyle(0x2a6070, 1);
-    g.fillRect(tkX - 40, tkY - 120, 80, 14);
-    g.fillEllipse(tkX, tkY - 122, 88, 18);
-    // Water crown / crest (risen from head)
-    g.fillStyle(0x3090b0, 0.6);
-    g.fillTriangle(tkX - 28, tkY - 140, tkX - 18, tkY - 172, tkX - 8, tkY - 140);
-    g.fillTriangle(tkX - 6, tkY - 140, tkX, tkY - 188, tkX + 6, tkY - 140);
-    g.fillTriangle(tkX + 8, tkY - 140, tkX + 18, tkY - 168, tkX + 28, tkY - 140);
-    g.lineStyle(1, 0x50b8d8, 0.6);
-    g.strokeTriangle(tkX - 28, tkY - 140, tkX - 18, tkY - 172, tkX - 8, tkY - 140);
-    g.strokeTriangle(tkX - 6, tkY - 140, tkX, tkY - 188, tkX + 6, tkY - 140);
-    g.strokeTriangle(tkX + 8, tkY - 140, tkX + 18, tkY - 168, tkX + 28, tkY - 140);
-
-    // Face features
-    // Eyes (ancient, observant, luminous)
-    g.fillStyle(0x80d8e8, 0.9);
-    g.fillEllipse(tkX - 18, tkY - 104, 22, 14);
-    g.fillEllipse(tkX + 18, tkY - 104, 22, 14);
-    g.fillStyle(0x204858, 1);
-    g.fillCircle(tkX - 18, tkY - 104, 6);
-    g.fillCircle(tkX + 18, tkY - 104, 6);
-    // Eye glow
-    g.fillStyle(0x90e8f8, 0.5);
-    g.fillCircle(tkX - 20, tkY - 106, 2);
-    g.fillCircle(tkX + 16, tkY - 106, 2);
-
-    // Nose ridge (subtle)
-    g.lineStyle(1, 0x287080, 0.6);
-    g.lineBetween(tkX - 4, tkY - 98, tkX - 4, tkY - 86);
-    g.lineBetween(tkX + 4, tkY - 98, tkX + 4, tkY - 86);
-
-    // Mouth (set, dignified — not smiling, not frowning. Patient.)
-    g.lineStyle(2, 0x246070, 0.8);
-    g.lineBetween(tkX - 24, tkY - 82, tkX + 24, tkY - 82);
-    // Subtle chin markings (water glyphs)
-    g.lineStyle(1, 0x3a8898, 0.4);
-    g.arc(tkX - 8, tkY - 72, 8, -Math.PI * 0.5, Math.PI * 0.5, false);
-    g.strokePath();
-    g.arc(tkX + 8, tkY - 72, 8, Math.PI * 0.5, -Math.PI * 0.5, false);
-    g.strokePath();
-
-    // Sunset rim-light from the right — warm gold catching his left side
-    g.fillStyle(0xd08028, 0.12);
-    g.fillEllipse(tkX + 40, tkY - 60, 140, 200);
-    // Right-side crown and arm rim-light
-    g.fillStyle(0xf0a030, 0.08);
-    g.fillEllipse(tkX + 60, tkY - 100, 80, 120);
-
-    // Ambient water light glow around the King (his presence illuminates the pool)
-    const glowG = this.add.graphics().setDepth(11);
-    // Wide deep outer halo
-    glowG.fillStyle(0x1878a0, 0.18);
-    glowG.fillEllipse(tkX, tkY - 20, 320, 240);
-    // Mid glow
-    glowG.fillStyle(0x3090b0, 0.20);
-    glowG.fillEllipse(tkX, tkY - 20, 220, 160);
-    // Bright inner pool glow
-    glowG.fillStyle(0x50b8d0, 0.15);
-    glowG.fillEllipse(tkX, tkY + 10, 140, 60);
-
-    // Breathing tween
-    this.tweens.add({
-      targets: g, y: { from: 0, to: -6 },
-      duration: 5000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
-    });
-    // Glow pulse
-    this.tweens.add({
-      targets: glowG, alpha: { from: 0.65, to: 1.0 },
-      duration: 3000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
-    });
-
-    this._tideKingX = tkX;
-    this._tideKingY = tkY;
   }
 
   // ── Return arrow ─────────────────────────────────────────

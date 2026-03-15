@@ -259,14 +259,12 @@ class QueensChamberScene extends BaseScene {
     const H = this.scale.height;
     const WH = H - 156;
 
-    // Draw Birdie at her own local origin, placed off-screen right
-    const g = this.add.graphics().setDepth(20);
     const targetX = W * 0.14; // where she ends up (left area)
-    g.setPosition(W + 60, WH - 225);  // start off-screen right
-    this._drawBirdie(g);               // draw at local (0,0)
+    const birdieImg = this.add.image(W + 80, WH - 75, 'portrait_birdie')
+      .setDisplaySize(130, 130).setOrigin(0.5, 1).setDepth(2);
 
     this.tweens.add({
-      targets: g,
+      targets: birdieImg,
       x: targetX,
       duration: 650,
       ease: 'Power2.easeOut',
@@ -274,36 +272,16 @@ class QueensChamberScene extends BaseScene {
         this._play(DIALOGUE_BIRDIE_ENTRANCE, () => {
           GameState.setFlag('birdie_done', true);
           this.tweens.add({
-            targets: g,
+            targets: birdieImg,
             x: W + 80,
             duration: 500,
             ease: 'Power2.easeIn',
-            onComplete: () => g.destroy(),
+            onComplete: () => birdieImg.destroy(),
           });
           this.setStatus('Use the door on the right to go to the Library.');
         });
       },
     });
-  }
-
-  _drawBirdie(g) {
-    // Robes (layered)
-    g.fillStyle(0x8b6914, 1);
-    g.fillTriangle(0, 0, -28, 88, 28, 88);
-    g.fillStyle(0x6a4a0a, 1);
-    g.fillTriangle(0, 10, -22, 88, 22, 88);
-    // Head
-    g.fillStyle(0xf0c090, 1); g.fillCircle(0, -14, 14);
-    // Hair
-    g.fillStyle(0x5a3a10, 1); g.fillEllipse(0, -22, 32, 18);
-    // Feather wisps
-    g.lineStyle(1, 0x8a6020, 1);
-    g.lineBetween(-14, -22, -22, -36);
-    g.lineBetween(0, -26, -4, -40);
-    g.lineBetween(14, -22, 18, -36);
-    // Candelabra
-    g.fillStyle(0xaa8830, 1); g.fillRect(22, 8, 4, 40);
-    g.fillStyle(0xffdd40, 0.9); g.fillEllipse(24, 4, 6, 12);
   }
 
   _goToLibrary() {

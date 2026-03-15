@@ -22,7 +22,10 @@ class ThornwoodScene extends BaseScene {
 
     // ── Draw world ────────────────────────────────────────────
     this._drawHollow(W, WH);
-    this._drawThorn(W, WH);
+
+    // Portrait: Thorn the Goat
+    this.add.image(W * 0.44, WH * 0.80, 'portrait_thorn')
+      .setDisplaySize(150, 150).setOrigin(0.5, 1).setDepth(1);
 
     // Scene label
     this.add.text(W / 2, 18, 'Edge of the Thornwood', {
@@ -181,94 +184,6 @@ class ThornwoodScene extends BaseScene {
     // Bright tip
     g.fillStyle(0xffffff, 0.30);
     g.fillCircle(x, y - 2, 2);
-  }
-
-  // ── Thorn the Goat ───────────────────────────────────────────
-
-  _drawThorn(W, WH) {
-    const g  = this.add.graphics().setDepth(12);
-    const tx = W * 0.44;
-    const ty = WH * 0.72;
-
-    // Body — small, black, dignified
-    g.fillStyle(0x0c0c0e, 1);
-    g.fillEllipse(tx, ty - 20, 58, 34);
-
-    // Legs — four neat, upright legs
-    g.fillStyle(0x0e0e10, 1);
-    g.fillRect(tx - 18, ty - 6, 7, 30);
-    g.fillRect(tx - 6,  ty - 6, 7, 30);
-    g.fillRect(tx + 6,  ty - 6, 7, 30);
-    g.fillRect(tx + 18, ty - 6, 7, 30);
-    // Hooves
-    g.fillStyle(0x1a1a1c, 1);
-    g.fillEllipse(tx - 14, ty + 24, 9, 5);
-    g.fillEllipse(tx - 2,  ty + 24, 9, 5);
-    g.fillEllipse(tx + 10, ty + 24, 9, 5);
-    g.fillEllipse(tx + 22, ty + 24, 9, 5);
-
-    // Neck
-    g.fillStyle(0x0c0c0e, 1);
-    g.fillEllipse(tx + 22, ty - 32, 18, 26);
-
-    // Head — slightly raised, haughty tilt
-    g.fillStyle(0x0e0e10, 1);
-    g.fillEllipse(tx + 30, ty - 46, 24, 20);
-
-    // Amber eyes — the soul of the operation
-    g.fillStyle(0xd4840a, 1);
-    g.fillCircle(tx + 36, ty - 48, 3.5);
-    g.fillStyle(0x080808, 1);
-    g.fillCircle(tx + 36, ty - 48, 1.5);
-    // Gleam
-    g.fillStyle(0xfff0c0, 0.9);
-    g.fillCircle(tx + 37.5, ty - 49.5, 0.8);
-
-    // Ear
-    g.fillStyle(0x141414, 1);
-    g.fillTriangle(tx + 26, ty - 54, tx + 22, ty - 62, tx + 30, ty - 58);
-
-    // Beard — a small distinguished one
-    g.fillStyle(0x181818, 1);
-    g.fillEllipse(tx + 28, ty - 36, 7, 12);
-
-    // Horns — small, curved
-    g.lineStyle(2.5, 0x5a4820, 1);
-    g.beginPath();
-    g.moveTo(tx + 24, ty - 54);
-    g.lineTo(tx + 18, ty - 64);
-    g.lineTo(tx + 20, ty - 68);
-    g.strokePath();
-    g.beginPath();
-    g.moveTo(tx + 30, ty - 54);
-    g.lineTo(tx + 36, ty - 63);
-    g.lineTo(tx + 38, ty - 67);
-    g.strokePath();
-
-    // Tail flick — small upright curl
-    g.lineStyle(2, 0x0e0e10, 1);
-    g.beginPath();
-    g.moveTo(tx - 26, ty - 24);
-    g.lineTo(tx - 34, ty - 34);
-    g.lineTo(tx - 30, ty - 42);
-    g.strokePath();
-
-    // Thorn's name tag aesthetic — a small bell on a ribbon
-    g.fillStyle(0x906820, 1);
-    g.fillCircle(tx + 22, ty - 26, 4);
-    g.lineStyle(1, 0xc8a030, 1);
-    g.strokeCircle(tx + 22, ty - 26, 4);
-
-    // Subtle idle sway tween
-    this._thornGraphic = g;
-    this.tweens.add({
-      targets: g,
-      x: { from: 0, to: 5 },
-      duration: 2800,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    });
   }
 
   // ── Hotspots ─────────────────────────────────────────────────

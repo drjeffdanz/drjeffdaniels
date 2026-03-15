@@ -62,7 +62,8 @@ class PalaceLibraryScene extends BaseScene {
     }).setOrigin(0.5).setDepth(4);
 
     // ── Mackenzie character ───────────────────────────────────
-    this._drawMackenzie(W, H);
+    this.add.image(W * 0.20, WH - 80, 'portrait_mackenzie')
+      .setDisplaySize(160, 160).setOrigin(0.5, 1).setDepth(1);
 
     this.add.text(W / 2, 18, "The Palace Library  ·  Palace of Elderwyn", {
       fontFamily: 'Georgia, serif', fontSize: '12px',
@@ -99,34 +100,6 @@ class PalaceLibraryScene extends BaseScene {
     });
 
     this._updateStatus();
-  }
-
-  _drawMackenzie(W, H) {
-    const WH = H - 156;
-    const g  = this.add.graphics().setDepth(8);
-    const mx = W * 0.20, my = WH - 168;
-
-    // Green cloak
-    g.fillStyle(0x2d5016, 1);
-    g.fillTriangle(mx, my, mx-24, my+80, mx+24, my+80);
-    // Head
-    g.fillStyle(0xc8906a, 1); g.fillCircle(mx, my-14, 15);
-    // Dark braid
-    g.fillStyle(0x1a0e08, 1);
-    g.fillEllipse(mx, my-22, 30, 16);
-    g.fillRect(mx+10, my-18, 4, 26);
-    // Scar
-    g.lineStyle(1, 0xa06050, 1); g.lineBetween(mx+2, my-4, mx+5, my-1);
-    // Arms
-    g.fillStyle(0x3a6a20, 1);
-    g.fillRect(mx-20, my+18, 16, 8);
-    g.fillRect(mx+4,  my+18, 16, 8);
-
-    // Subtle pacing animation
-    this.tweens.add({
-      targets: g, x: { from: 0, to: 14 },
-      duration: 2400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
-    });
   }
 
   // ── Hotspots ────────────────────────────────────────────────

@@ -20,7 +20,10 @@ class VessaTowerScene extends BaseScene {
 
     // ── World ─────────────────────────────────────────────────
     this._drawMasterLoom(W, H, WH);
-    this._drawVessa(W, H, WH);
+
+    // Portrait: Vessa of Elderwyn
+    this.add.image(W * 0.22, WH * 0.60, 'portrait_vessa')
+      .setDisplaySize(170, 170).setOrigin(0.5, 1).setDepth(1);
 
     this.add.text(W / 2, 18, "Vessa's Tower", {
       fontFamily: 'Georgia, serif', fontSize: '12px',
@@ -78,97 +81,6 @@ class VessaTowerScene extends BaseScene {
         this._masterLoomGlow.lineStyle(1, 0xd4b050, 0.15 * this._masterLoomGlow.alpha);
         this._masterLoomGlow.strokeRect(lx, ly, lw, lh);
       },
-    });
-  }
-
-  _drawVessa(W, H, WH) {
-    const g  = this.add.graphics().setDepth(9);
-    const vx = W * 0.22;
-    const vy = WH * 0.36;
-
-    // Vessa stands/sits slightly left, at the Master Loom's side
-
-    // Robe — long, flowing, dark indigo-gray
-    g.fillStyle(0x1e1a2a, 1);
-    g.fillTriangle(vx - 24, vy + 100, vx + 24, vy + 100, vx, vy + 18);
-
-    // Robe details — subtle fold lines
-    g.lineStyle(1, 0x2e2a3a, 0.5);
-    g.lineBetween(vx - 10, vy + 30, vx - 16, vy + 96);
-    g.lineBetween(vx + 8,  vy + 30, vx + 14, vy + 96);
-
-    // Arms — one at side, one slightly raised (working at loom)
-    g.fillStyle(0x1e1a2a, 1);
-    // Left arm at side (still, dignified)
-    g.fillRect(vx - 30, vy + 22, 10, 34);
-    // Right arm reaching slightly toward loom
-    g.fillRect(vx + 16, vy + 18, 28, 10);
-
-    // Hands — slightly lighter (skin showing)
-    g.fillStyle(0xb09090, 0.8);
-    g.fillEllipse(vx - 26, vy + 56, 10, 8);  // left hand
-    g.fillEllipse(vx + 46, vy + 22, 8, 8);   // right hand
-
-    // Neck
-    g.fillStyle(0xb09090, 1);
-    g.fillRect(vx - 4, vy + 6, 8, 14);
-
-    // Head
-    g.fillStyle(0xb09090, 1);
-    g.fillEllipse(vx, vy - 4, 26, 30);
-
-    // White-silver hair — swept back, dignified
-    g.fillStyle(0xd0d0cc, 1);
-    g.fillEllipse(vx, vy - 14, 30, 16);
-    // Hair pulled back
-    g.fillStyle(0xc8c8c4, 0.9);
-    g.fillTriangle(vx - 12, vy - 14, vx - 4, vy - 2, vx - 22, vy + 8);
-    g.fillTriangle(vx + 12, vy - 14, vx + 4, vy - 2, vx + 22, vy + 8);
-    // Silver bun at back
-    g.fillStyle(0xc8c8c4, 0.8);
-    g.fillCircle(vx, vy - 18, 8);
-    g.lineStyle(1, 0xa8a8a4, 0.6);
-    g.strokeCircle(vx, vy - 18, 8);
-
-    // Face — deeply lined, beautiful
-    // Eyes (slightly downcast, thoughtful)
-    g.fillStyle(0x2a2028, 1);
-    g.fillEllipse(vx - 6, vy - 6, 6, 4);
-    g.fillEllipse(vx + 6, vy - 6, 6, 4);
-    // Brow lines
-    g.lineStyle(1, 0x807878, 0.5);
-    g.lineBetween(vx - 9, vy - 11, vx - 4, vy - 9);
-    g.lineBetween(vx + 4,  vy - 9, vx + 9,  vy - 11);
-    // Laugh lines / life lines
-    g.lineStyle(1, 0x987080, 0.3);
-    g.lineBetween(vx - 12, vy - 6, vx - 10, vy + 2);
-    g.lineBetween(vx + 10, vy - 6, vx + 12, vy + 2);
-    // Mouth — composed, a small closed smile
-    g.lineStyle(1.5, 0x907878, 0.7);
-    g.beginPath();
-    g.moveTo(vx - 5, vy + 4);
-    g.lineTo(vx,     vy + 6);
-    g.lineTo(vx + 5, vy + 4);
-    g.strokePath();
-
-    // Dignity: upright posture line suggestion
-    g.lineStyle(1, 0x3a3048, 0.2);
-    g.lineBetween(vx, vy - 20, vx, vy + 100);
-
-    // Subtle ambient glow around Vessa (she is the center of this story)
-    g.fillStyle(0xd0a030, 0.04);
-    g.fillCircle(vx, vy + 40, 60);
-
-    this.add.text(vx, vy + 116, 'Vessa of Elderwyn', {
-      fontFamily: 'Georgia, serif', fontSize: '9px',
-      color: '#c8a0a0', fontStyle: 'italic',
-    }).setOrigin(0.5).setDepth(10).setAlpha(0.8);
-
-    // Subtle breathing animation
-    this.tweens.add({
-      targets: g,
-      scaleY: { from: 1.0, to: 1.005 },
-      duration: 4000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     });
   }
 
