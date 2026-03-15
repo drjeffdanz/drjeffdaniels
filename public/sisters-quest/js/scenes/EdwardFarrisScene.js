@@ -31,13 +31,13 @@ class EdwardFarrisScene extends BaseScene {
 
     // ── World ──────────────────────────────────────────────────
     this._initSceneCoords(W, WH);
-    this._farrisX = W * 0.40;
+    this._farrisX = W * 0.68;
     this._farrisY = this._deskY - 68;
     // Warm glow backlight (draws the eye)
-    this.add.graphics().setDepth(0).fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.40, WH * 0.80 - 130, 110, 260);
+    this.add.graphics().setDepth(0).fillStyle(0xc8956c, 0.18).fillEllipse(W * 0.68, WH * 0.86 - 130, 110, 260);
     // Ground shadow
-    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.40, WH * 0.80, 80, 20);
-    this.add.image(W * 0.40, WH * 0.80, 'sprite_farris')
+    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.68, WH * 0.86, 80, 20);
+    this.add.image(W * 0.68, WH * 0.86, 'sprite_farris')
       .setDisplaySize(140, 260).setOrigin(0.5, 1).setDepth(1);
 
     // ── Stamp animation ────────────────────────────────────────
