@@ -10,7 +10,7 @@ class EdwardFarrisScene extends BaseScene {
   preload() { this.load.image('bg_harbor', 'assets/backgrounds/harbor-office.jpg'); }
 
   create() {
-    MusicManager.play(this, 'music_town');
+    MusicManager.play(this, 'music_harbor');
     const W  = this.scale.width;
     const H  = this.scale.height;
     const WH = H - 156;
