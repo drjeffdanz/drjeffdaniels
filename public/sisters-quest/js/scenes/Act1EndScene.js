@@ -55,11 +55,11 @@ class Act1EndScene extends Phaser.Scene {
     }
 
     // Figures (sisters walking into dawn)
-    const sisterFeetY = H * 0.68 + 44;
-    this.add.image(W / 2 - 32, sisterFeetY, 'sprite_cambrie')
-      .setDisplaySize(44, 78).setOrigin(0.5, 1).setDepth(5);
-    this.add.image(W / 2 - 6, sisterFeetY, 'sprite_mackenzie')
-      .setDisplaySize(50, 89).setOrigin(0.5, 1).setDepth(5);
+    const sisterFeetY = H * 0.72;
+    this.add.image(W / 2 - 48, sisterFeetY, 'sprite_cambrie')
+      .setDisplaySize(90, 160).setOrigin(0.5, 1).setDepth(5);
+    this.add.image(W / 2 + 18, sisterFeetY, 'sprite_mackenzie')
+      .setDisplaySize(100, 178).setOrigin(0.5, 1).setDepth(5);
 
     // ── Decorative border ────────────────────────────────────
     const border = this.add.graphics();

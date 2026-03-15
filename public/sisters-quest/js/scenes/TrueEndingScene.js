@@ -76,11 +76,11 @@ class TrueEndingScene extends Phaser.Scene {
     const g = this.add.graphics().setDepth(2);
 
     // Sisters waiting on shore (center-left, silhouetted against the light)
-    const silFeetY = H * 0.80 + 38;
-    this.add.image(W * 0.28 - 20, silFeetY, 'sprite_cambrie')
-      .setDisplaySize(32, 57).setOrigin(0.5, 1).setDepth(3).setTint(0x0d0b09);
-    this.add.image(W * 0.28 + 4, silFeetY, 'sprite_mackenzie')
-      .setDisplaySize(36, 64).setOrigin(0.5, 1).setDepth(3).setTint(0x0d0b09);
+    const silFeetY = H * 0.88;
+    this.add.image(W * 0.28 - 30, silFeetY, 'sprite_cambrie')
+      .setDisplaySize(70, 124).setOrigin(0.5, 1).setDepth(3).setTint(0x0d0b09);
+    this.add.image(W * 0.28 + 10, silFeetY, 'sprite_mackenzie')
+      .setDisplaySize(78, 139).setOrigin(0.5, 1).setDepth(3).setTint(0x0d0b09);
 
     // Vessa descending the cliff — glowing white-gold silhouette
     this._drawVessaDescent(g, W * 0.75, H * 0.60);
