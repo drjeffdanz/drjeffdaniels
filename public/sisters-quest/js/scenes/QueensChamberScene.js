@@ -261,7 +261,7 @@ class QueensChamberScene extends BaseScene {
     const WH = H - 156;
 
     const targetX = W * 0.14; // where she ends up (left area)
-    const birdieImg = this.add.image(W + 80, WH - 75, 'sprite_birdie')
+    const birdieImg = this.add.image(W + 80, WH * 0.88, 'sprite_birdie')
       .setDisplaySize(96, 240).setOrigin(0.5, 1).setDepth(2);
 
     this.tweens.add({

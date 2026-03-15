@@ -24,7 +24,7 @@ class IsleOfTidesScene extends BaseScene {
     this._drawTidePools(W, H, WH);
 
     // Portrait: Selkie Mira
-    this.add.image(W * 0.82, WH * 0.58, 'sprite_mira')
+    this.add.image(W * 0.82, WH * 0.88, 'sprite_mira')
       .setDisplaySize(96, 240).setOrigin(0.5, 1).setDepth(1);
 
     this.add.text(W / 2, 18, 'The Isle of Tides', {

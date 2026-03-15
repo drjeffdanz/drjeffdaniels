@@ -23,7 +23,7 @@ class VessaTowerScene extends BaseScene {
     this._drawMasterLoom(W, H, WH);
 
     // Portrait: Vessa of Elderwyn
-    this.add.image(W * 0.22, WH * 0.60, 'sprite_vessa')
+    this.add.image(W * 0.22, WH * 0.85, 'sprite_vessa')
       .setDisplaySize(96, 240).setOrigin(0.5, 1).setDepth(1);
 
     this.add.text(W / 2, 18, "Vessa's Tower", {
