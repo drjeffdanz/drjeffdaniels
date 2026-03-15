@@ -67,7 +67,11 @@ const DIALOGUE_WAYNE_FIRST = [
   { speaker: 'cambrie', text: "We're on a time limit—" },
   { speaker: 'wayne', text: "You can eat fast. What's your name?" },
   { speaker: 'mackenzie', text: "Mackenzie. My sister Cambrie." },
-  { speaker: 'wayne', text: "I'm Wayne. Wayne Havasu. Sit down, Mackenzie. You remind me of Jennibelle. She argues with me about everything too." },
+  { speaker: 'narrator', text: "Wayne goes very still. He sets down his cup slowly, as if sudden movement might break something. He looks at Mackenzie, then at Cambrie, then back again — the way a person looks at something they gave up on ever finding." },
+  { speaker: 'wayne', text: "...Mackenzie." },
+  { speaker: 'wayne', text: "And Cambrie." },
+  { speaker: 'mackenzie', text: "...Yes. Is something wrong?" },
+  { speaker: 'wayne', text: "No. Nothing's wrong. I'm Wayne. Wayne Havasu. Sit down. Both of you." },
 ];
 
 const DIALOGUE_JENNIBELLE_INTRO = [
@@ -107,6 +111,7 @@ const DIALOGUE_WAYNE_FAREWELL = [
   { speaker: 'wayne', text: "You know what I believe?" },
   { speaker: 'wayne', text: "You're braver than you believe, and stronger than you seem, and smarter than you think. But the most important thing is — even if we're apart, I'll always be with you." },
   { speaker: 'mackenzie', text: "...Wayne, you barely know us." },
+  { speaker: 'narrator', text: "He looks at his daughters. He has always known them. He doesn't say that." },
   { speaker: 'wayne', text: "I know enough. Go. Your mother needs you." },
   { speaker: 'narrator', text: "Jennibelle waved from the shore until she was too small to see." },
 ];
