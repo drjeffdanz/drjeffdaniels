@@ -439,8 +439,9 @@ class WayneShackScene extends BaseScene {
 
   _goTo(scene) {
     this._locked = true;
+    GameState.save(scene);
     this.cameras.main.fadeOut(500, 0, 0, 0);
-    this.time.delayedCall(500, () => this.scene.start(scene));
+    this.time.delayedCall(520, () => this.scene.start(scene));
   }
 
   // ── Helpers ───────────────────────────────────────────────

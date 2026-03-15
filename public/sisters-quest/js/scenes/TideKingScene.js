@@ -343,8 +343,9 @@ class TideKingScene extends BaseScene {
 
   _goTo(scene) {
     this._locked = true;
+    GameState.save(scene);
     this.cameras.main.fadeOut(600, 0, 0, 0);
-    this.time.delayedCall(600, () => this.scene.start(scene));
+    this.time.delayedCall(620, () => this.scene.start(scene));
   }
 
   // ── Helpers ───────────────────────────────────────────────

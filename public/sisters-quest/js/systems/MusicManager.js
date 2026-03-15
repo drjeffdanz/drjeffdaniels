@@ -1,6 +1,6 @@
 // ============================================================
 // systems/MusicManager.js — Sisters' Quest: The Moonveil Crown
-// Global music manager — crossfade between 4 ambient tracks
+// Global music manager — crossfade between ambient tracks
 // Usage: MusicManager.play(this, 'music_palace')
 // ============================================================
 
@@ -27,9 +27,14 @@ const MusicManager = (() => {
       targets:    w,
       vol:        to,
       duration:   duration,
-      onUpdate:   () => { try { sound.volume = w.vol; } catch (_) {} },
+      onUpdate:   () => { try { if (sound) sound.volume = w.vol; } catch (_) {} },
       onComplete: () => { if (onDone) onDone(); },
     });
+  }
+
+  // Safe volume read — returns _volume fallback if the sound is in a bad state.
+  function _readVol(sound) {
+    try { return (typeof sound.volume === 'number' && sound.volume > 0) ? sound.volume : _volume; } catch (_) { return _volume; }
   }
 
   return {
@@ -40,13 +45,21 @@ const MusicManager = (() => {
 
       const prev  = _sound;
       _currentKey = key;
+      _sound      = null; // clear immediately so a crash in the fade-out block never leaves a stale ref
 
       // Fade out old track
       if (prev) {
-        const startVol = (prev.volume > 0) ? prev.volume : _volume;
-        _tweenVolume(scene, prev, startVol, 0, FADE_OUT_MS, () => {
-          try { prev.stop(); prev.destroy(); } catch (_) {}
-        });
+        try {
+          const startVol = _readVol(prev);
+          _tweenVolume(scene, prev, startVol, 0, FADE_OUT_MS, () => {
+            try { prev.stop(); } catch (_) {}
+            try { prev.destroy(); } catch (_) {}
+          });
+        } catch (_) {
+          // Sound in unexpected state — attempt cleanup and continue
+          try { prev.stop(); } catch (_) {}
+          try { prev.destroy(); } catch (_) {}
+        }
       }
 
       // Fade in new track
@@ -62,10 +75,16 @@ const MusicManager = (() => {
       const s = _sound;
       _sound      = null;
       _currentKey = null;
-      const startVol = (s.volume > 0) ? s.volume : _volume;
-      _tweenVolume(scene, s, startVol, 0, FADE_OUT_MS, () => {
-        try { s.stop(); s.destroy(); } catch (_) {}
-      });
+      try {
+        const startVol = _readVol(s);
+        _tweenVolume(scene, s, startVol, 0, FADE_OUT_MS, () => {
+          try { s.stop(); } catch (_) {}
+          try { s.destroy(); } catch (_) {}
+        });
+      } catch (_) {
+        try { s.stop(); } catch (_) {}
+        try { s.destroy(); } catch (_) {}
+      }
     },
 
     // ── Adjust master volume (0–1) ────────────────────────────
@@ -73,7 +92,9 @@ const MusicManager = (() => {
       _volume = v;
       if (_sound) {
         const s = _sound;
-        _tweenVolume(scene, s, s.volume, v, 300, null);
+        try {
+          _tweenVolume(scene, s, _readVol(s), v, 300, null);
+        } catch (_) {}
       }
     },
 

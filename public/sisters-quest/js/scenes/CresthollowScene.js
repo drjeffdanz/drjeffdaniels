@@ -77,6 +77,17 @@ class CresthollowScene extends BaseScene {
         this._play(DIALOGUE_CRESTHOLLOW_ENTER);
       });
     }
+
+    // ── Safety guard: ensure _locked is cleared if nothing is playing ─
+    // Guards against unknown edge cases (e.g. Continue save) that leave
+    // _locked=true even though no dialogue is active.
+    this.time.delayedCall(100, () => {
+      if (this._locked && !this.dialogue.isActive) {
+        this._locked = false;
+        this._setHotspotsEnabled(true);
+        this.enableUI();
+      }
+    });
   }
 
   // ── Thornwood Gate ────────────────────────────────────────
@@ -410,8 +421,9 @@ class CresthollowScene extends BaseScene {
 
   _goTo(scene) {
     this._locked = true;
+    GameState.save(scene);
     this.cameras.main.fadeOut(500, 0, 0, 0);
-    this.time.delayedCall(500, () => this.scene.start(scene));
+    this.time.delayedCall(520, () => this.scene.start(scene));
   }
 
   // ── Helpers ──────────────────────────────────────────────
