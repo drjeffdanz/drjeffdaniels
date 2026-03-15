@@ -374,20 +374,21 @@ class CresthollowScene extends BaseScene {
   // ── State checks ─────────────────────────────────────────
 
   _checkThornwoodState() {
-    // Thornwood unlocks if player has the witch's token OR the flag is explicitly set
-    const unlocked = GameState.getFlag('thornwood_unlocked') ||
-                     GameState.hasItem('witch_riddle_answer');
-    if (unlocked) {
-      GameState.setFlag('thornwood_unlocked');
-      if (this._thornwoodGateOpen) this._thornwoodGateOpen.setVisible(true);
-      this.setStatus("The Thornwood gate stands open.");
-    }
-
-    // Ready-for-thornwood flag
+    // Set ready_for_thornwood when all three hub items are collected
     if (GameState.hasItem('harbor_pass') &&
         GameState.hasItem('ships_manifest') &&
         GameState.hasItem('wayne_coins')) {
       GameState.setFlag('ready_for_thornwood');
+    }
+
+    // Gate opens when hub items collected, witch's token found, OR flag already set
+    const unlocked = GameState.getFlag('thornwood_unlocked') ||
+                     GameState.hasItem('witch_riddle_answer') ||
+                     GameState.getFlag('ready_for_thornwood');
+    if (unlocked) {
+      GameState.setFlag('thornwood_unlocked');
+      if (this._thornwoodGateOpen) this._thornwoodGateOpen.setVisible(true);
+      this.setStatus("The Thornwood gate stands open.");
     }
   }
 
