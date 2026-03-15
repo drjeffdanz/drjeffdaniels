@@ -67,16 +67,16 @@ const DIALOGUE_WAYNE_FIRST = [
   { speaker: 'cambrie', text: "We're on a time limit—" },
   { speaker: 'wayne', text: "You can eat fast. What's your name?" },
   { speaker: 'mackenzie', text: "Mackenzie. My sister Cambrie." },
-  { speaker: 'wayne', text: "I'm Wayne. Wayne Havasu. Sit down, Mackenzie. You remind me of my niece. She argues with me about everything too." },
+  { speaker: 'wayne', text: "I'm Wayne. Wayne Havasu. Sit down, Mackenzie. You remind me of Jennibelle. She argues with me about everything too." },
 ];
 
 const DIALOGUE_JENNIBELLE_INTRO = [
   { speaker: 'narrator', text: "A young woman appears from around the side of the shack, lugging a surfboard almost as tall as she is." },
-  { speaker: 'jennibelle', text: "Uncle Wayne! The left fin is rattling again. I told you—" },
+  { speaker: 'jennibelle', text: "Wayne! The left fin is rattling again. I told you—" },
   { speaker: 'wayne', text: "Jennibelle. We have guests. Don't rattle." },
   { speaker: 'jennibelle', text: "Oh! Sorry. Hi. I'm Jennibelle. He fixes everything with duct tape, it's a whole thing." },
-  { speaker: 'cambrie', text: "Do you live here too?" },
-  { speaker: 'jennibelle', text: "Just visiting for the season. I like it out here. Quiet. Mostly." },
+  { speaker: 'cambrie', text: "Do you two live here together?" },
+  { speaker: 'jennibelle', text: "We do. I followed him out here two seasons ago and never really left." },
 ];
 
 const DIALOGUE_WAYNE_BOAT = [
@@ -462,6 +462,6 @@ const DIALOGUE_EPILOGUE = [
   { speaker: 'narrator', text: "Dorian returned to his family, or what remained of it, forty years older than when he left." },
   { speaker: 'narrator', text: "Mira went back to the sea. She circles that stretch of coast still — joyfully, they say, in a way she hasn't in eleven years." },
   { speaker: 'narrator', text: "Thorn the goat published his collected works. He dedicated them to the fence post." },
-  { speaker: 'narrator', text: "Wayne grilled fish and watched the water. Jennibelle fixed the fin herself. The duct tape finally gave out." },
+  { speaker: 'narrator', text: "Wayne grilled fish and watched the water. Jennibelle fixed the fin herself, then sat beside him until dark. The duct tape finally gave out." },
   { speaker: 'narrator', text: "The sisters went home. The road back was the same road, walked by different people." },
 ];

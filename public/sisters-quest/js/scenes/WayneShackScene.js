@@ -329,7 +329,7 @@ class WayneShackScene extends BaseScene {
           this._play(DIALOGUE_JENNIBELLE_INTRO);
         } else {
           this._play([
-            { speaker: 'jennibelle', text: "That fin still rattles when you hit chop. Uncle Wayne keeps saying he'll fix it." },
+            { speaker: 'jennibelle', text: "That fin still rattles when you hit chop. Wayne keeps saying he'll fix it." },
             { speaker: 'cambrie', text: "Does he fix it?" },
             { speaker: 'jennibelle', text: "No. But he says he will. With great confidence every single time." },
           ]);
