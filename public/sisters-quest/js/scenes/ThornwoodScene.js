@@ -25,8 +25,10 @@ class ThornwoodScene extends BaseScene {
     this._drawHollow(W, WH);
 
     // Portrait: Thorn the Goat
+    // Ground shadow
+    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.44, WH * 0.88, 70, 18);
     this.add.image(W * 0.44, WH * 0.88, 'sprite_thorn')
-      .setDisplaySize(96, 240).setOrigin(0.5, 1).setDepth(1);
+      .setDisplaySize(120, 300).setOrigin(0.5, 1).setDepth(1);
 
     // Scene label
     this.add.text(W / 2, 18, 'Edge of the Thornwood', {

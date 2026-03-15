@@ -34,14 +34,16 @@ class WayneShackScene extends BaseScene {
     this._drawFirePit(W, WH);
 
     // Wayne portrait — left side of scene
+    // Ground shadow
+    this.add.graphics().setDepth(0).fillStyle(0x000000, 0.30).fillEllipse(W * 0.26, WH * 0.88, 70, 18);
     this.add.image(W * 0.26, WH * 0.88, 'sprite_wayne')
-      .setDisplaySize(96, 240).setOrigin(0.5, 1).setDepth(1);
+      .setDisplaySize(120, 300).setOrigin(0.5, 1).setDepth(1);
     this._wayneX = W * 0.26 + 21;
     this._wayneY = this._chairY - 10;
 
     // Jennibelle portrait — right side of scene (hidden until flag set)
     this._jennibelleImg = this.add.image(W * 0.72, WH * 0.88, 'sprite_jennibelle')
-      .setDisplaySize(96, 240).setOrigin(0.5, 1).setDepth(1)
+      .setDisplaySize(120, 300).setOrigin(0.5, 1).setDepth(1)
       .setVisible(false);
 
     this._drawReturnArrow(W, WH);

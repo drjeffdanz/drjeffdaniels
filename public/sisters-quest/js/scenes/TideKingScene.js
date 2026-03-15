@@ -37,8 +37,10 @@ class TideKingScene extends BaseScene {
 
     // ── World (drawn back to front) ───────────────────────────
     this._drawTidePools(W, WH);
+    // Ground shadow
+    this.add.graphics().setDepth(14).fillStyle(0x000000, 0.30).fillEllipse(W * 0.50, WH * 0.88, 90, 22);
     this.add.image(W * 0.50, WH * 0.88, 'sprite_tideking')
-      .setDisplaySize(120, 300).setOrigin(0.5, 1).setDepth(15);
+      .setDisplaySize(140, 350).setOrigin(0.5, 1).setDepth(15);
     this._tideKingX = W * 0.50;
     this._tideKingY = WH * 0.68;
     this._drawReturnArrow(W, WH);
