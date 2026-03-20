@@ -14,6 +14,7 @@ const navLinks = [
   { label: "Tech Radar", href: "/tech-radar" },
   { label: "Zork", href: "/zork" },
   { label: "Sisters' Quest", href: "/sisters-quest" },
+  { label: "Road Rage", href: "/road-rage" },
   { label: "Contact", href: "/#contact" },
 ];
 
