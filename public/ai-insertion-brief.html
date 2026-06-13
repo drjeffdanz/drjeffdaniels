@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI &amp; Automation Insertion Horizon 2027–2035 — Defense &amp; Aerospace</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E9EDF0;
+  --card:#FFFFFF;
+  --ink:#16222E;
+  --ink-soft:#4A5B6A;
+  --line:#C4CED6;
+  --test-orange:#E84E0F;
+  --signal-blue:#1D5FA8;
+  --steel:#7A8C9B;
+  --ok:#1E7A4F;
+  --radius:6px;
+  --gap:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+body{
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  background:var(--paper);
+  background-image:linear-gradient(var(--line) 1px, transparent 1px),linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:48px 48px;
+  background-attachment:fixed;
+  color:var(--ink);
+  padding:20px;
+}
+.wrap{max-width:1200px;margin:0 auto}
+.classification{
+  text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;
+  background:var(--ink);color:#fff;padding:5px 8px;border-radius:3px;margin-bottom:14px;
+}
+.classification b{color:#FFD166}
+
+.titleblock{
+  background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);
+  display:grid;grid-template-columns:1fr auto;overflow:hidden;margin-bottom:var(--gap);
+}
+.tb-main{padding:22px 26px;border-right:2px solid var(--ink)}
+.tb-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--test-orange);text-transform:uppercase;margin-bottom:6px}
+h1{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:clamp(26px,4vw,40px);line-height:1.02;text-transform:uppercase;letter-spacing:.5px}
+h1 .accent{color:var(--test-orange)}
+.tb-sub{margin-top:10px;font-size:14px;color:var(--ink-soft);max-width:64ch}
+.tb-meta{display:grid;grid-template-rows:repeat(4,1fr);min-width:210px}
+.tb-meta div{padding:8px 16px;border-bottom:1px solid var(--line);font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft)}
+.tb-meta div:last-child{border-bottom:none}
+.tb-meta b{display:block;color:var(--ink);font-size:12px;margin-top:2px}
+
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:var(--gap)}
+.controls label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--ink-soft);text-transform:uppercase}
+.controls select{
+  padding:8px 12px;border:1.5px solid var(--ink);border-radius:4px;background:var(--card);
+  font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);cursor:pointer;
+}
+.controls select:focus-visible{outline:2px solid var(--test-orange);outline-offset:2px}
+.legend{display:flex;gap:14px;margin-left:auto;flex-wrap:wrap}
+.legend span{font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
+.chip{width:14px;height:10px;border-radius:2px;display:inline-block}
+.chip.fielding{background:var(--ok)}
+.chip.scaling{background:var(--signal-blue)}
+.chip.prototyping{background:var(--test-orange)}
+.chip.maturing{background:var(--steel)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:var(--gap);margin-bottom:var(--gap)}
+.kpi{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--test-orange);border-radius:var(--radius);padding:16px 18px}
+.kpi:nth-child(2){border-top-color:var(--signal-blue)}
+.kpi:nth-child(3){border-top-color:var(--ok)}
+.kpi:nth-child(4){border-top-color:var(--ink)}
+.kpi .lab{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.4px;color:var(--ink-soft);text-transform:uppercase}
+.kpi .val{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:34px;line-height:1.1;margin:4px 0 2px}
+.kpi .note{font-size:12px;color:var(--ink-soft)}
+.kpi .note b{color:var(--ok)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:var(--gap);box-shadow:0 1px 3px rgba(22,34,46,.07)}
+.card h2{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:20px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.card .sub{font-size:13px;color:var(--ink-soft);margin-bottom:16px}
+.two-col{display:grid;grid-template-columns:1.15fr 1fr;gap:var(--gap)}
+@media(max-width:880px){.two-col{grid-template-columns:1fr}}
+
+/* ===== Signature: insertion horizon ===== */
+.horizon{overflow-x:auto}
+.h-grid{min-width:760px}
+.h-years{display:grid;grid-template-columns:230px repeat(9,1fr);border-bottom:2px solid var(--ink);font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft)}
+.h-years div{padding:6px 4px;text-align:center;border-left:1px dashed var(--line)}
+.h-years div:first-child{border-left:none;text-align:left;letter-spacing:1px;text-transform:uppercase}
+.h-row{display:grid;grid-template-columns:230px repeat(9,1fr);align-items:center;border-bottom:1px solid #EEF2F5;position:relative;min-height:46px}
+.h-row:hover{background:#F6F9FB}
+.h-label{padding:6px 10px 6px 4px;font-size:13px;font-weight:500;line-height:1.25}
+.h-label small{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--steel);letter-spacing:.6px;text-transform:uppercase;margin-top:2px}
+.h-track{grid-column:2 / span 9;position:relative;height:100%;background:
+  repeating-linear-gradient(90deg, transparent, transparent calc(100%/9 - 1px), #E3E9EE calc(100%/9 - 1px), #E3E9EE calc(100%/9));}
+.h-bar{
+  position:absolute;top:50%;transform:translateY(-50%);height:16px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;cursor:default;
+  transition:height .15s ease, box-shadow .15s ease;
+}
+.h-bar:hover{height:20px;box-shadow:0 2px 8px rgba(22,34,46,.3)}
+.h-bar.fielding{background:var(--ok)}
+.h-bar.scaling{background:var(--signal-blue)}
+.h-bar.prototyping{background:var(--test-orange)}
+.h-bar.maturing{background:var(--steel)}
+.h-bar .tip{
+  visibility:hidden;opacity:0;position:absolute;bottom:130%;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;font-size:11.5px;line-height:1.45;padding:8px 11px;border-radius:5px;
+  width:250px;z-index:30;transition:opacity .12s ease;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.25);
+}
+.h-bar:hover .tip,.h-bar:focus .tip{visibility:visible;opacity:1}
+.h-bar:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.gate{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed var(--test-orange);z-index:5}
+.gate em{position:absolute;top:-2px;left:4px;font-style:normal;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--test-orange);white-space:nowrap;letter-spacing:.5px}
+
+/* ===== The AI insertion stack ===== */
+.stack{display:flex;flex-direction:column;gap:7px}
+.layer{display:grid;grid-template-columns:42px 1fr 132px;gap:12px;align-items:center;border:1px solid var(--line);border-radius:5px;padding:11px 14px;background:#FBFCFD}
+.layer .lnum{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:22px;color:var(--steel);text-align:center}
+.layer .lbody b{font-family:'Saira Condensed',sans-serif;font-size:15.5px;letter-spacing:.4px;text-transform:uppercase;display:block}
+.layer .lbody small{font-size:12px;color:var(--ink-soft);line-height:1.4;display:block;margin-top:2px}
+.tempo{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-align:right;color:#fff;padding:5px 9px;border-radius:10px;white-space:nowrap;justify-self:end}
+.t-days{background:var(--test-orange)}
+.t-months{background:var(--signal-blue)}
+.t-cont{background:var(--ok)}
+.t-years{background:var(--steel)}
+.stack-note{margin-top:12px;font-size:12.5px;color:var(--ink-soft);border-left:3px solid var(--test-orange);padding:6px 12px;background:#FFF6F1;border-radius:0 4px 4px 0}
+
+/* ===== PSP board ===== */
+.psp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.psp-col h4{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-soft);border-bottom:2px solid var(--ink);padding-bottom:5px;margin-bottom:8px}
+.psp{border:1px solid var(--line);border-left:4px solid var(--signal-blue);border-radius:0 4px 4px 0;background:#F0F6FC;padding:9px 12px;margin-bottom:7px}
+.psp-col:nth-child(2) .psp{border-left-color:var(--test-orange);background:#FFF6F1}
+.psp-col:nth-child(3) .psp{border-left-color:var(--ok);background:#F0F8F3}
+.psp b{font-family:'Saira Condensed',sans-serif;font-size:15px;letter-spacing:.4px;text-transform:uppercase;display:block}
+.psp small{font-size:11.5px;color:var(--ink-soft);line-height:1.4}
+
+/* ===== Plays ===== */
+.plays{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:var(--gap)}
+.play{border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;background:#FBFCFD;position:relative}
+.play::before{content:attr(data-k);position:absolute;top:12px;right:14px;font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:30px;color:#E3E9EE}
+.play h3{font-family:'Saira Condensed',sans-serif;font-size:17px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;color:var(--signal-blue);padding-right:34px}
+.play p{font-size:13px;line-height:1.55;color:var(--ink-soft)}
+.play p b{color:var(--ink)}
+
+/* ===== Table ===== */
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-soft);text-align:left;padding:9px 10px;border-bottom:2px solid var(--ink);cursor:pointer;user-select:none;white-space:nowrap}
+thead th:hover{color:var(--test-orange)}
+tbody td{padding:9px 10px;border-bottom:1px solid #EEF2F5;vertical-align:top}
+tbody tr:hover{background:#F6F9FB}
+.pill{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 8px;border-radius:10px;color:#fff;white-space:nowrap}
+.pill.fielding{background:var(--ok)}.pill.scaling{background:var(--signal-blue)}.pill.prototyping{background:var(--test-orange)}.pill.maturing{background:var(--steel)}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+
+footer{font-size:11.5px;color:var(--ink-soft);line-height:1.7;padding:6px 4px 30px}
+footer b{color:var(--ink)}
+canvas{max-height:300px}
+@media print{body{background:#fff;padding:0}.controls{display:none}.card{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="classification">UNCLASSIFIED // OPEN-SOURCE SYNTHESIS // <b>FOR ACADEMIC &amp; STRATEGY USE</b></div>
+
+  <div class="titleblock">
+    <div class="tb-main">
+      <div class="tb-eyebrow">Technology Management · Strategic Foresight Brief · AI &amp; Automation Focus</div>
+      <h1>AI &amp; Automation Insertion <span class="accent">2027–2035</span></h1>
+      <div class="tb-sub">The Pentagon declared itself an AI-first warfighting department in January 2026 — with seven Pace-Setting Projects, a 30-day model-deployment mandate, mandatory data access, and a $54.6B autonomy bet. This brief maps where AI/automation insertion windows open across the decade, and where a technology manager should position.</div>
+    </div>
+    <div class="tb-meta">
+      <div>DOC NO.<b>TIH-2735-AI</b></div>
+      <div>PREPARED FOR<b>Dr. J. Daniels</b></div>
+      <div>DATE<b>09 JUN 2026</b></div>
+      <div>REV<b>B — AI/Automation Focus</b></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label for="domainFilter">Mission Area</label>
+    <select id="domainFilter" aria-label="Filter timeline and table by mission area">
+      <option value="all">All mission areas</option>
+      <option value="warfighting">Warfighting autonomy</option>
+      <option value="intel">Intelligence &amp; decision support</option>
+      <option value="enterprise">Enterprise AI &amp; data</option>
+      <option value="foundation">Foundations: compute, T&amp;E, assurance</option>
+    </select>
+    <div class="legend">
+      <span><i class="chip fielding"></i>Fielding</span>
+      <span><i class="chip scaling"></i>Scaling</span>
+      <span><i class="chip prototyping"></i>Prototyping</span>
+      <span><i class="chip maturing"></i>Maturing</span>
+    </div>
+  </div>
+
+  <section class="kpis">
+    <div class="kpi"><div class="lab">DAWG Autonomy FY27</div><div class="val">$54.6B</div><div class="note">From $226M in FY26 — a ~240× single-year escalation</div></div>
+    <div class="kpi"><div class="lab">Pace-Setting Projects</div><div class="val">7</div><div class="note">Jan 2026 AI Strategy; monthly demos to DepSec; first demos Jul 2026</div></div>
+    <div class="kpi"><div class="lab">Model Refresh Mandate</div><div class="val">30 days</div><div class="note">Frontier models deployed within 30 days of public release — a procurement criterion</div></div>
+    <div class="kpi"><div class="lab">CCA Objective Fleet</div><div class="val">~1,000</div><div class="note">Autonomy software validated in flight Feb 2026 (A-GRA)</div></div>
+  </section>
+
+  <section class="card horizon">
+    <h2>AI &amp; Automation Insertion Horizon</h2>
+    <div class="sub">When each AI/automation capability's insertion window opens and closes, 2027–2035. Hover or tab to a bar for the strategic read. Dashed orange lines mark gates that condition entry.</div>
+    <div class="h-grid" id="horizonGrid"></div>
+  </section>
+
+  <div class="two-col">
+    <section class="card">
+      <h2>The Autonomy Funding Cliff — FY26 → FY27</h2>
+      <div class="sub">Selected AI/autonomy lines ($B). The FY27 request doesn't grow autonomy funding — it detonates it.</div>
+      <canvas id="budgetChart" aria-label="Bar chart of FY26 versus FY27 AI and autonomy budget lines"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>The AI Insertion Stack</h2>
+      <div class="sub">Five layers, five refresh tempos. The strategic asymmetry: insertion velocity accelerates as you climb the stack — and policy now <i>mandates</i> the fast tempos.</div>
+      <div class="stack">
+        <div class="layer"><div class="lnum">L5</div><div class="lbody"><b>Autonomy platforms</b><small>CCA, attritable mass, maritime/ground autonomy — hardware hosts</small></div><span class="tempo t-years">YEARS / INCREMENT</span></div>
+        <div class="layer"><div class="lnum">L4</div><div class="lbody"><b>Agents &amp; orchestration</b><small>Agent Network, Swarm Forge, Enterprise Agents — where Replicator failed</small></div><span class="tempo t-months">WEEKS–MONTHS</span></div>
+        <div class="layer"><div class="lnum">L3</div><div class="lbody"><b>Models</b><small>GenAI.mil; frontier models at all classification levels</small></div><span class="tempo t-days">≤ 30 DAYS (MANDATED)</span></div>
+        <div class="layer"><div class="lnum">L2</div><div class="lbody"><b>Data</b><small>War Data Platform (ex-Advana); Data Decrees force release to cleared users</small></div><span class="tempo t-cont">CONTINUOUS</span></div>
+        <div class="layer"><div class="lnum">L1</div><div class="lbody"><b>Compute</b><small>Datacenter-to-edge expansion via private-capital partnerships</small></div><span class="tempo t-years">MULTI-YEAR CAPEX</span></div>
+      </div>
+      <div class="stack-note"><b>The read:</b> value migrates to the fastest legally-refreshable layer. L3–L4 are where capability now changes monthly; L5 hardware is becoming the commodity host.</div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Seven Pace-Setting Projects — Jan 2026 AI Strategy</h2>
+    <div class="sub">Each PSP has a single accountable leader, aggressive timelines, and monthly demonstrations. Every DoW component must name three "fast-follow" projects — meaning the PSP playbooks become department-wide insertion templates.</div>
+    <div class="psp-grid">
+      <div class="psp-col">
+        <h4>Warfighting</h4>
+        <div class="psp"><b>Swarm Forge</b><small>Competitive mechanism pairing elite units with tech innovators to discover and scale AI-enabled ways of fighting</small></div>
+        <div class="psp"><b>Agent Network</b><small>AI agents for battle management and decision support — campaign planning to kill chain</small></div>
+        <div class="psp"><b>Ender's Foundry</b><small>AI-enabled simulation: sim-dev / sim-ops feedback loops</small></div>
+      </div>
+      <div class="psp-col">
+        <h4>Intelligence</h4>
+        <div class="psp"><b>Open Arsenal</b><small>Accelerating the conversion of intelligence into deployable capability and weapons</small></div>
+        <div class="psp"><b>Project Grant</b><small>Deterrence shifted from static postures to dynamic pressure with interpretable results</small></div>
+      </div>
+      <div class="psp-col">
+        <h4>Enterprise</h4>
+        <div class="psp"><b>GenAI.mil</b><small>Generative AI access for the workforce, expanding to all classification levels</small></div>
+        <div class="psp"><b>Enterprise Agents</b><small>The playbook for building and deploying agentic AI across enterprise workflows</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Insertion Strategy — Six Plays for the AI Decade</h2>
+    <div class="sub">How a technology manager positions against the AI-first mandate, 2027–2035.</div>
+    <div class="plays">
+      <div class="play" data-k="01"><h3>Ride the 30-day cadence</h3><p>Model deployment within <b>30 days of public release</b> is now a primary procurement criterion. Architectures that can't hot-swap models are obsolete by policy. Insertion plans must assume the model layer churns monthly — design evaluation harnesses, not model lock-in.</p></div>
+      <div class="play" data-k="02"><h3>Own the orchestration layer</h3><p>Replicator's autopsy is explicit: drones existed, but <b>software to orchestrate heterogeneous swarms didn't</b>. DAWG's $54.6B and Swarm Forge both chase that gap. L4 orchestration is the decade's highest-leverage insertion point.</p></div>
+      <div class="play" data-k="03"><h3>Reference architectures are the seams</h3><p>The CCA's government-owned <b>A-GRA</b> flew plug-and-play autonomy in Feb 2026. Government reference architectures define the insertion interface: conform and you can insert every increment; don't, and you're locked out of the platform generation.</p></div>
+      <div class="play" data-k="04"><h3>Data access is the moat — and it's being drained</h3><p>The <b>Data Decrees</b> force release of DoW data to cleared users with valid purpose; Advana is being restructured into the War Data Platform. Incumbent advantage built on data hoarding erodes; advantage rebuilds around data <b>engineering</b> and pipeline quality.</p></div>
+      <div class="play" data-k="05"><h3>Close the sim-to-field loop</h3><p>Ender's Foundry makes the simulation environment a continuous insertion path: capabilities proven in sim-dev/sim-ops loops transition on PSP timelines, not acquisition timelines. Digital-twin and synthetic-environment competence becomes an entry ticket.</p></div>
+      <div class="play" data-k="06"><h3>Bet on the bottleneck: assurance &amp; T&amp;E</h3><p>Everything above accelerates capability; almost nothing accelerates <b>trust</b>. AI test &amp; evaluation, autonomy certification, and counter-AI hardening are the longest bars on the horizon — and the scarcest skill set. The unglamorous long-position for 2030–2035.</p></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Watch List — AI &amp; Automation Programs</h2>
+    <div class="sub">Sortable detail behind the horizon view. Click a column header to sort; the mission-area filter applies here too.</div>
+    <div style="overflow-x:auto">
+    <table id="watchTable">
+      <thead><tr>
+        <th data-col="name">Program / Capability</th>
+        <th data-col="domain">Mission Area</th>
+        <th data-col="window">Window</th>
+        <th data-col="status">Status</th>
+        <th data-col="signal">Key Signal</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    </div>
+  </section>
+
+  <footer>
+    <b>Sources (open):</b> DoW AI Strategy memorandum &amp; Advana/WDP memorandum (9 Jan 2026, media.defense.gov); OUSD(R&amp;E)/cto.mil AI Acceleration release; Breaking Defense; Nextgov/FCW; Holland &amp; Knight, Covington &amp; Forecast International analyses; Defense One (DAWG/Replicator); CRS IF12740 (CCA) &amp; IF12611 (Replicator); DefenseScoop FY27 budget coverage; GA-ASI A-GRA flight reporting (Feb 2026); Deloitte 2026 A&amp;D Outlook. Figures are budget <i>requests</i> unless enacted; reconciliation funding is not guaranteed. Insertion-window judgments are the author's analytical estimates, not official schedules. Compiled 09 Jun 2026 · Rev B supersedes Rev A for AI/automation scope.
+  </footer>
+</div>
+
+<script>
+const YEARS = [2027,2028,2029,2030,2031,2032,2033,2034,2035];
+
+const PROGRAMS = [
+ {name:"GenAI.mil — frontier models for the force", dom:"enterprise", domLabel:"Enterprise", start:2027, end:2029, status:"fielding",
+  signal:"PSP; expanding to all classification levels; 30-day model deployment mandated",
+  tip:"The democratization layer. Every workflow it touches becomes a candidate for agentic automation in the next wave. Watch classified-level rollout as the tipping point."},
+ {name:"Enterprise Agents — agentic workflows", dom:"enterprise", domLabel:"Enterprise", start:2027, end:2030.5, status:"scaling",
+  signal:"PSP building the DoW-wide playbook; components must name 3 fast-follow projects each",
+  tip:"The playbook becomes a template multiplied across every component. Insertion play: workflow-specific agents + the evaluation/governance scaffolding around them."},
+ {name:"War Data Platform (ex-Advana)", dom:"enterprise", domLabel:"Enterprise", start:2027, end:2029.5, status:"scaling",
+  signal:"Advana restructured Jan 2026; Data Decrees enforced; supports FY27–28 clean-audit goals",
+  tip:"The substrate for all agentic AI. Standardized data access at scale — data engineering, lineage, and pipeline quality are the durable niches here."},
+ {name:"Agent Network — AI battle management", dom:"intel", domLabel:"Intel/Decision", start:2027, end:2031.5, status:"prototyping",
+  signal:"PSP: agents from campaign planning to kill chain; monthly demos to DepSec",
+  tip:"The highest-stakes agent deployment in government. Human-machine teaming doctrine and decision-assurance will gate how far autonomy reaches into C2."},
+ {name:"Open Arsenal — intel-to-capability conversion", dom:"intel", domLabel:"Intel/Decision", start:2027, end:2031, status:"prototyping",
+  signal:"PSP accelerating conversion of intelligence into deployable weapons/capability",
+  tip:"Compresses the find-to-field cycle. AI-assisted requirements and rapid capability generation — a structural change to how insertions originate."},
+ {name:"Ender's Foundry — AI simulation loops", dom:"intel", domLabel:"Intel/Decision", start:2027, end:2030.5, status:"scaling",
+  signal:"PSP: sim-dev / sim-ops feedback loops as a continuous proving ground",
+  tip:"Simulation becomes the insertion on-ramp: prove it in the loop, field it on PSP tempo. Digital twins and synthetic environments are the entry ticket."},
+ {name:"CCA Inc 1 autonomy (A-GRA cycles)", dom:"warfighting", domLabel:"Warfighting", start:2027, end:2029.5, status:"fielding",
+  signal:"4-hr semi-autonomous YFQ-42A flight Feb 2026; production decision 2026; ~1,000-aircraft objective",
+  tip:"Proof that autonomy software is now swappable at operational tempo on a combat platform. Mission-software modules conforming to A-GRA are the recurring insertion."},
+ {name:"CCA Inc 2 + multi-service autonomy", dom:"warfighting", domLabel:"Warfighting", start:2028, end:2032, status:"prototyping",
+  signal:"Navy, Marine Corps, Army CCA programs converting roadmaps to increments through 2026+",
+  tip:"Each new increment and service reopens the autonomy competition. Position at requirements and reference-architecture definition, not production."},
+ {name:"Swarm orchestration (Swarm Forge / DAWG)", dom:"warfighting", domLabel:"Warfighting", start:2027, end:2032, status:"prototyping",
+  signal:"Replicator dissolved into DAWG late 2025 — its core gap was swarm C2 software; FY27 ask $54.6B",
+  tip:"The single biggest identified software gap in U.S. defense. Heterogeneous-swarm command software is the decade's premier L4 insertion target."},
+ {name:"Attritable autonomous mass production", dom:"warfighting", domLabel:"Warfighting", start:2027, end:2030.5, status:"scaling",
+  signal:"FY27: $53.6B for autonomy, drone platforms & contested logistics; $21B munitions/C-UAS/CCA",
+  tip:"Hardware at commodity scale. Margin compresses on airframes; persists in autonomy stacks, payloads, and manufacturing automation."},
+ {name:"AI-driven logistics & predictive sustainment", dom:"enterprise", domLabel:"Enterprise", start:2027, end:2032, status:"scaling",
+  signal:"DLA shifting supply-chain risk management from reactive to predictive; LOG is a top-6 CTA",
+  tip:"Where agentic AI meets contested logistics. Durable, unglamorous demand across every theater scenario — strong fit for incremental insertion."},
+ {name:"Counter-autonomy & AI-enabled C-UAS", dom:"warfighting", domLabel:"Warfighting", start:2027, end:2031, status:"scaling",
+  signal:"Counter-drone funding folded into FY27's $21B bundle; AI-C2 for drone/missile defense rising",
+  tip:"Fighting against AI is the mirror market of fighting with it. Sensor fusion + automated engagement decisions under human supervision."},
+ {name:"AI compute: datacenter to edge", dom:"foundation", domLabel:"Foundation", start:2027, end:2033, status:"scaling",
+  signal:"AI Strategy directs substantial compute expansion leveraging private-sector capital partnerships",
+  tip:"The slow layer everything rides on. Edge inference for platforms (SWaP-constrained) is the differentiated niche vs. commodity datacenter capacity."},
+ {name:"AI T&E, assurance & autonomy certification", dom:"foundation", domLabel:"Foundation", start:2027, end:2035, status:"maturing",
+  signal:"Capability tempo (30-day models, monthly demos) vastly outruns current test & certification capacity",
+  tip:"Play 06: the bottleneck. Whoever industrializes trust — evaluation, red-teaming, certification of autonomy — controls the rate every other bar on this chart actually fields."}
+];
+
+const GATES = [
+ {year:2027.05, label:"PSP monthly demo cadence"},
+ {year:2028.75, label:"FY28 clean-audit / WDP FOC goal"}
+];
+
+const grid = document.getElementById('horizonGrid');
+function pct(yr){ return ((yr - 2027) / 9) * 100; }
+
+function renderHorizon(filter){
+  let html = '<div class="h-years"><div>Capability</div>' + YEARS.map(y=>'<div>'+y+'</div>').join('') + '</div>';
+  PROGRAMS.filter(p=>filter==='all'||p.dom===filter).forEach(p=>{
+    const left = Math.max(0, pct(p.start));
+    const width = Math.min(100, pct(p.end)) - left;
+    html += `<div class="h-row">
+      <div class="h-label">${p.name}<small>${p.domLabel}</small></div>
+      <div class="h-track">
+        ${GATES.map(g=>{const gp=pct(g.year); return (gp>0&&gp<100)?`<span class="gate" style="left:${gp}%"><em>${g.label}</em></span>`:'';}).join('')}
+        <div class="h-bar ${p.status}" tabindex="0" style="left:${left}%;width:${width}%">
+          <span class="tip"><b>${p.name}</b><br>${p.tip}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+}
+
+const tbody = document.querySelector('#watchTable tbody');
+let sortCol = null, sortDir = 1;
+function windowStr(p){ return Math.floor(p.start) + '–' + Math.round(p.end); }
+function renderTable(filter){
+  let rows = PROGRAMS.filter(p=>filter==='all'||p.dom===filter).map(p=>({
+    name:p.name, domain:p.domLabel, window:windowStr(p), start:p.start, status:p.status, signal:p.signal
+  }));
+  if(sortCol){
+    rows.sort((a,b)=>{
+      const va = sortCol==='window'? a.start : a[sortCol];
+      const vb = sortCol==='window'? b.start : b[sortCol];
+      return (va>vb?1:va<vb?-1:0)*sortDir;
+    });
+  }
+  tbody.innerHTML = rows.map(r=>`<tr>
+    <td><b>${r.name}</b></td>
+    <td class="mono">${r.domain}</td>
+    <td class="mono">${r.window}</td>
+    <td><span class="pill ${r.status}">${r.status.toUpperCase()}</span></td>
+    <td style="color:var(--ink-soft)">${r.signal}</td>
+  </tr>`).join('');
+}
+document.querySelectorAll('#watchTable th').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const c = th.dataset.col;
+    if(sortCol===c){ sortDir*=-1; } else { sortCol=c; sortDir=1; }
+    renderTable(document.getElementById('domainFilter').value);
+  });
+});
+
+const filterEl = document.getElementById('domainFilter');
+filterEl.addEventListener('change',()=>{ renderHorizon(filterEl.value); renderTable(filterEl.value); });
+
+new Chart(document.getElementById('budgetChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['DAWG (autonomy umbrella)','Autonomy / drones / contested logistics','Munitions, C-UAS & CCA bundle','CCA (AF RDT&E line)'],
+    datasets:[
+      {label:'FY26 ($B)', data:[0.226, 16.5, 3.1, 0.495], backgroundColor:'#7A8C9B', borderRadius:3},
+      {label:'FY27 request ($B)', data:[54.6, 53.6, 21, 0.5], backgroundColor:'#E84E0F', borderRadius:3}
+    ]
+  },
+  options:{
+    responsive:true, animation:{duration:400},
+    plugins:{
+      legend:{position:'bottom', labels:{font:{family:"'IBM Plex Sans'",size:12}, boxWidth:14}},
+      tooltip:{callbacks:{ footer:(items)=>{
+        const notes = [
+          'FY26: $226M → FY27: $54.6B — a ~240× escalation. DAWG absorbed Replicator late 2025.',
+          'FY26 approximated: $13.4B autonomous systems + $3.1B C-UAS. Categories overlap with DAWG.',
+          'FY27 bundle includes counter-drone tech and collaborative combat aircraft.',
+          'FY26 House mark $494.9M; FY27 line pending detailed justification books.'
+        ];
+        return notes[items[0].dataIndex];
+      }}}
+    },
+    scales:{
+      y:{title:{display:true,text:'$ Billions',font:{family:"'IBM Plex Mono'",size:11}}, grid:{color:'#EEF2F5'}},
+      x:{grid:{display:false}, ticks:{font:{family:"'IBM Plex Sans'",size:11}, maxRotation:30, minRotation:0}}
+    }
+  }
+});
+
+renderHorizon('all');
+renderTable('all');
+</script>
+</body>
+</html>
