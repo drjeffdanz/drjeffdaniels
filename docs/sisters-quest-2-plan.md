@@ -3,7 +3,7 @@
 *A 3D adventure game in the tradition of Sierra's King's Quest — the sequel to
 "Sisters' Quest: The Moonveil Crown."*
 
-**Status:** Planning (core decisions locked)
+**Status:** M0 tech spike complete — playable at `/sisters-quest-2` (source in `games/sisters-quest-2/`)
 **Last updated:** 2026-07-06
 
 ---
